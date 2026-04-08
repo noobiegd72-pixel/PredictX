@@ -105,7 +105,7 @@
 </head>
 <body>
 
-<div class="version-tag">v1.4.3</div>
+<div class="version-tag">v1.5</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -167,8 +167,8 @@
                     <strong id="adm-count-active" style="font-size: 1.3rem; color: var(--accent);">0</strong>
                 </div>
                 <div style="background: rgba(244,63,94,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">HORA CIERRE (ESTA APUESTA)</span><br>
-                    <input type="time" id="adm-close-time" value="22:00" style="margin-top:5px; height:35px; font-size:0.8rem;">
+                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">FECHA Y HORA CIERRE</span><br>
+                    <input type="datetime-local" id="adm-close-time" style="margin-top:5px; height:35px; font-size:0.75rem;">
                 </div>
             </div>
 
@@ -327,6 +327,11 @@
 
     function tryOpenAdmin() {
         if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
+            // Rellenar fecha actual por defecto al abrir
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('adm-close-time').value = now.toISOString().slice(0,16);
+            
             document.getElementById('admin-overlay').classList.add('open');
         } else {
             notify("Acceso denegado", "error");
@@ -343,13 +348,12 @@
         
         if(!q || options.length < 2) return notify("Completa los datos", "error");
         
-        // Guardamos la hora de cierre dentro de este objeto específico
         const newBet = { 
             id: 'b_'+Date.now(), 
             question: q, 
             options, 
             status: 'active',
-            closeTime: selectedCloseTime || "22:00" 
+            closeTime: selectedCloseTime 
         };
         
         if(isQueue) db.ref('queue').push(newBet);
@@ -390,8 +394,7 @@
         }
 
         const now = new Date();
-        const [h, m] = globalData.current.closeTime.split(':');
-        const tClose = new Date(); tClose.setHours(h, m, 0);
+        const tClose = new Date(globalData.current.closeTime);
         const dClose = tClose - now;
 
         if(dClose <= 0) {
@@ -399,9 +402,12 @@
             document.getElementById('timer-close').innerText = "MERCADO CERRADO";
         } else {
             marketClosed = false;
-            const hh = Math.floor(dClose/3600000).toString().padStart(2,'0');
+            const hoursTotal = Math.floor(dClose/3600000);
             const mm = Math.floor((dClose%3600000)/60000).toString().padStart(2,'0');
             const ss = Math.floor((dClose%60000)/1000).toString().padStart(2,'0');
+            
+            // Si falta más de un día, mostramos las horas totales (ej. 48:00:00)
+            const hh = hoursTotal.toString().padStart(2,'0');
             document.getElementById('timer-close').innerText = `CIERRA EN ${hh}:${mm}:${ss}`;
         }
         document.getElementById('timer-next').innerText = globalData.queue.length > 0 ? `EN COLA: ${globalData.queue.length}` : "COLA VACÍA";
@@ -426,7 +432,10 @@
     }
     function renderQueue() {
         const c = document.getElementById('queue-list-container');
-        c.innerHTML = globalData.queue.map(q => `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question} <small style="color:var(--accent)">(${q.closeTime})</small></div>`).join('') || "Cola vacía";
+        c.innerHTML = globalData.queue.map(q => {
+            const dateStr = q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A';
+            return `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question} <br><small style="color:var(--accent)">Cierre: ${dateStr}</small></div>`
+        }).join('') || "Cola vacía";
     }
     function renderAdminTools() {
         const b = document.getElementById('adm-resolve-checks'); b.innerHTML = '';
