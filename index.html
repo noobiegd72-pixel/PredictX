@@ -11,105 +11,60 @@
 
     <style>
         :root {
-            --bg: #030305;
-            --card: #0d0f14;
-            --accent: #6366f1;
-            --accent-hover: #818cf8;
-            --success: #10b981;
-            --error: #f43f5e;
-            --text: #f8fafc;
-            --text-muted: #64748b;
-            --border: #1e293b;
-            --glass: rgba(13, 15, 20, 0.8);
+            --bg: #030305; --card: #0d0f14; --accent: #6366f1; --accent-hover: #818cf8;
+            --success: #10b981; --error: #f43f5e; --text: #f8fafc; --text-muted: #64748b;
+            --border: #1e293b; --glass: rgba(13, 15, 20, 0.8);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-
         body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* --- NOTIFICACIONES --- */
-        #notification-container {
-            position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .toast {
-            background: var(--card); border: 1px solid var(--border); padding: 14px 24px;
-            border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center;
-            gap: 12px; animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            pointer-events: auto; min-width: 300px; backdrop-filter: blur(10px);
-        }
+        /* NOTIFICACIONES */
+        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 14px 24px; border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; pointer-events: auto; min-width: 320px; backdrop-filter: blur(10px); border-left: 4px solid var(--accent); }
 
-        @keyframes toastIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes toastOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
-
-        /* --- HEADER & NAV --- */
-        nav {
-            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
-            background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border);
-            z-index: 100; position: relative;
-        }
-
-        .btn {
-            padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;
-        }
-
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        /* HEADER */
+        nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
         .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-        .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--text); background: rgba(255,255,255,0.05); }
 
-        /* --- VIEWS --- */
-        .view { position: absolute; inset: 75px 0 0 0; padding: 30px; transition: 0.5s; overflow-y: auto; }
-        .view-hidden { transform: translateX(50px); opacity: 0; pointer-events: none; }
+        /* VISTAS */
+        .view { position: absolute; inset: 75px 0 0 0; padding: 30px; transition: all 0.5s ease; overflow-y: auto; }
+        .view-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; visibility: hidden; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* --- UI CARDS --- */
-        .main-card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 32px;
-            padding: 50px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        /* MAIN CARD */
+        .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.6s ease-out; }
+        .badges-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        .badge { padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; transition: all 0.3s; }
+        .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
+        .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
 
-        .timer-badge {
-            background: rgba(99, 102, 241, 0.1); color: var(--accent);
-            padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;
-        }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 35px 0; }
+        .opt-btn { background: #161a23; border: 2px solid var(--border); padding: 22px; border-radius: 20px; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); align-items: center; }
+        .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); background: #1c212c; }
+        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
 
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 40px 0; }
-
-        .opt-btn {
-            background: #161a23; border: 2px solid var(--border); padding: 20px;
-            border-radius: 18px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between;
-        }
-        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); }
-
-        /* --- ADMIN WINDOW --- */
-        #admin-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-
-        .admin-window {
-            background: var(--card); width: 90vw; max-width: 780px; height: 580px;
-            border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden;
-        }
+        /* ADMIN PANEL REDUCIDO */
+        #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
+        .admin-window { background: var(--card); width: 90vw; max-width: 650px; height: 600px; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); transform: scale(0.95); transition: transform 0.3s ease; }
+        #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
+        #admin-overlay.open .admin-window { transform: scale(1); }
 
         .admin-nav { display: flex; background: #11141b; border-bottom: 1px solid var(--border); }
-        .admin-nav-item { padding: 15px 25px; cursor: pointer; font-weight: 600; color: var(--text-muted); }
-        .admin-nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .admin-nav-item { padding: 15px 20px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.8rem; border-right: 1px solid var(--border); transition: 0.3s; }
+        .admin-nav-item.active { color: var(--accent); background: var(--card); border-bottom: 3px solid var(--accent); }
+        .admin-content { flex: 1; padding: 25px; overflow-y: auto; }
 
-        .stats-banner {
-            background: rgba(99, 102, 241, 0.05); border: 1px solid var(--border);
-            padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between;
-        }
-
-        input { background: #161a23; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; width: 100%; }
-        
-        .hist-item {
-            background: var(--card); border: 1px solid var(--border); padding: 20px;
-            border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between;
-        }
+        input { background: #161a23; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); background: #1c212c; }
+        .hist-item { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; }
     </style>
 </head>
 <body>
@@ -117,28 +72,36 @@
 <div id="notification-container"></div>
 
 <nav>
-    <div style="display: flex; gap: 10px;">
-        <input type="password" id="adminPass" placeholder="Acceso Admin..." style="width: 140px; font-size: 0.75rem;">
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <input type="password" id="adminPass" placeholder="Contraseña" style="width: 120px; font-size: 0.7rem;">
         <button class="btn btn-ghost" onclick="tryOpenAdmin()">⚙️ Panel</button>
     </div>
-    
     <div style="display: flex; gap: 15px; align-items: center;">
         <button class="btn btn-ghost" onclick="showView('inbox')">📥 Bandeja</button>
         <button class="btn btn-ghost" onclick="showView('main')">🎲 Apuestas</button>
-        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 8px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">8.000 CR</div>
+        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">--- CR</div>
     </div>
 </nav>
 
 <div id="view-main" class="view">
     <div class="container">
         <div class="main-card">
-            <span class="timer-badge" id="timer">CARGANDO TIEMPO...</span>
-            <h1 id="q-text" style="font-size: 2.5rem; margin: 20px 0 10px 0; font-weight: 800;">Conectando...</h1>
-            <p id="odds-summary" style="color: var(--text-muted);">Espera a que el administrador cree una apuesta</p>
+            <div class="badges-row">
+                <span class="badge badge-timer" id="timer-next">COLA VACÍA</span>
+                <span class="badge badge-close" id="timer-close">CERRADO</span>
+            </div>
+            
+            <h1 id="q-text" style="font-size: 2.8rem; font-weight: 800; margin-bottom: 10px;">Cargando...</h1>
+            <p id="q-desc" style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 10px;">Conectando...</p>
+
             <div class="options-grid" id="options-box"></div>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px;">
-                <input type="number" id="bet-val" value="1.000" min="0.001" step="0.5" style="width: 120px; font-size: 1.2rem; font-weight: 800;">
-                <button class="btn btn-primary" onclick="executeBet()" style="padding: 18px 45px;">APOSTAR</button>
+
+            <div id="bet-controls" style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 35px; align-items: flex-end;">
+                <div style="text-align: left;">
+                    <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px;">APUESTA (CR)</label>
+                    <input type="number" id="bet-val" value="1.000" step="0.100" style="width: 130px; font-weight: 800; font-size: 1.25rem;">
+                </div>
+                <button id="btn-bet-action" class="btn btn-primary" onclick="executeBet()" style="padding: 0 45px; height: 55px; font-size: 1rem; border-radius: 16px;">CONFIRMAR APUESTA</button>
             </div>
         </div>
     </div>
@@ -146,7 +109,7 @@
 
 <div id="view-inbox" class="view view-hidden">
     <div class="container">
-        <h2 style="margin-bottom: 25px;">Tus apuestas</h2>
+        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 25px;">Tus apuestas</h2>
         <div id="history-container"></div>
     </div>
 </div>
@@ -154,42 +117,46 @@
 <div id="admin-overlay">
     <div class="admin-window">
         <div class="admin-nav">
-            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">Gestión</div>
-            <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">Cola</div>
+            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">Control</div>
+            <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">Cola Global</div>
             <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px; cursor:pointer;">✕</button>
         </div>
         
         <div class="admin-content" id="adm-tab-create">
-            <div class="stats-banner">
-                <div><span>APUESTAS HOY</span><br><strong id="adm-total-bets">0</strong></div>
-                <div style="text-align: right;"><span>ACERTANTES ÚLTIMA</span><br><strong id="adm-last-winners" style="color: var(--success);">--</strong></div>
-            </div>
-            <input type="text" id="adm-q-input" placeholder="Pregunta..." style="margin-bottom: 10px;">
-            <div id="adm-options-list">
-                <div style="display:grid; grid-template-columns: 1fr 100px; gap:10px; margin-bottom:5px;">
-                    <input type="text" placeholder="Opción" class="on">
-                    <input type="number" placeholder="1.000" class="oo" step="0.001">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="background: rgba(99,102,241,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
+                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">ACTIVOS</span><br>
+                    <strong id="adm-count-active" style="font-size: 1.3rem; color: var(--accent);">0</strong>
+                </div>
+                <div style="background: rgba(244,63,94,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
+                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">CIERRE</span><br>
+                    <input type="time" id="adm-close-time" onchange="updateCloseTime(this.value)" style="margin-top:5px; height:35px; font-size:0.8rem;">
                 </div>
             </div>
-            <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin:10px 0;">+ Opción</button>
-            <button class="btn btn-primary" onclick="saveToGlobalQueue()" style="width:100%;">Añadir a la Cola Global</button>
-            
-            <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
-                <h4 style="color:var(--success)">Resolver Activa</h4>
-                <div id="adm-resolve-checks" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:15px 0;"></div>
-                <button class="btn btn-ghost" onclick="resolveGlobalBet()" style="width:100%; color:var(--success); border-color:var(--success)">Validar y Siguiente</button>
+
+            <div style="background: #11141b; padding: 20px; border-radius: 18px; border: 1px solid var(--border); margin-bottom: 20px;">
+                <input type="text" id="adm-q-input" placeholder="Pregunta..." style="margin-bottom: 12px;">
+                <div id="adm-options-list"></div>
+                <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin: 8px 0; justify-content: center; font-size: 0.75rem;">+ Opción</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-ghost" onclick="saveToGlobalQueue(true)" style="border-color:var(--accent); color:var(--accent); justify-content:center;">A COLA</button>
+                    <button class="btn btn-primary" onclick="saveToGlobalQueue(false)" style="justify-content:center;">ACTIVAR HOY</button>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 15px;">
+                <h4 style="color: var(--success); font-size:0.8rem; margin-bottom:10px;">RESOLVER ACTUAL</h4>
+                <div id="adm-resolve-checks" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;"></div>
+                <button class="btn btn-ghost" onclick="completeCycle()" style="width:100%; border-color:var(--success); color:var(--success); justify-content:center; font-weight:800;">VALIDAR RESULTADOS</button>
             </div>
         </div>
-
         <div class="admin-content" id="adm-tab-queue" style="display:none;">
-            <h4>Cola de Espera Global</h4>
-            <div id="queue-list-container" style="margin-top:15px;"></div>
+            <div id="queue-list-container"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURACIÓN FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyBo_HqMcBYGc6bI6xHfeKllOAfxH-qO6zM",
         authDomain: "predictx-clase.firebaseapp.com",
@@ -203,234 +170,241 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- ESTADO LOCAL ---
-    let localUserData = JSON.parse(localStorage.getItem('px_user_v7')) || {
-        balance: 8.000,
-        history: []
-    };
+    let uid = localStorage.getItem('px_uid') || 'u_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('px_uid', uid);
 
-    let globalState = { current: null, queue: [], lastResults: null };
+    let localUserData = { balance: 8.000, history: {} };
+    let globalData = { current: null, queue: [], closeTime: "22:00", activeBetsCount: 0 };
     let userSelection = [];
+    let marketClosed = false;
 
-    // --- SYNC CON FIREBASE ---
-    db.ref('/').on('value', (snapshot) => {
-        const data = snapshot.val() || {};
-        globalState.current = data.currentBet || null;
-        globalState.queue = data.queue ? Object.values(data.queue) : [];
-        globalState.lastResults = data.lastResults || null;
-        
-        if(globalState.lastResults) {
-            processWinningBets(globalState.lastResults);
-            document.getElementById('adm-last-winners').innerText = globalState.lastResults.winnersCount + " Acertaron";
+    // Sincronizar Usuario
+    db.ref('users/' + uid).on('value', snap => {
+        if(snap.val()) {
+            localUserData = snap.val();
+            if(!localUserData.history) localUserData.history = {};
+        } else {
+            db.ref('users/' + uid).set({ balance: 8.000, history: {} });
         }
+        renderMain();
+        renderHistory();
+    });
+
+    // Sincronizar Global
+    db.ref('/').on('value', snap => {
+        const data = snap.val() || {};
+        globalData.current = data.currentBet || null;
+        globalData.queue = data.queue ? Object.values(data.queue) : [];
+        globalData.closeTime = data.closeTime || "22:00";
+        globalData.activeBetsCount = data.activeBetsCount || 0;
+        
+        if(data.lastResults) processResults(data.lastResults);
+        
+        document.getElementById('adm-close-time').value = globalData.closeTime;
+        document.getElementById('adm-count-active').innerText = globalData.activeBetsCount;
         
         renderMain();
         renderAdminTools();
         renderQueue();
     });
 
-    // --- FUNCIONES UI ---
     function renderMain() {
         const box = document.getElementById('options-box');
         const qText = document.getElementById('q-text');
-        const summary = document.getElementById('odds-summary');
-        document.getElementById('balanceDisp').innerText = `${localUserData.balance.toFixed(3)} CR`;
-        box.innerHTML = '';
-
-        if (!globalState.current || globalState.current.status === 'resolved') {
-            qText.innerText = "No hay apuestas hoy";
-            summary.innerText = "Espera a que el administrador cree una apuesta";
+        const qDesc = document.getElementById('q-desc');
+        const btnBet = document.getElementById('btn-bet-action');
+        document.getElementById('balanceDisp').innerText = `${(localUserData.balance || 0).toFixed(3)} CR`;
+        
+        if (!globalData.current || globalData.current.status === 'resolved') {
+            qText.innerText = "No hay eventos";
+            qDesc.innerText = "Vuelve más tarde para nuevas oportunidades.";
+            box.innerHTML = '';
             return;
         }
 
-        qText.innerText = globalState.current.question;
-        globalState.current.options.forEach((o, i) => {
+        qText.innerText = globalData.current.question;
+        qDesc.innerText = "Selecciona tus opciones y apuesta.";
+        box.innerHTML = '';
+        const hasBet = localUserData.history && localUserData.history[globalData.current.id];
+
+        globalData.current.options.forEach((o, i) => {
             const btn = document.createElement('div');
-            btn.className = `opt-btn ${userSelection.includes(i) ? 'active' : ''}`;
+            btn.className = `opt-btn ${userSelection.includes(i) ? 'active' : ''} ${hasBet ? 'disabled' : ''}`;
             btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${parseFloat(o.odds).toFixed(3)}</span>`;
-            btn.onclick = () => {
-                if(userSelection.includes(i)) userSelection = userSelection.filter(x => x !== i);
-                else userSelection.push(i);
-                renderMain();
-            };
+            
+            if(!hasBet && !marketClosed) {
+                btn.onclick = () => {
+                    if(userSelection.includes(i)) userSelection = userSelection.filter(x => x !== i);
+                    else userSelection.push(i);
+                    renderMain();
+                };
+            }
             box.appendChild(btn);
         });
 
-        if(userSelection.length > 0) {
-            const odds = userSelection.reduce((acc, idx) => acc * globalState.current.options[idx].odds, 1);
-            summary.innerText = `Multiplicador total: x${odds.toFixed(3)}`;
-        }
+        if(marketClosed) { btnBet.disabled = true; btnBet.innerText = "MERCADO CERRADO"; }
+        else if(hasBet) { btnBet.disabled = true; btnBet.innerText = "YA HAS APOSTADO"; }
+        else { btnBet.disabled = false; btnBet.innerText = "CONFIRMAR APUESTA"; }
     }
 
     function executeBet() {
         const amount = parseFloat(document.getElementById('bet-val').value);
-        if(!globalState.current) return notify("No hay apuesta activa", "error");
-        if(userSelection.length === 0) return notify("Selecciona opciones", "info");
-        if(amount > localUserData.balance) return notify("Saldo insuficiente", "error");
+        if(userSelection.length === 0) return notify("Selecciona una opción", "error");
+        if(amount <= 0 || amount > localUserData.balance) return notify("Saldo insuficiente", "error");
 
-        const odds = userSelection.reduce((acc, idx) => acc * globalState.current.options[idx].odds, 1);
-        
+        const finalOdds = userSelection.reduce((acc, i) => acc * globalData.current.options[i].odds, 1);
+        const betObj = {
+            id: globalData.current.id,
+            question: globalData.current.question,
+            picks: userSelection.map(i => globalData.current.options[i].name),
+            indices: [...userSelection],
+            amount: amount, 
+            odds: finalOdds, 
+            status: 'PENDIENTE',
+            timestamp: Date.now()
+        };
+
         localUserData.balance -= amount;
-        localUserData.history.unshift({
-            betId: globalState.current.id,
-            question: globalState.current.question,
-            picks: userSelection.map(i => globalState.current.options[i].name),
-            pickIndices: [...userSelection],
-            odds: odds,
-            amount: amount,
-            status: 'PENDIENTE'
-        });
-
-        saveLocal();
+        localUserData.history[globalData.current.id] = betObj;
+        db.ref('users/' + uid).set(localUserData);
+        db.ref('activeBetsCount').set(firebase.database.ServerValue.increment(1));
+        
         userSelection = [];
-        renderMain();
         notify("¡Apuesta registrada!", "success");
     }
 
-    function processWinningBets(results) {
-        let changed = false;
-        localUserData.history.forEach(h => {
-            if(h.betId === results.betId && h.status === 'PENDIENTE') {
-                const isWon = h.pickIndices.every(p => results.winners.includes(p));
-                if(isWon) {
-                    localUserData.balance += (h.amount * h.odds);
-                    h.status = 'GANADA';
-                    notify(`¡Ganaste ${(h.amount * h.odds).toFixed(3)} CR!`, "success");
-                } else {
-                    h.status = 'PERDIDA';
-                }
-                changed = true;
-            }
-        });
-        if(changed) saveLocal();
-    }
-
-    // --- ADMIN LOGIC ---
-    function saveToGlobalQueue() {
-        const q = document.getElementById('adm-q-input').value;
-        const names = document.querySelectorAll('.on');
-        const odds = document.querySelectorAll('.oo');
-        let options = [];
-        names.forEach((n, i) => { if(n.value) options.push({ name: n.value, odds: parseFloat(odds[i].value) || 1.1 }); });
-
-        if(!q) return notify("Pregunta vacía", "error");
-
-        const newBet = { id: Date.now(), question: q, options, status: 'active' };
-
-        if(!globalState.current || globalState.current.status === 'resolved') {
-            db.ref('currentBet').set(newBet);
-        } else {
-            db.ref('queue').push(newBet);
+    function processResults(res) {
+        if(localUserData.history && localUserData.history[res.betId] && localUserData.history[res.betId].status === 'PENDIENTE') {
+            const myBet = localUserData.history[res.betId];
+            const isWin = myBet.indices.every(idx => res.winners.includes(idx));
+            myBet.status = isWin ? 'GANADA' : 'PERDIDA';
+            if(isWin) localUserData.balance += (myBet.amount * myBet.odds);
+            db.ref('users/' + uid).set(localUserData);
+            notify(isWin ? "¡HAS GANADO!" : "Has perdido", isWin ? "success" : "error");
         }
-        notify("Añadido al sistema global", "success");
     }
 
-    function resolveGlobalBet() {
-        const checks = document.querySelectorAll('.resolve-chk');
+    // --- ADMIN ---
+    function tryOpenAdmin() {
+        if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
+            document.getElementById('admin-overlay').classList.add('open');
+        } else {
+            notify("Acceso denegado", "error");
+        }
+    }
+
+    function saveToGlobalQueue(isQueue) {
+        const q = document.getElementById('adm-q-input').value;
+        const ons = document.querySelectorAll('.on');
+        const oos = document.querySelectorAll('.oo');
+        let options = [];
+        ons.forEach((n, i) => { if(n.value) options.push({name: n.value, odds: parseFloat(oos[i].value) || 1.100})});
+        
+        if(!q || options.length < 2) return notify("Completa los datos", "error");
+        const newBet = { id: 'b_'+Date.now(), question: q, options, status: 'active' };
+        
+        if(isQueue) db.ref('queue').push(newBet);
+        else db.ref('currentBet').set(newBet);
+        
+        document.getElementById('adm-q-input').value = "";
+        document.getElementById('adm-options-list').innerHTML = "";
+        addOptionRow(); addOptionRow();
+        notify("Actualizado", "success");
+    }
+
+    function completeCycle() {
+        const chks = document.querySelectorAll('.resolve-chk');
         let winners = [];
-        checks.forEach(c => { if(c.checked) winners.push(parseInt(c.value)) });
+        chks.forEach(c => { if(c.checked) winners.push(parseInt(c.value)) });
+        if(winners.length === 0) return notify("Elige ganadores", "error");
 
-        if(winners.length === 0) return notify("Marca los ganadores", "info");
+        db.ref('lastResults').set({ betId: globalData.current.id, winners: winners });
+        db.ref('activeBetsCount').set(0);
 
-        // 1. Notificar ganadores
-        db.ref('lastResults').set({
-            betId: globalState.current.id,
-            winners: winners,
-            winnersCount: Math.floor(Math.random()*5) + 1 // Solo visual
-        });
-
-        // 2. Pasar al siguiente de la cola
-        if(globalState.queue.length > 0) {
-            const nextBet = globalState.queue[0];
-            // Eliminar el primero de la cola (usamos la key de Firebase)
+        if(globalData.queue.length > 0) {
             db.ref('queue').limitToFirst(1).once('value', s => {
                 const key = Object.keys(s.val())[0];
+                const next = s.val()[key];
                 db.ref('queue/' + key).remove();
-                db.ref('currentBet').set(nextBet);
+                db.ref('currentBet').set(next);
             });
         } else {
             db.ref('currentBet/status').set('resolved');
         }
     }
 
-    function renderQueue() {
-        const container = document.getElementById('queue-list-container');
-        container.innerHTML = globalState.queue.length ? '' : 'Vacía';
-        globalState.queue.forEach(b => {
-            container.innerHTML += `<div style="background:#11141b; padding:10px; border-radius:10px; margin-bottom:5px; border:1px solid var(--border);">${b.question}</div>`;
-        });
+    function updateCloseTime(val) { db.ref('closeTime').set(val); }
+
+    function updateTimers() {
+        const now = new Date();
+        const [h, m] = globalData.closeTime.split(':');
+        const tClose = new Date(); tClose.setHours(h, m, 0);
+        const dClose = tClose - now;
+
+        if(dClose <= 0) {
+            marketClosed = true;
+            document.getElementById('timer-close').innerText = "MERCADO CERRADO";
+        } else {
+            marketClosed = false;
+            const hh = Math.floor(dClose/3600000).toString().padStart(2,'0');
+            const mm = Math.floor((dClose%3600000)/60000).toString().padStart(2,'0');
+            const ss = Math.floor((dClose%60000)/1000).toString().padStart(2,'0');
+            document.getElementById('timer-close').innerText = `CIERRA EN ${hh}:${mm}:${ss}`;
+        }
+        document.getElementById('timer-next').innerText = globalData.queue.length > 0 ? `EN COLA: ${globalData.queue.length}` : "COLA VACÍA";
     }
 
+    // UI
+    function showView(n) {
+        document.getElementById('view-main').classList.toggle('view-hidden', n!=='main');
+        document.getElementById('view-inbox').classList.toggle('view-hidden', n!=='inbox');
+    }
+    function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+    function switchAdminTab(el, t) {
+        document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('adm-tab-create').style.display = t==='create' ? 'block' : 'none';
+        document.getElementById('adm-tab-queue').style.display = t==='queue' ? 'block' : 'none';
+    }
+    function addOptionRow() {
+        const div = document.createElement('div');
+        div.style = "display: flex; gap: 8px; margin-bottom: 8px; animation: slideUp 0.3s ease;";
+        div.innerHTML = `<input type="text" placeholder="Opción" class="on" style="font-size:0.8rem;"> <input type="number" placeholder="1.0" class="oo" style="width: 80px; font-size:0.8rem;" step="0.001">`;
+        document.getElementById('adm-options-list').appendChild(div);
+    }
+    function renderQueue() {
+        const c = document.getElementById('queue-list-container');
+        c.innerHTML = globalData.queue.map(q => `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question}</div>`).join('') || "Cola vacía";
+    }
     function renderAdminTools() {
-        const box = document.getElementById('adm-resolve-checks');
-        box.innerHTML = '';
-        if(globalState.current && globalState.current.status === 'active') {
-            globalState.current.options.forEach((o, i) => {
-                box.innerHTML += `<label style="background:#11141b; padding:10px; border-radius:8px; cursor:pointer;"><input type="checkbox" class="resolve-chk" value="${i}"> ${o.name}</label>`;
+        const b = document.getElementById('adm-resolve-checks'); b.innerHTML = '';
+        if(globalData.current && globalData.current.options) {
+            globalData.current.options.forEach((o, i) => {
+                b.innerHTML += `<label style="background:#0d0f14; padding:10px; border-radius:10px; border:1px solid #1e293b; font-size:0.8rem; cursor:pointer;"><input type="checkbox" class="resolve-chk" value="${i}"> ${o.name}</label>`;
             });
         }
     }
-
-    // --- HELPERS ---
-    function updateTimer() {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setUTCHours(22, 0, 0, 0); 
-        if(now > midnight) midnight.setDate(midnight.getDate() + 1);
-        const diff = midnight - now;
-        const h = Math.floor(diff / 3600000).toString().padStart(2,'0');
-        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
-        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
-        document.getElementById('timer').innerText = `PRÓXIMA APUESTA EN ${h}:${m}:${s}`;
-    }
-
-    function notify(msg, type) {
-        const c = document.getElementById('notification-container');
-        const t = document.createElement('div');
-        t.className = `toast ${type}`;
-        t.innerHTML = `<span>${msg}</span>`;
-        c.appendChild(t);
-        setTimeout(() => { t.style.animation = 'toastOut 0.4s forwards'; setTimeout(()=>t.remove(), 400); }, 3000);
-    }
-
-    function showView(v) {
-        document.getElementById('view-main').className = v === 'main' ? 'view' : 'view view-hidden';
-        document.getElementById('view-inbox').className = v === 'inbox' ? 'view' : 'view view-hidden';
-        if(v === 'inbox') renderHistory();
-    }
-
-    function switchAdminTab(el, tab) {
-        document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('adm-tab-create').style.display = tab === 'create' ? 'block' : 'none';
-        document.getElementById('adm-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
-    }
-
-    function tryOpenAdmin() {
-        if(document.getElementById('adminPass').value === "Isaias2013Cerrado") document.getElementById('admin-overlay').style.display = 'flex';
-        else notify("Contraseña incorrecta", "error");
-    }
-
-    function closeAdmin() { document.getElementById('admin-overlay').style.display = 'none'; }
-    function addOptionRow() {
-        const div = document.createElement('div');
-        div.style = "display:grid; grid-template-columns: 1fr 100px; gap:10px; margin-bottom:5px;";
-        div.innerHTML = `<input type="text" placeholder="Opción" class="on"><input type="number" placeholder="1.000" class="oo" step="0.001">`;
-        document.getElementById('adm-options-list').appendChild(div);
-    }
-    function saveLocal() { localStorage.setItem('px_user_v7', JSON.stringify(localUserData)); }
     function renderHistory() {
         const c = document.getElementById('history-container');
-        c.innerHTML = localUserData.history.map(h => `
+        const items = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp);
+        c.innerHTML = items.map(h => `
             <div class="hist-item">
-                <div><strong>${h.question}</strong><br><small>${h.picks.join(', ')}</small></div>
-                <div style="text-align:right"><span style="color:${h.status==='GANADA'?'#10b981':'#f43f5e'}">${h.status}</span><br><strong>${h.amount.toFixed(3)}</strong></div>
+                <div><strong>${h.question}</strong><br><small style="color:var(--text-muted)">${h.picks.join(' + ')} • x${h.odds.toFixed(3)}</small></div>
+                <div style="text-align:right"><span style="color:${h.status==='GANADA'?'#10b981':(h.status==='PERDIDA'?'#f43f5e':'#6366f1')}">${h.status}</span><br><strong>${h.amount.toFixed(3)} CR</strong></div>
             </div>
-        `).join('');
+        `).join('') || '<p style="color:var(--text-muted); text-align:center;">No hay apuestas.</p>';
+    }
+    function notify(m, t) {
+        const container = document.getElementById('notification-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${t}`;
+        toast.innerText = m;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
     }
 
-    setInterval(updateTimer, 1000);
-    renderMain();
+    addOptionRow(); addOptionRow();
+    setInterval(updateTimers, 1000);
 </script>
 </body>
 </html>
