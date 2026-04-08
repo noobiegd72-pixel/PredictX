@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PredictX | Las apuestas de la clase</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg: #030305;
@@ -28,35 +32,18 @@
             overflow: hidden;
         }
 
-        /* --- SISTEMA DE NOTIFICACIONES --- */
+        /* --- NOTIFICACIONES --- */
         #notification-container {
-            position: fixed;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
+            position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
 
         .toast {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 14px 24px;
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 0.9rem;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            pointer-events: auto;
-            min-width: 300px;
-            backdrop-filter: blur(10px);
+            background: var(--card); border: 1px solid var(--border); padding: 14px 24px;
+            border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center;
+            gap: 12px; animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: auto; min-width: 300px; backdrop-filter: blur(10px);
         }
 
         .toast.success { border-left: 4px solid var(--success); }
@@ -66,180 +53,52 @@
         @keyframes toastIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes toastOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
 
-        /* --- ANIMACIONES --- */
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .anim-slide { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* --- HEADER --- */
+        /* --- UI ELEMENTS --- */
         nav {
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--border);
-            z-index: 100;
-            position: relative;
+            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border);
+            z-index: 100; position: relative;
         }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
         }
 
         .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
         .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
 
-        /* --- VIEWS --- */
-        .view {
-            position: absolute;
-            inset: 75px 0 0 0;
-            padding: 30px;
-            transition: all 0.5s ease;
-            overflow-y: auto;
-        }
+        .view { position: absolute; inset: 75px 0 0 0; padding: 30px; transition: 0.5s; overflow-y: auto; }
         .view-hidden { transform: translateX(50px); opacity: 0; pointer-events: none; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* --- BETTING UI --- */
         .main-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            padding: 50px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: var(--card); border: 1px solid var(--border); border-radius: 32px;
+            padding: 50px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .timer-badge {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--accent);
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin: 40px 0;
-        }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 40px 0; }
 
         .opt-btn {
-            background: #161a23;
-            border: 2px solid var(--border);
-            padding: 20px;
-            border-radius: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #161a23; border: 2px solid var(--border); padding: 20px;
+            border-radius: 18px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between;
         }
-        .opt-btn:hover { border-color: var(--accent); background: #1c212c; }
-        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); }
 
-        /* --- ADMIN MODAL --- */
         #admin-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
         }
 
         .admin-window {
-            background: var(--card);
-            width: 90vw;
-            max-width: 780px;
-            height: 580px;
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            background: var(--card); width: 90vw; max-width: 780px; height: 580px;
+            border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .admin-nav {
-            display: flex;
-            background: #11141b;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .admin-nav-item {
-            padding: 15px 25px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: 0.3s;
-        }
-        .admin-nav-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(99, 102, 241, 0.05); }
-
-        .admin-content { flex: 1; padding: 25px; overflow-y: auto; }
-
-        .stats-banner {
-            background: rgba(99, 102, 241, 0.05);
-            border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        input {
-            background: #161a23;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            width: 100%;
-        }
-
-        .opt-input-row {
-            display: grid;
-            grid-template-columns: 1fr 100px;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        /* --- HISTORY --- */
-        .hist-item {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .payout-tag { font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; }
-        .tag-win { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .tag-loss { background: rgba(244, 63, 94, 0.1); color: var(--error); }
-
+        input { background: #161a23; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; width: 100%; }
+        
+        .stats-banner { background: rgba(99, 102, 241, 0.05); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -260,20 +119,14 @@
 </nav>
 
 <div id="view-main" class="view">
-    <div class="container anim-slide">
+    <div class="container">
         <div class="main-card">
-            <span class="timer-badge" id="timer">CARGANDO TIEMPO...</span>
-            <h1 id="q-text" style="font-size: 2.5rem; margin: 20px 0 10px 0; font-weight: 800;">No hay apuestas hoy</h1>
+            <h1 id="q-text" style="font-size: 2.5rem; margin-bottom: 10px; font-weight: 800;">Conectando...</h1>
             <p id="odds-summary" style="color: var(--text-muted);">Espera a que el administrador cree una apuesta</p>
-
             <div class="options-grid" id="options-box"></div>
-
             <div style="display: flex; justify-content: center; align-items: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px;">
-                <div style="text-align: left;">
-                    <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 800;">CRÉDITOS</label>
-                    <input type="number" id="bet-val" value="1.000" min="0.001" step="0.5" style="width: 120px; display: block; font-size: 1.2rem; font-weight: 800; margin-top: 5px;">
-                </div>
-                <button class="btn btn-primary" onclick="executeBet()" style="padding: 18px 45px; font-size: 1rem; border-radius: 15px;">REALIZAR APUESTA</button>
+                <input type="number" id="bet-val" value="1.000" min="0.001" step="0.5" style="width: 120px; font-size: 1.2rem; font-weight: 800;">
+                <button class="btn btn-primary" onclick="executeBet()" style="padding: 18px 45px;">APOSTAR</button>
             </div>
         </div>
     </div>
@@ -281,301 +134,239 @@
 
 <div id="view-inbox" class="view view-hidden">
     <div class="container">
-        <h2 style="font-size: 1.8rem; margin-bottom: 25px;">Tus apuestas</h2>
+        <h2 style="margin-bottom: 25px;">Tus apuestas</h2>
         <div id="history-container"></div>
     </div>
 </div>
 
 <div id="admin-overlay">
-    <div class="admin-window anim-slide">
-        <div class="admin-nav">
-            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">Gestión de Apuestas</div>
-            <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">Cola de Espera</div>
-            <div style="margin-left: auto; display: flex; align-items: center; padding-right: 15px;">
-                <button onclick="closeAdmin()" style="background:none; border:none; color:white; cursor:pointer; font-size:1.5rem;">✕</button>
-            </div>
+    <div class="admin-window">
+        <div style="display: flex; background: #11141b; border-bottom: 1px solid var(--border); padding: 15px;">
+            <strong>Panel de Control Global</strong>
+            <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; cursor:pointer;">✕</button>
         </div>
-
-        <div class="admin-content" id="adm-tab-create">
+        <div style="padding: 25px; overflow-y: auto;">
             <div class="stats-banner">
-                <div>
-                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">APUESTAS HOY</span>
-                    <strong id="adm-total-bets">0 Usuarios</strong>
-                </div>
-                <div style="text-align: right;">
-                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">ACERTANTES ÚLTIMA</span>
-                    <strong id="adm-last-winners" style="color: var(--success);">--</strong>
+                <div><span>ESTADO</span><br><strong id="adm-total-bets">Sincronizando...</strong></div>
+                <div style="text-align: right;"><span>ÚLTIMA</span><br><strong id="adm-last-winners" style="color: var(--success);">--</strong></div>
+            </div>
+            <input type="text" id="adm-q-input" placeholder="Pregunta de la apuesta..." style="margin-bottom: 10px;">
+            <div id="adm-options-list">
+                <div style="display:grid; grid-template-columns: 1fr 100px; gap:10px; margin-bottom:5px;">
+                    <input type="text" placeholder="Opción" class="on">
+                    <input type="number" placeholder="1.000" class="oo" step="0.001">
                 </div>
             </div>
-
-            <div style="margin-bottom: 25px;">
-                <h4 style="margin-bottom: 15px; color: var(--accent);">Crear Nueva Apuesta</h4>
-                <input type="text" id="adm-q-input" placeholder="Pregunta (ej: ¿Quién llegará tarde?)" style="margin-bottom: 15px;">
-                <div id="adm-options-list">
-                    <div class="opt-input-row"><input type="text" placeholder="Opción A" class="on"><input type="number" placeholder="1.500" class="oo" step="0.001"></div>
-                    <div class="opt-input-row"><input type="text" placeholder="Opción B" class="on"><input type="number" placeholder="2.000" class="oo" step="0.001"></div>
-                </div>
-                <button class="btn btn-ghost" onclick="addOptionRow()" style="width: 100%; margin-top: 10px; justify-content: center;">+ Opción</button>
-                <button class="btn btn-primary" onclick="saveToQueue()" style="width: 100%; margin-top: 15px; justify-content: center;">Añadir a la Cola</button>
+            <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin:10px 0;">+ Opción</button>
+            <button class="btn btn-primary" onclick="updateGlobalBet()" style="width:100%;">Publicar para todos</button>
+            
+            <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                <h4 style="color:var(--success)">Resolver y Validar</h4>
+                <div id="adm-resolve-checks" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:15px 0;"></div>
+                <button class="btn btn-ghost" onclick="resolveGlobalBet()" style="width:100%; color:var(--success); border-color:var(--success)">Validar Resultados</button>
             </div>
-
-            <div style="border-top: 1px solid var(--border); padding-top: 20px;">
-                <h4 style="margin-bottom: 10px; color: var(--success);">Resolver Evento</h4>
-                <div id="adm-resolve-checks" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;"></div>
-                <button class="btn btn-ghost" onclick="completeBetCycle()" style="width:100%; border-color: var(--success); color: var(--success); justify-content: center;">Validar y Siguiente</button>
-            </div>
-        </div>
-
-        <div class="admin-content" id="adm-tab-queue" style="display: none;">
-            <h4 style="margin-bottom: 15px;">Eventos en espera</h4>
-            <div id="queue-list-container"></div>
         </div>
     </div>
 </div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem('px_clase_v6')) || {
-        balance: 8.000,
-        current: null,
-        queue: [],
-        history: [],
-        lastWinnerCount: null
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo_HqMcBYGc6bI6xHfeKllOAfxH-qO6zM",
+      authDomain: "predictx-clase.firebaseapp.com",
+      projectId: "predictx-clase",
+      storageBucket: "predictx-clase.firebasestorage.app",
+      messagingSenderId: "109290007889",
+      appId: "1:109290007889:web:b0b238303ab823457ef770"
     };
 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // --- ESTADO LOCAL (Saldo y su historial se quedan en el navegador del usuario) ---
+    let localUserData = JSON.parse(localStorage.getItem('px_user_v7')) || {
+        balance: 8.000,
+        history: []
+    };
+
+    let globalBet = null;
     let userSelection = [];
 
-    function notify(msg, type = 'info') {
-        const container = document.getElementById('notification-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        let icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : '🔔');
-        toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'toastOut 0.4s forwards';
-            setTimeout(() => toast.remove(), 400);
-        }, 3500);
-    }
+    // --- SINCRONIZACIÓN EN TIEMPO REAL ---
+    db.ref('currentBet').on('value', (snapshot) => {
+        globalBet = snapshot.val();
+        renderMain();
+        renderAdminTools();
+    });
 
-    function showView(name) {
-        document.getElementById('view-main').classList.add('view-hidden');
-        document.getElementById('view-inbox').classList.add('view-hidden');
-        document.getElementById(`view-${name}`).classList.remove('view-hidden');
-        if(name === 'inbox') renderHistory();
-    }
+    db.ref('lastResults').on('value', (snapshot) => {
+        const results = snapshot.val();
+        if(results) {
+            document.getElementById('adm-last-winners').innerText = results.winnersCount + " Acertaron";
+            processWinningBets(results);
+        }
+    });
 
+    // --- FUNCIONES CORE ---
     function renderMain() {
         const box = document.getElementById('options-box');
         const qText = document.getElementById('q-text');
         const summary = document.getElementById('odds-summary');
-        document.getElementById('balanceDisp').innerText = `${state.balance.toFixed(3)} CR`;
+        document.getElementById('balanceDisp').innerText = `${localUserData.balance.toFixed(3)} CR`;
         box.innerHTML = '';
 
-        if (!state.current) {
+        if (!globalBet || globalBet.status === 'resolved') {
             qText.innerText = "No hay apuestas hoy";
             summary.innerText = "Espera a que el administrador cree una apuesta";
-            summary.style.color = 'var(--text-muted)';
             return;
         }
 
-        qText.innerText = state.current.question;
-        state.current.options.forEach((o, i) => {
+        qText.innerText = globalBet.question;
+        globalBet.options.forEach((o, i) => {
             const btn = document.createElement('div');
             btn.className = `opt-btn ${userSelection.includes(i) ? 'active' : ''}`;
-            btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${o.odds.toFixed(3)}</span>`;
+            btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${parseFloat(o.odds).toFixed(3)}</span>`;
             btn.onclick = () => {
-                const idx = userSelection.indexOf(i);
-                if(idx > -1) userSelection.splice(idx, 1);
+                if(userSelection.includes(i)) userSelection = userSelection.filter(x => x !== i);
                 else userSelection.push(i);
                 renderMain();
             };
             box.appendChild(btn);
         });
-
-        if(userSelection.length > 0) {
-            const totalOdds = userSelection.reduce((acc, curr) => acc * state.current.options[curr].odds, 1);
-            summary.innerText = `Multiplicador total: x${totalOdds.toFixed(3)}`;
-            summary.style.color = 'var(--success)';
-        } else {
-            summary.innerText = "Selecciona tus predicciones para calcular cuota";
-            summary.style.color = 'var(--text-muted)';
-        }
     }
 
     function executeBet() {
         const amount = parseFloat(document.getElementById('bet-val').value);
-        if(!state.current) return notify("No hay ninguna apuesta activa", "error");
-        if(userSelection.length === 0) return notify("Selecciona al menos una opción", "info");
-        if(amount > state.balance - 0.0001) return notify("Fondos insuficientes (mínimo 0.001 CR)", "error");
+        if(!globalBet) return notify("No hay ninguna apuesta activa", "error");
+        if(userSelection.length === 0) return notify("Selecciona opciones", "info");
+        if(amount > localUserData.balance) return notify("Saldo insuficiente", "error");
 
-        const totalOdds = userSelection.reduce((acc, curr) => acc * state.current.options[curr].odds, 1);
-        state.balance -= amount;
+        const odds = userSelection.reduce((acc, idx) => acc * globalBet.options[idx].odds, 1);
         
-        state.history.unshift({
-            betId: state.current.id,
-            question: state.current.question,
-            picks: userSelection.map(i => state.current.options[i].name),
+        localUserData.balance -= amount;
+        localUserData.history.unshift({
+            betId: globalBet.id,
+            question: globalBet.question,
+            picks: userSelection.map(i => globalBet.options[i].name),
             pickIndices: [...userSelection],
-            odds: totalOdds,
+            odds: odds,
             amount: amount,
-            status: 'PENDIENTE',
-            time: new Date().toLocaleTimeString()
+            status: 'PENDIENTE'
         });
 
+        saveLocal();
         userSelection = [];
-        save();
         renderMain();
-        notify("¡Apuesta registrada correctamente!", "success");
+        notify("¡Apuesta enviada!", "success");
     }
 
-    function tryOpenAdmin() {
-        if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
-            document.getElementById('admin-overlay').style.display = 'flex';
-            renderAdminTools();
-        } else {
-            notify("Contraseña incorrecta", "error");
-        }
+    function processWinningBets(results) {
+        localUserData.history.forEach(h => {
+            if(h.betId === results.betId && h.status === 'PENDIENTE') {
+                const isWon = h.pickIndices.every(p => results.winners.includes(p));
+                if(isWon) {
+                    const win = h.amount * h.odds;
+                    localUserData.balance += win;
+                    h.status = 'GANADA';
+                    notify(`¡Has ganado ${win.toFixed(3)} CR!`, "success");
+                } else {
+                    h.status = 'PERDIDA';
+                }
+            }
+        });
+        saveLocal();
+        renderMain();
     }
 
-    function closeAdmin() { document.getElementById('admin-overlay').style.display = 'none'; }
-
-    function switchAdminTab(el, tab) {
-        document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('adm-tab-create').style.display = tab === 'create' ? 'block' : 'none';
-        document.getElementById('adm-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
-        if(tab === 'queue') renderQueue();
-    }
-
-    function addOptionRow() {
-        const container = document.getElementById('adm-options-list');
-        const div = document.createElement('div');
-        div.className = 'opt-input-row';
-        div.style.marginTop = "8px";
-        div.innerHTML = `<input type="text" placeholder="Opción" class="on"><input type="number" placeholder="1.000" class="oo" step="0.001">`;
-        container.appendChild(div);
-    }
-
-    function saveToQueue() {
+    // --- FUNCIONES ADMIN (SINCRONIZAN CON FIREBASE) ---
+    function updateGlobalBet() {
         const q = document.getElementById('adm-q-input').value;
         const names = document.querySelectorAll('.on');
         const odds = document.querySelectorAll('.oo');
         let options = [];
-        names.forEach((n, i) => { if(n.value) options.push({ name: n.value, odds: parseFloat(odds[i].value) || 1.100 }); });
+        names.forEach((n, i) => { if(n.value) options.push({ name: n.value, odds: parseFloat(odds[i].value) || 1.1 }); });
 
         if(!q) return notify("Falta la pregunta", "error");
 
-        const newBet = { id: Date.now(), question: q, options };
-        if(!state.current) state.current = newBet;
-        else state.queue.push(newBet);
+        db.ref('currentBet').set({
+            id: Date.now(),
+            question: q,
+            options: options,
+            status: 'active'
+        });
+        notify("Apuesta publicada globalmente", "success");
+    }
 
-        save();
-        renderMain();
-        notify("Añadido al sistema de apuestas", "success");
-        document.getElementById('adm-q-input').value = "";
-        renderAdminTools();
+    function resolveGlobalBet() {
+        const checks = document.querySelectorAll('.resolve-chk');
+        let winners = [];
+        checks.forEach(c => { if(c.checked) winners.push(parseInt(c.value)) });
+
+        if(winners.length === 0) return notify("Selecciona resultados", "info");
+
+        db.ref('lastResults').set({
+            betId: globalBet.id,
+            winners: winners,
+            winnersCount: Math.floor(Math.random() * 10) + 1 // Simulado para el panel
+        });
+
+        db.ref('currentBet').update({ status: 'resolved' });
+        notify("Resultados enviados a todos", "success");
     }
 
     function renderAdminTools() {
         const box = document.getElementById('adm-resolve-checks');
-        const totalBetsEl = document.getElementById('adm-total-bets');
-        const lastWinEl = document.getElementById('adm-last-winners');
-        
         box.innerHTML = '';
-        if(!state.current) {
-            totalBetsEl.innerText = "0 Usuarios";
-        } else {
-            const count = state.history.filter(h => h.betId === state.current.id).length;
-            totalBetsEl.innerText = `${count} Usuarios`;
-            state.current.options.forEach((o, i) => {
-                box.innerHTML += `<label style="background:#11141b; padding:12px; border-radius:10px; cursor:pointer; font-size:0.8rem; border:1px solid var(--border);">
-                    <input type="checkbox" class="resolve-chk" value="${i}"> ${o.name}
-                </label>`;
+        if(globalBet && globalBet.status === 'active') {
+            document.getElementById('adm-total-bets').innerText = "Apuesta Activa";
+            globalBet.options.forEach((o, i) => {
+                box.innerHTML += `<label style="background:#11141b; padding:10px; border-radius:8px; cursor:pointer;"><input type="checkbox" class="resolve-chk" value="${i}"> ${o.name}</label>`;
             });
+        } else {
+            document.getElementById('adm-total-bets').innerText = "Esperando nueva";
         }
-        lastWinEl.innerText = state.lastWinnerCount !== null ? `${state.lastWinnerCount} Acertaron` : '--';
     }
 
-    function completeBetCycle() {
-        const checks = document.querySelectorAll('.resolve-chk');
-        let winners = [];
-        checks.forEach(c => { if(c.checked) winners.push(parseInt(c.value)) });
-        
-        if(!state.current) return notify("No hay ninguna apuesta activa", "error");
-        if(winners.length === 0) return notify("Marca los resultados reales", "info");
-
-        let correctCount = 0;
-        state.history.forEach(h => {
-            if(h.betId === state.current.id && h.status === 'PENDIENTE') {
-                const isWon = h.pickIndices.every(p => winners.includes(p));
-                if(isWon) {
-                    const winAmt = h.amount * h.odds;
-                    state.balance += winAmt;
-                    h.status = 'GANADA';
-                    h.payout = winAmt;
-                    correctCount++;
-                } else {
-                    h.status = 'PERDIDA';
-                    h.payout = 0;
-                }
-            }
-        });
-
-        state.lastWinnerCount = correctCount;
-        state.current = state.queue.length > 0 ? state.queue.shift() : null;
-        save();
-        renderMain();
-        renderAdminTools();
-        notify(`Evento cerrado. Acertaron ${correctCount} personas.`, "success");
+    // --- UTILS ---
+    function notify(msg, type) {
+        const c = document.getElementById('notification-container');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`; t.innerText = msg;
+        c.appendChild(t);
+        setTimeout(() => { t.style.animation = 'toastOut 0.4s forwards'; setTimeout(()=>t.remove(), 400); }, 3000);
     }
 
-    function renderQueue() {
-        const container = document.getElementById('queue-list-container');
-        container.innerHTML = '';
-        if(state.queue.length === 0) {
-            container.innerHTML = `<p style="color:var(--text-muted)">Cola vacía.</p>`;
-            return;
-        }
-        state.queue.forEach(b => {
-            container.innerHTML += `<div style="background:#11141b; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid var(--border);">
-                <strong>${b.question}</strong><br><small style="color:var(--accent)">${b.options.length} opciones en cola</small>
-            </div>`;
-        });
+    function showView(v) {
+        document.getElementById('view-main').className = v === 'main' ? 'view' : 'view view-hidden';
+        document.getElementById('view-inbox').className = v === 'inbox' ? 'view' : 'view view-hidden';
+        if(v === 'inbox') renderHistory();
     }
+
+    function saveLocal() { localStorage.setItem('px_user_v7', JSON.stringify(localUserData)); }
+
+    function addOptionRow() {
+        const div = document.createElement('div');
+        div.style = "display:grid; grid-template-columns: 1fr 100px; gap:10px; margin-bottom:5px;";
+        div.innerHTML = `<input type="text" placeholder="Opción" class="on"><input type="number" placeholder="1.000" class="oo" step="0.001">`;
+        document.getElementById('adm-options-list').appendChild(div);
+    }
+
+    function tryOpenAdmin() {
+        if(document.getElementById('adminPass').value === "Isaias2013Cerrado") document.getElementById('admin-overlay').style.display = 'flex';
+        else notify("Contraseña incorrecta", "error");
+    }
+
+    function closeAdmin() { document.getElementById('admin-overlay').style.display = 'none'; }
 
     function renderHistory() {
-        const container = document.getElementById('history-container');
-        container.innerHTML = '';
-        if(state.history.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted)">No has hecho ninguna apuesta todavía.</div>`;
-            return;
-        }
-        state.history.forEach(h => {
-            container.innerHTML += `<div class="hist-item anim-slide">
-                <div><strong>${h.question}</strong><br><small>${h.picks.join(' + ')} (x${h.odds.toFixed(3)})</small></div>
-                <div style="text-align:right">
-                    <div class="payout-tag ${h.status === 'GANADA' ? 'tag-win' : 'tag-loss'}">${h.status}</div>
-                    <strong>${h.status === 'GANADA' ? '+'+h.payout.toFixed(3) : '-'+h.amount.toFixed(3)} CR</strong>
-                </div>
-            </div>`;
-        });
+        const c = document.getElementById('history-container');
+        c.innerHTML = localUserData.history.map(h => `
+            <div class="hist-item" style="background:var(--card); border:1px solid var(--border); padding:20px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                <div><strong>${h.question}</strong><br><small>${h.picks.join(', ')}</small></div>
+                <div style="text-align:right"><span style="color:${h.status==='GANADA'?'#10b981':'#f43f5e'}">${h.status}</span><br><strong>${h.amount.toFixed(3)}</strong></div>
+            </div>
+        `).join('');
     }
 
-    function updateTimer() {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setUTCHours(22, 0, 0, 0); 
-        if(now > midnight) midnight.setDate(midnight.getDate() + 1);
-        const diff = midnight - now;
-        const h = Math.floor(diff / 3600000).toString().padStart(2,'0');
-        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
-        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
-        document.getElementById('timer').innerText = `PROXIMA APUESTA EN ${h}:${m}:${s}`;
-    }
-
-    function save() { localStorage.setItem('px_clase_v6', JSON.stringify(state)); }
-
-    setInterval(updateTimer, 1000);
     renderMain();
 </script>
 </body>
