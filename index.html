@@ -10,9 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
-        /* =========================================
-           VARIABLES GLOBALES DE DISEÑO (Pulidas)
-           ========================================= */
+        /* VARIABLES GLOBALES */
         :root {
             --bg-gradient: linear-gradient(135deg, #030305 0%, #0b0c13 100%); 
             --card: rgba(13, 15, 20, 0.6); 
@@ -27,409 +25,75 @@
             --shadow-subtle: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
-        /* =========================================
-           RESETEO Y ESTILOS BASE
-           ========================================= */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-gradient); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
 
-        body { 
-            background: var(--bg-gradient); 
-            color: var(--text); 
-            height: 100vh; 
-            overflow: hidden; 
-            position: relative; 
-        }
+        .version-tag { position: fixed; bottom: 20px; right: 25px; color: var(--text-muted); font-weight: 800; font-size: 0.9rem; z-index: 1000; pointer-events: none; opacity: 0.6; }
 
-        /* =========================================
-           ETIQUETA DE VERSIÓN
-           ========================================= */
-        .version-tag {
-            position: fixed;
-            bottom: 20px;
-            right: 25px;
-            color: var(--text-muted);
-            font-weight: 800;
-            font-size: 0.9rem;
-            z-index: 1000;
-            pointer-events: none;
-            opacity: 0.6;
-            letter-spacing: 1px;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* =========================================
-           ANIMACIONES
-           ========================================= */
-        @keyframes fadeIn { 
-            from { opacity: 0; } 
-            to { opacity: 1; } 
-        }
-
-        @keyframes slideUp { 
-            from { transform: translateY(20px); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
-        }
-
-        /* =========================================
-           SISTEMA DE NOTIFICACIONES (TOASTS)
-           ========================================= */
-        #notification-container { 
-            position: fixed; 
-            top: 25px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 9999; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            pointer-events: none; 
-            width: 90%; 
-            max-width: 400px; 
-        }
-
-        .toast { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 16px 24px; 
-            border-radius: 16px; 
-            color: var(--text); 
-            font-size: 0.95rem; 
-            font-weight: 600; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-            pointer-events: auto; 
-            backdrop-filter: blur(12px); 
-            border-left: 4px solid var(--accent); 
-        }
-
+        /* NOTIFICACIONES */
+        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 450px; }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 16px 24px; border-radius: 16px; color: var(--text); font-size: 0.95rem; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: auto; backdrop-filter: blur(12px); border-left: 4px solid var(--accent); }
         .toast.success { border-left-color: var(--success); }
         .toast.error { border-left-color: var(--error); }
 
-        /* =========================================
-           NAVEGACIÓN SUPERIOR
-           ========================================= */
-        nav { 
-            padding: 15px 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--glass); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--border); 
-            z-index: 100; 
-            position: relative; 
-            animation: fadeIn 0.8s ease; 
-        }
+        /* NAVEGACIÓN Y BOTONES */
+        nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
+        .btn { padding: 12px 22px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); background: var(--accent-hover); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid transparent; }
+        .btn-ghost:hover { border-color: var(--border); color: var(--text); background: rgba(255,255,255,0.03); }
 
-        /* =========================================
-           BOTONES
-           ========================================= */
-        .btn { 
-            padding: 12px 22px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            border: none; 
-            cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            font-size: 0.85rem; 
-            white-space: nowrap; 
-        }
+        /* VISTAS */
+        .view { position: absolute; inset: 75px 0 0 0; padding: 40px 20px; transition: all 0.5s ease; overflow-y: auto; }
+        .view-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; visibility: hidden; }
+        .container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; padding-bottom: 60px; }
+        .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 40px; text-align: center; box-shadow: var(--shadow-subtle); backdrop-filter: blur(10px); animation: slideUp 0.6s; }
 
-        .btn-primary { 
-            background: var(--accent); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-        }
+        /* BADGES Y OPCIONES */
+        .badges-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .badge { padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
+        .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin: 30px 0; }
+        .opt-btn { background: rgba(22, 26, 35, 0.7); border: 2px solid var(--border); padding: 20px; border-radius: 18px; cursor: pointer; display: flex; justify-content: space-between; transition: all 0.25s; align-items: center; }
+        .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-3px); background: rgba(28, 33, 44, 0.9); }
+        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.12); box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); }
+        .opt-btn.disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .btn-primary:hover:not(:disabled) { 
-            transform: translateY(-3px); 
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); 
-            background: var(--accent-hover);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
+        /* INPUTS Y NOTAS */
+        input[type="number"], input[type="text"], input[type="password"], input[type="datetime-local"] { background: rgba(22, 26, 35, 0.8); border: 1px solid var(--border); color: white; padding: 14px 18px; border-radius: 12px; width: 100%; font-weight: 600; outline: none; transition: 0.3s; font-size: 0.95rem; }
+        input:focus { border-color: var(--accent); background: rgba(28, 33, 44, 1); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        .hist-item { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; backdrop-filter: blur(10px); }
 
-        .btn-ghost { 
-            background: transparent; 
-            color: var(--text-muted); 
-            border: 1px solid transparent; 
-        }
+        /* PANEL ADMIN */
+        #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(15px); }
+        #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
+        .admin-window { background: var(--bg-gradient); width: 95vw; max-width: 800px; height: 85vh; border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); transform: scale(0.95); transition: transform 0.3s; }
+        #admin-overlay.open .admin-window { transform: scale(1); }
+        .admin-nav { display: flex; background: rgba(10, 12, 16, 0.9); border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .admin-nav-item { padding: 18px 24px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.85rem; transition: 0.3s; white-space: nowrap; border-bottom: 3px solid transparent; }
+        .admin-nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: rgba(255,255,255,0.02); }
+        .admin-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .admin-bet-card { background: rgba(22, 26, 35, 0.5); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 20px; }
 
-        .btn-ghost:hover { 
-            border-color: var(--border); 
-            color: var(--text); 
-            background: rgba(255,255,255,0.03); 
-        }
-
-        /* =========================================
-           VISTAS Y CONTENEDORES
-           ========================================= */
-        .view { 
-            position: absolute; 
-            inset: 75px 0 0 0; 
-            padding: 40px 20px; 
-            transition: all 0.5s ease; 
-            overflow-y: auto; 
-        }
-
-        .view-hidden { 
-            opacity: 0; 
-            transform: translateY(20px); 
-            pointer-events: none; 
-            visibility: hidden; 
-        }
-
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            display: flex;
-            flex-direction: column;
-            gap: 30px; /* Espacio entre múltiples apuestas */
-            padding-bottom: 60px;
-        }
-
-        .main-card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 28px; 
-            padding: 40px; 
-            text-align: center; 
-            box-shadow: var(--shadow-subtle); 
-            backdrop-filter: blur(10px);
-            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
-
-        /* =========================================
-           BADGES (ETIQUETAS ESTADO)
-           ========================================= */
-        .badges-row { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            flex-wrap: wrap; 
-        }
-
-        .badge { 
-            padding: 6px 14px; 
-            border-radius: 50px; 
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-        }
-
-        .badge-timer { 
-            background: rgba(99, 102, 241, 0.1); 
-            color: var(--accent); 
-            border: 1px solid rgba(99, 102, 241, 0.2); 
-        }
-
-        .badge-close { 
-            background: rgba(244, 63, 94, 0.1); 
-            color: var(--error); 
-            border: 1px solid rgba(244, 63, 94, 0.2); 
-        }
-
-        /* =========================================
-           GRILLA DE OPCIONES DE APUESTA
-           ========================================= */
-        .options-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 16px; 
-            margin: 30px 0; 
-        }
-
-        .opt-btn { 
-            background: rgba(22, 26, 35, 0.7); 
-            border: 2px solid var(--border); 
-            padding: 20px; 
-            border-radius: 18px; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-            align-items: center; 
-        }
-
-        .opt-btn:hover:not(.disabled) { 
-            border-color: var(--accent); 
-            transform: translateY(-3px); 
-            background: rgba(28, 33, 44, 0.9); 
-        }
-
-        .opt-btn.active { 
-            border-color: var(--accent); 
-            background: rgba(99, 102, 241, 0.12); 
-            box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); 
-        }
-
-        .opt-btn.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* =========================================
-           INPUTS
-           ========================================= */
-        input[type="number"], input[type="text"], input[type="password"], input[type="datetime-local"] { 
-            background: rgba(22, 26, 35, 0.8); 
-            border: 1px solid var(--border); 
-            color: white; 
-            padding: 14px 18px; 
-            border-radius: 12px; 
-            width: 100%; 
-            font-weight: 600; 
-            outline: none; 
-            transition: 0.3s; 
-            font-size: 0.95rem;
-        }
-
-        input:focus { 
-            border-color: var(--accent); 
-            background: rgba(28, 33, 44, 1); 
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        /* =========================================
-           HISTORIAL DE APUESTAS
-           ========================================= */
-        .hist-item { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 20px; 
-            border-radius: 20px; 
-            margin-bottom: 16px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            animation: slideUp 0.4s ease-out; 
-            backdrop-filter: blur(10px);
-        }
-
-        /* =========================================
-           PANEL DE ADMINISTRADOR
-           ========================================= */
-        #admin-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.85); 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000; 
-            backdrop-filter: blur(15px); 
-        }
-
-        #admin-overlay.open { 
-            display: flex; 
-            animation: fadeIn 0.3s forwards; 
-        }
-
-        .admin-window { 
-            background: var(--bg-gradient); 
-            width: 95vw; 
-            max-width: 650px; 
-            height: 85vh; 
-            border-radius: 28px; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transform: scale(0.95); 
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
-
-        #admin-overlay.open .admin-window { 
-            transform: scale(1); 
-        }
-
-        .admin-nav { 
-            display: flex; 
-            background: rgba(10, 12, 16, 0.9); 
-            border-bottom: 1px solid var(--border); 
-            overflow-x: auto; 
-        }
-
-        .admin-nav-item { 
-            padding: 18px 24px; 
-            cursor: pointer; 
-            color: var(--text-muted); 
-            font-weight: 700; 
-            font-size: 0.85rem; 
-            transition: 0.3s; 
-            white-space: nowrap; 
-            border-bottom: 3px solid transparent;
-        }
-
-        .admin-nav-item.active { 
-            color: var(--accent); 
-            border-bottom: 3px solid var(--accent); 
-            background: rgba(255,255,255,0.02);
-        }
-
-        .admin-content { 
-            flex: 1; 
-            padding: 30px; 
-            overflow-y: auto; 
-        }
-
-        .admin-bet-card {
-            background: rgba(22, 26, 35, 0.5);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
-
-        /* =========================================
-           MEDIA QUERIES (RESPONSIVE)
-           ========================================= */
         @media (max-width: 768px) {
-            nav { padding: 12px 20px; }
-            .btn { padding: 10px 14px; font-size: 0.8rem; }
-            #balanceDisp { padding: 10px 14px !important; font-size: 0.8rem; }
-            .view { padding: 20px 15px; inset: 65px 0 0 0; }
-            .main-card { padding: 30px 20px; border-radius: 24px; }
-            .main-card h1 { font-size: 1.8rem !important; }
-            .main-card p { font-size: 0.95rem !important; }
-            .options-grid { grid-template-columns: 1fr; margin: 20px 0; }
-            .bet-controls-flex { flex-direction: column; align-items: stretch !important; gap: 15px !important; }
-            .bet-controls-flex div { text-align: center !important; }
-            .bet-val-input { width: 100% !important; text-align: center; }
-            .btn-action-bet { width: 100%; height: 50px !important; justify-content: center; }
+            nav { padding: 12px 20px; } .btn { padding: 10px 14px; font-size: 0.8rem; }
+            .view { padding: 20px 15px; inset: 65px 0 0 0; } .main-card { padding: 30px 20px; }
+            .options-grid { grid-template-columns: 1fr; }
             .admin-window { height: 95vh; border-radius: 20px; }
-            .version-tag { font-size: 0.8rem; bottom: 10px; right: 15px; }
+            .admin-stat-grid { grid-template-columns: 1fr !important; }
         }
-
-        @media (max-width: 480px) {
-            nav { flex-direction: column; gap: 12px; height: auto; }
-            .view { inset: 125px 0 0 0; }
-        }
+        @media (max-width: 480px) { nav { flex-direction: column; gap: 12px; height: auto; } .view { inset: 125px 0 0 0; } }
     </style>
 </head>
 <body>
 
-<div class="version-tag">v1.5</div>
-
+<div class="version-tag">v1.5.1</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -440,7 +104,7 @@
     <div style="display: flex; gap: 10px; align-items: center;">
         <button class="btn btn-ghost" onclick="showView('inbox')">📥 Historial</button>
         <button class="btn btn-ghost" onclick="showView('main')" style="border-color: var(--border); background: rgba(255,255,255,0.03);">🎲 Eventos</button>
-        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.25); box-shadow: 0 4px 15px rgba(16,185,129,0.1);">--- CR</div>
+        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.25);">--- CR</div>
     </div>
 </nav>
 
@@ -448,9 +112,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <span class="badge badge-timer" id="global-queue-badge" style="display: none; background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: var(--border);">EN COLA: 0</span>
     </div>
-
-    <div class="container" id="active-bets-container">
-        </div>
+    <div class="container" id="active-bets-container"></div>
 </div>
 
 <div id="view-inbox" class="view view-hidden">
@@ -466,37 +128,38 @@
             <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">➕ Crear Evento</div>
             <div class="admin-nav-item" onclick="switchAdminTab(this, 'resolve')">✔️ Resolver Eventos</div>
             <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">📋 Cola Global</div>
-            <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px 25px; cursor:pointer; font-size: 1.2rem; transition: 0.2s;">✕</button>
+            <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px 25px; cursor:pointer; font-size: 1.2rem;">✕</button>
         </div>
         
         <div class="admin-content" id="adm-tab-create">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+            <div class="admin-stat-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                 <div style="background: rgba(99,102,241,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(99,102,241,0.2);">
                     <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">EVENTOS ACTIVOS</span><br>
                     <strong id="adm-count-active" style="font-size: 1.8rem; color: var(--accent);">0</strong>
                 </div>
+                <div style="background: rgba(16,185,129,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(16,185,129,0.2);">
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">TOTAL APUESTAS (GLOBAL)</span><br>
+                    <strong id="adm-count-total-bets" style="font-size: 1.8rem; color: var(--success);">0</strong>
+                </div>
                 <div style="background: rgba(244,63,94,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(244,63,94,0.2);">
-                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">FECHA Y HORA CIERRE</span><br>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">HORA CIERRE</span><br>
                     <input type="datetime-local" id="adm-close-time" style="margin-top:8px; padding: 10px; font-size:0.8rem; background: rgba(0,0,0,0.5);">
                 </div>
             </div>
 
             <div style="background: rgba(13, 15, 20, 0.8); padding: 25px; border-radius: 20px; border: 1px solid var(--border);">
                 <input type="text" id="adm-q-input" placeholder="Pregunta (Ej: ¿Quién gana la carrera?)" style="margin-bottom: 15px; font-size: 1.05rem;">
-                
                 <div id="adm-options-list"></div>
                 <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin: 15px 0; justify-content: center; border: 1px dashed var(--border);">+ Añadir otra opción</button>
-                
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
                     <button class="btn btn-ghost" onclick="saveToGlobalQueue(true)" style="border: 1px solid var(--accent); color:var(--accent); justify-content:center;">GUARDAR EN COLA</button>
                     <button class="btn btn-primary" onclick="saveToGlobalQueue(false)" style="justify-content:center;">ACTIVAR HOY</button>
                 </div>
-                <p style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 15px;">"Activar Hoy" añadirá este evento a la lista de eventos activos simultáneos.</p>
             </div>
         </div>
 
         <div class="admin-content" id="adm-tab-resolve" style="display:none;">
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Selecciona las opciones ganadoras para cada evento y ciérralos de forma independiente.</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Selecciona las opciones ganadoras para cada evento. También puedes eliminar el evento (se devolverán los créditos).</p>
             <div id="adm-resolve-list"></div>
         </div>
 
@@ -534,25 +197,16 @@
     }
 
     let localUserData = { balance: 8.000, history: {} };
-    
-    // globalData ahora maneja un objeto de activeBets
-    let globalData = { 
-        activeBets: {}, // { "b_123": {id, question...}, "b_456": {...} }
-        queue: []
-    };
-
-    // userSelections ahora es un diccionario: clave = betId, valor = array de indices
-    // Ejemplo: { "b_123": [0, 2], "b_456": [1] }
+    let globalData = { activeBets: {}, queue: [] };
+    let allUsersData = {}; // Para calcular estadísticas globales
     let userSelections = {}; 
-
-    // Diccionario para rastrear qué mercados han cerrado por tiempo
     let marketClosedStatus = {}; 
 
     // ==========================================
     // LISTENERS DE BASE DE DATOS
     // ==========================================
 
-    // Escuchar datos del usuario
+    // Escuchar datos del usuario local
     db.ref('users/' + uid).on('value', snap => {
         const data = snap.val();
         if (data) {
@@ -565,32 +219,25 @@
         renderHistory();
     });
 
+    // Escuchar datos de todos los usuarios (Solo para estadísticas del admin)
+    db.ref('users').on('value', snap => {
+        allUsersData = snap.val() || {};
+        updateAdminStats();
+        renderAdminTools(); 
+    });
+
     // Escuchar datos globales (Múltiples apuestas y Cola)
     db.ref('/').on('value', snap => {
         const data = snap.val() || {};
-        
-        // Obtenemos el objeto de apuestas activas
         globalData.activeBets = data.activeBets || {};
-        
-        // Convertimos cola a array
-        if (data.queue) {
-            globalData.queue = Object.values(data.queue);
-        } else {
-            globalData.queue = [];
-        }
+        globalData.queue = data.queue ? Object.values(data.queue) : [];
 
-        // Auto-activación de cola si NO hay apuestas activas
         if (Object.keys(globalData.activeBets).length === 0 && globalData.queue.length > 0) {
             autoMoveQueue();
         }
 
-        // Evaluar resultados globales
-        if (data.lastResults) {
-            // Evaluamos todos los resultados recibidos (último emitido)
-            processResults(data.lastResults);
-        }
+        if (data.lastResults) processResults(data.lastResults);
 
-        // Actualizar contadores del Admin
         const admCountElement = document.getElementById('adm-count-active');
         if (admCountElement) admCountElement.innerText = Object.keys(globalData.activeBets).length;
         
@@ -600,6 +247,7 @@
             queueBadge.innerText = `EN COLA: ${globalData.queue.length}`;
         }
 
+        updateAdminStats();
         renderMain();
         renderAdminTools();
         renderQueue();
@@ -614,9 +262,7 @@
             if (s.val()) {
                 const key = Object.keys(s.val())[0];
                 const nextBet = s.val()[key];
-                
                 db.ref('queue/' + key).remove();
-                // Lo pasamos a activeBets
                 db.ref('activeBets/' + nextBet.id).set(nextBet);
             }
         });
@@ -624,199 +270,120 @@
 
     function renderMain() {
         const container = document.getElementById('active-bets-container');
-        
-        // Actualizar saldo
         document.getElementById('balanceDisp').innerText = `${(localUserData.balance || 0).toFixed(3)} CR`;
-        
         const activeBetKeys = Object.keys(globalData.activeBets);
 
-        // Estado vacío
         if (activeBetKeys.length === 0) {
             container.innerHTML = `
                 <div class="main-card" style="padding: 60px 30px;">
                     <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; color: var(--text-muted);">Sin eventos</h1>
                     <p style="color: var(--text-muted); font-size: 1.1rem;">No hay apuestas activas en este momento. Revisa más tarde.</p>
-                </div>
-            `;
+                </div>`;
             return;
         }
 
         let htmlContent = '';
-        
-        // Asegurar que cada apuesta tenga su array en userSelections
-        activeBetKeys.forEach(betId => {
-            if (!userSelections[betId]) userSelections[betId] = [];
-        });
+        activeBetKeys.forEach(betId => { if (!userSelections[betId]) userSelections[betId] = []; });
 
-        // Iterar y crear una tarjeta por cada apuesta activa
         activeBetKeys.forEach(betId => {
             const bet = globalData.activeBets[betId];
             const hasBet = localUserData.history && localUserData.history[betId];
             const isClosed = marketClosedStatus[betId];
-
-            // Calcular cuota de esta tarjeta específica
             let currentOdds = 1.000;
             if (userSelections[betId].length > 0) {
                 currentOdds = userSelections[betId].reduce((acc, i) => acc * bet.options[i].odds, 1);
             }
 
-            // Iniciar construcción de la tarjeta
             let cardHtml = `
                 <div class="main-card" id="card-${betId}">
-                    <div class="badges-row">
-                        <span class="badge badge-close" id="timer-close-${betId}">CALCULANDO...</span>
-                    </div>
-                    
+                    <div class="badges-row"><span class="badge badge-close" id="timer-close-${betId}">CALCULANDO...</span></div>
                     <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 10px;">${bet.question}</h1>
                     <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 20px;">Selecciona opciones y apuesta en este evento.</p>
-
                     <div class="options-grid" id="options-box-${betId}">
             `;
 
-            // Inyectar botones de opciones
             bet.options.forEach((opcion, i) => {
-                let btnClass = 'opt-btn';
-                if (userSelections[betId].includes(i)) btnClass += ' active';
-                if (hasBet) btnClass += ' disabled';
-
+                let btnClass = 'opt-btn' + (userSelections[betId].includes(i) ? ' active' : '') + (hasBet ? ' disabled' : '');
                 cardHtml += `
                     <div class="${btnClass}" onclick="toggleSelection('${betId}', ${i}, ${hasBet || isClosed})">
                         <span>${opcion.name}</span> 
                         <span style="font-weight:800; color:var(--success)">x${parseFloat(opcion.odds).toFixed(3)}</span>
-                    </div>
-                `;
+                    </div>`;
             });
 
-            cardHtml += `</div>`; // Cerrar options-grid
-
-            // Determinar estado del botón
-            let btnText = "CONFIRMAR APUESTA";
-            let btnClassObj = "btn btn-primary btn-action-bet";
-            let btnDisabled = "";
-            let btnStyle = "padding: 0 40px; height: 55px; font-size: 0.95rem; border-radius: 14px;";
-
-            if (isClosed) {
-                btnDisabled = "disabled";
-                btnText = "MERCADO CERRADO";
-                btnStyle += " background: var(--border); color: var(--text-muted);";
-            } else if (hasBet) {
-                btnDisabled = "disabled";
-                btnText = "YA APOSTASTE AQUÍ";
-                btnStyle += " background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.3);";
-            }
-
-            // Inyectar controles de apuesta
-            cardHtml += `
-                    <div class="bet-controls-flex" style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px; align-items: flex-end; margin-top: 10px;">
+            let btnText = isClosed ? "MERCADO CERRADO" : (hasBet ? "YA APOSTASTE AQUÍ" : "CONFIRMAR APUESTA");
+            let btnStyle = isClosed ? "background: var(--border); color: var(--text-muted);" : 
+                           (hasBet ? "background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.3);" : "");
+            
+            cardHtml += `</div>
+                    <div style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px; align-items: flex-end; margin-top: 10px; flex-wrap: wrap;">
                         <div style="text-align: left;">
-                            <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px; letter-spacing: 1px;">CRÉDITOS (CR)</label>
-                            <input type="number" id="bet-val-${betId}" class="bet-val-input" value="1.000" step="0.100" style="width: 140px; font-weight: 800; font-size: 1.2rem; text-align: center;">
+                            <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px;">CRÉDITOS (CR)</label>
+                            <input type="number" id="bet-val-${betId}" value="1.000" step="0.100" style="width: 140px; font-weight: 800; font-size: 1.2rem; text-align: center;">
                             <span style="display: block; margin-top: 10px; font-size: 0.8rem; color: var(--success); font-weight: 800;">Cuota Total: x${currentOdds.toFixed(3)}</span>
                         </div>
-                        <button class="${btnClassObj}" ${btnDisabled} style="${btnStyle}" onclick="executeBet('${betId}')">${btnText}</button>
+                        <button class="btn btn-primary" ${isClosed || hasBet ? 'disabled' : ''} style="padding: 0 40px; height: 55px; font-size: 0.95rem; border-radius: 14px; ${btnStyle}" onclick="executeBet('${betId}')">${btnText}</button>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             htmlContent += cardHtml;
         });
 
-        // Solo actualizar el innerHTML si cambió drásticamente o si es necesario re-renderizar
-        // (Nota: Para inputs numéricos puros, re-renderizar todo borra lo que el usuario está tecleando.
-        // Pero dado que querías el código sin librerías reactivas, manejaremos la re-renderización clásica).
-        // Guardamos los valores de los inputs antes de re-renderizar para no molestar la UX.
-        
         let savedInputs = {};
-        activeBetKeys.forEach(id => {
-            const el = document.getElementById(`bet-val-${id}`);
-            if (el) savedInputs[id] = el.value;
-        });
-
+        activeBetKeys.forEach(id => { const el = document.getElementById(`bet-val-${id}`); if (el) savedInputs[id] = el.value; });
         container.innerHTML = htmlContent;
-
-        // Restaurar valores
-        activeBetKeys.forEach(id => {
-            const el = document.getElementById(`bet-val-${id}`);
-            if (el && savedInputs[id]) el.value = savedInputs[id];
-        });
+        activeBetKeys.forEach(id => { const el = document.getElementById(`bet-val-${id}`); if (el && savedInputs[id]) el.value = savedInputs[id]; });
     }
 
-    // Maneja la selección múltiple en una tarjeta específica
     window.toggleSelection = function(betId, optionIndex, isBlocked) {
         if (isBlocked) return;
-        
         const selArray = userSelections[betId];
-        if (selArray.includes(optionIndex)) {
-            userSelections[betId] = selArray.filter(x => x !== optionIndex);
-        } else {
-            userSelections[betId].push(optionIndex);
-        }
-        renderMain(); // Re-render visual
+        userSelections[betId] = selArray.includes(optionIndex) ? selArray.filter(x => x !== optionIndex) : [...selArray, optionIndex];
+        renderMain(); 
     };
 
     function executeBet(betId) {
         const bet = globalData.activeBets[betId];
-        const inputEl = document.getElementById(`bet-val-${betId}`);
-        const amount = parseFloat(inputEl.value);
+        const amount = parseFloat(document.getElementById(`bet-val-${betId}`).value);
         const selections = userSelections[betId];
 
-        if (!selections || selections.length === 0) {
-            return notify("Selecciona al menos una opción en este evento", "error");
-        }
-        if (isNaN(amount) || amount <= 0) {
-            return notify("Introduce una cantidad válida", "error");
-        }
-        if (amount > localUserData.balance) {
-            return notify("Saldo insuficiente", "error");
-        }
+        if (!selections || selections.length === 0) return notify("Selecciona al menos una opción", "error");
+        if (isNaN(amount) || amount <= 0) return notify("Cantidad inválida", "error");
+        if (amount > localUserData.balance) return notify("Saldo insuficiente", "error");
 
-        // Multiplicar cuotas
         const finalOdds = selections.reduce((acc, i) => acc * bet.options[i].odds, 1);
-
-        const betObj = {
-            id: betId,
-            question: bet.question,
-            picks: selections.map(i => bet.options[i].name),
-            indices: [...selections],
-            amount: amount, 
-            odds: finalOdds, 
-            status: 'PENDIENTE',
-            timestamp: Date.now()
-        };
-
         localUserData.balance -= amount;
-        localUserData.history[betId] = betObj;
-        
+        localUserData.history[betId] = {
+            id: betId, question: bet.question, picks: selections.map(i => bet.options[i].name),
+            indices: [...selections], amount: amount, odds: finalOdds, status: 'PENDIENTE', timestamp: Date.now()
+        };
         db.ref('users/' + uid).set(localUserData);
-        
-        // Limpiar selecciones de este evento
         userSelections[betId] = [];
         notify("¡Apuesta registrada exitosamente!", "success");
     }
 
     // ==========================================
-    // SISTEMA DE RESOLUCIÓN Y PREMIOS
+    // SISTEMA DE RESULTADOS Y DEVOLUCIONES
     // ==========================================
 
     function processResults(resultObj) {
-        // resultObj llega como: { betId: "b_123", winners: [0, 1] }
         const betId = resultObj.betId;
-        
         if (localUserData.history && localUserData.history[betId] && localUserData.history[betId].status === 'PENDIENTE') {
             const myBet = localUserData.history[betId];
             
-            // Para ganar una múltiple, TODAS las selecciones deben estar en la lista de ganadores enviada
-            const isWin = myBet.indices.every(idx => resultObj.winners.includes(idx));
-            
-            myBet.status = isWin ? 'GANADA' : 'PERDIDA';
-            
-            if (isWin) {
-                localUserData.balance += (myBet.amount * myBet.odds);
-                notify(`¡HAS GANADO! +${(myBet.amount * myBet.odds).toFixed(3)} CR`, "success");
+            if (resultObj.cancelled) {
+                myBet.status = 'CANCELADA';
+                localUserData.balance += myBet.amount;
+                notify(`Evento cancelado: ${myBet.question}. CR devueltos.`, "error");
             } else {
-                notify(`Apuesta perdida: ${myBet.question}`, "error");
+                const isWin = myBet.indices.every(idx => resultObj.winners.includes(idx));
+                myBet.status = isWin ? 'GANADA' : 'PERDIDA';
+                if (isWin) {
+                    localUserData.balance += (myBet.amount * myBet.odds);
+                    notify(`¡HAS GANADO! +${(myBet.amount * myBet.odds).toFixed(3)} CR`, "success");
+                } else {
+                    notify(`Apuesta perdida: ${myBet.question}`, "error");
+                }
             }
-            
             db.ref('users/' + uid).set(localUserData);
         }
     }
@@ -826,101 +393,93 @@
     // ==========================================
 
     function tryOpenAdmin() {
-        const pass = document.getElementById('adminPass').value;
-        if (pass === "Isaias2013Cerrado") {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        if (document.getElementById('adminPass').value === "Isaias2013Cerrado") {
+            const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('adm-close-time').value = now.toISOString().slice(0,16);
             document.getElementById('admin-overlay').classList.add('open');
-        } else {
-            notify("Acceso denegado", "error");
-        }
+        } else notify("Acceso denegado", "error");
     }
 
-    function closeAdmin() { 
-        document.getElementById('admin-overlay').classList.remove('open'); 
-    }
+    function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
 
     function switchAdminTab(el, tabName) {
         document.querySelectorAll('.admin-nav-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
-        
         document.getElementById('adm-tab-create').style.display = (tabName === 'create') ? 'block' : 'none';
         document.getElementById('adm-tab-resolve').style.display = (tabName === 'resolve') ? 'block' : 'none';
         document.getElementById('adm-tab-queue').style.display = (tabName === 'queue') ? 'block' : 'none';
     }
 
     function addOptionRow() {
-        const container = document.getElementById('adm-options-list');
         const div = document.createElement('div');
-        div.style.display = "flex";
-        div.style.gap = "10px";
-        div.style.marginBottom = "10px";
-        div.style.animation = "slideUp 0.3s ease";
-        
-        div.innerHTML = `
-            <input type="text" placeholder="Opción" class="on" style="flex: 1;"> 
-            <input type="number" placeholder="1.100" class="oo" style="width: 100px; text-align:center;" step="0.001">
-        `;
-        container.appendChild(div);
+        div.style.cssText = "display: flex; gap: 10px; margin-bottom: 10px; animation: slideUp 0.3s ease;";
+        div.innerHTML = `<input type="text" placeholder="Opción" class="on" style="flex: 1;"> <input type="number" placeholder="1.100" class="oo" style="width: 100px; text-align:center;" step="0.001">`;
+        document.getElementById('adm-options-list').appendChild(div);
     }
 
     function saveToGlobalQueue(isToQueue) {
         const questionInput = document.getElementById('adm-q-input').value;
-        const optionNames = document.querySelectorAll('.on');
-        const optionOdds = document.querySelectorAll('.oo');
-        const selectedCloseTime = document.getElementById('adm-close-time').value;
-        
         let options = [];
-        optionNames.forEach((inputEl, index) => { 
-            if (inputEl.value.trim() !== "") {
-                const oddsValue = parseFloat(optionOdds[index].value);
-                options.push({ name: inputEl.value.trim(), odds: isNaN(oddsValue) ? 1.100 : oddsValue });
+        document.querySelectorAll('.on').forEach((el, idx) => { 
+            if (el.value.trim() !== "") {
+                const odds = parseFloat(document.querySelectorAll('.oo')[idx].value);
+                options.push({ name: el.value.trim(), odds: isNaN(odds) ? 1.100 : odds });
             }
         });
         
         if (!questionInput || options.length < 2) return notify("Faltan datos", "error");
         
-        const betId = 'b_' + Date.now();
-        const newBet = { 
-            id: betId, 
-            question: questionInput, 
-            options: options, 
-            closeTime: selectedCloseTime 
-        };
+        const newBet = { id: 'b_' + Date.now(), question: questionInput, options: options, closeTime: document.getElementById('adm-close-time').value };
         
-        if (isToQueue) {
-            db.ref('queue').push(newBet);
-            notify("Añadido a la cola", "success");
-        } else {
-            // Se añade a las apuestas activas
-            db.ref('activeBets/' + betId).set(newBet);
-            notify("Evento activado", "success");
-        }
+        if (isToQueue) { db.ref('queue').push(newBet); notify("Añadido a la cola", "success"); } 
+        else { db.ref('activeBets/' + newBet.id).set(newBet); notify("Evento activado", "success"); }
         
-        document.getElementById('adm-q-input').value = "";
-        document.getElementById('adm-options-list').innerHTML = "";
+        document.getElementById('adm-q-input').value = ""; document.getElementById('adm-options-list').innerHTML = "";
         addOptionRow(); addOptionRow();
     }
 
-    // Renderiza la lista de apuestas activas para que el admin las resuelva independientemente
+    // Calcular estadísticas globales
+    function updateAdminStats() {
+        let totalActiveBets = 0;
+        const activeBetIds = Object.keys(globalData.activeBets);
+        
+        Object.values(allUsersData).forEach(user => {
+            if(user.history) {
+                Object.values(user.history).forEach(bet => {
+                    if(bet.status === 'PENDIENTE' && activeBetIds.includes(bet.id)) {
+                        totalActiveBets++;
+                    }
+                });
+            }
+        });
+        const el = document.getElementById('adm-count-total-bets');
+        if(el) el.innerText = totalActiveBets;
+    }
+
+    // Renderiza panel de resolución con estadisticas de participantes
     function renderAdminTools() {
         const container = document.getElementById('adm-resolve-list'); 
+        if (!container) return; // Evitar errores si no está abierto
         container.innerHTML = '';
         
         const activeBetKeys = Object.keys(globalData.activeBets);
-        
-        if (activeBetKeys.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align:center;">No hay eventos activos para resolver.</p>';
-            return;
-        }
+        if (activeBetKeys.length === 0) return container.innerHTML = '<p style="color: var(--text-muted); text-align:center;">No hay eventos activos.</p>';
 
         activeBetKeys.forEach(betId => {
             const bet = globalData.activeBets[betId];
             
+            // Calcular cuántos han apostado a ESTE evento
+            let participants = 0;
+            Object.values(allUsersData).forEach(user => {
+                if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
+                    participants++;
+                }
+            });
+            
             let html = `
                 <div class="admin-bet-card">
-                    <h4 style="color: white; margin-bottom: 12px; font-size: 1.1rem;">${bet.question}</h4>
+                    <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">${bet.question}</h4>
+                    <p style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 15px;">👥 Han apostado: ${participants} personas</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
             `;
             
@@ -934,84 +493,77 @@
 
             html += `
                     </div>
-                    <button class="btn btn-primary" onclick="resolveSpecificBet('${betId}')" style="width: 100%; justify-content: center; background: var(--success); color: #000;">VALIDAR Y CERRAR EVENTO</button>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="resolveSpecificBet('${betId}')" style="flex: 1; justify-content: center; background: var(--success); color: #000;">VALIDAR Y CERRAR</button>
+                        <button class="btn btn-primary" onclick="deleteSpecificBet('${betId}')" style="background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid var(--error); justify-content: center;">🗑️ ELIMINAR</button>
+                    </div>
                 </div>
             `;
             container.innerHTML += html;
         });
     }
 
-    // Función llamada desde el panel admin para cerrar una apuesta en particular
+    // Resolver evento: Calcula acertantes y cierra
     window.resolveSpecificBet = function(betId) {
-        const checkboxes = document.querySelectorAll(`.resolve-chk-${betId}`);
         let winners = [];
-        checkboxes.forEach(chk => { if (chk.checked) winners.push(parseInt(chk.value)) });
-        
+        document.querySelectorAll(`.resolve-chk-${betId}`).forEach(chk => { if (chk.checked) winners.push(parseInt(chk.value)) });
         if (winners.length === 0) return notify("Elige al menos un ganador", "error");
 
-        // Publicar resultados para esta apuesta
-        db.ref('lastResults').set({ betId: betId, winners: winners, ts: Date.now() });
+        let participants = 0;
+        let correctGuesses = 0;
         
-        // Eliminarla de las activas
+        Object.values(allUsersData).forEach(user => {
+            if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
+                participants++;
+                const isWin = user.history[betId].indices.every(idx => winners.includes(idx));
+                if(isWin) correctGuesses++;
+            }
+        });
+
+        db.ref('lastResults').set({ betId: betId, winners: winners, ts: Date.now() });
         db.ref('activeBets/' + betId).remove();
         
-        notify("Evento cerrado y validado", "success");
+        notify(`✅ Evento cerrado. Acertaron ${correctGuesses} / ${participants} personas.`, "success");
+    }
+
+    // Eliminar completamente y devolver créditos
+    window.deleteSpecificBet = function(betId) {
+        if(!confirm("¿Seguro que quieres eliminar este evento? Se devolverán los créditos a todos los que hayan apostado.")) return;
+        
+        db.ref('lastResults').set({ betId: betId, cancelled: true, ts: Date.now() });
+        db.ref('activeBets/' + betId).remove();
+        notify("Evento eliminado y créditos devueltos.", "success");
     }
 
     function renderQueue() {
         const container = document.getElementById('queue-list-container');
-        if (globalData.queue.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Cola vacía</div>`;
-            return;
-        }
-        container.innerHTML = globalData.queue.map(q => {
-            const dateStr = q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A';
-            return `
-                <div style="padding:15px; border-bottom:1px solid var(--border); font-size:0.95rem; background: rgba(0,0,0,0.2);">
-                    <strong>${q.question}</strong><br>
-                    <small style="color:var(--accent)">Cierre: ${dateStr}</small>
-                </div>
-            `;
-        }).join('');
+        if (globalData.queue.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Cola vacía</div>`;
+        container.innerHTML = globalData.queue.map(q => `<div style="padding:15px; border-bottom:1px solid var(--border); font-size:0.95rem; background: rgba(0,0,0,0.2);"><strong>${q.question}</strong><br><small style="color:var(--accent)">Cierre: ${q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A'}</small></div>`).join('');
     }
 
     // ==========================================
-    // UTILIDADES DE INTERFAZ Y TIEMPOS
+    // TIEMPOS E INTERFAZ
     // ==========================================
 
     function updateTimers() {
-        const activeBetKeys = Object.keys(globalData.activeBets);
         let requiresRender = false;
-
-        activeBetKeys.forEach(betId => {
+        Object.keys(globalData.activeBets).forEach(betId => {
             const bet = globalData.activeBets[betId];
             const timerEl = document.getElementById(`timer-close-${betId}`);
-            
-            if (!bet.closeTime) {
-                if (timerEl) timerEl.innerText = "SIN LÍMITE";
-                marketClosedStatus[betId] = false;
-                return;
-            }
+            if (!bet.closeTime) { if (timerEl) timerEl.innerText = "SIN LÍMITE"; marketClosedStatus[betId] = false; return; }
 
-            const now = new Date();
-            const timeClose = new Date(bet.closeTime);
-            const diff = timeClose - now;
-
+            const diff = new Date(bet.closeTime) - new Date();
             if (diff <= 0) {
-                if (!marketClosedStatus[betId]) {
-                    marketClosedStatus[betId] = true;
-                    requiresRender = true; // Forzar re-render para deshabilitar botón
-                }
+                if (!marketClosedStatus[betId]) { marketClosedStatus[betId] = true; requiresRender = true; }
                 if (timerEl) timerEl.innerText = "MERCADO CERRADO";
             } else {
                 marketClosedStatus[betId] = false;
-                const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const mins = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                if (timerEl) timerEl.innerText = `CIERRA EN ${hours}:${mins}:${secs}`;
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                if (timerEl) timerEl.innerText = `CIERRA EN ${h}:${m}:${s}`;
             }
         });
-
         if (requiresRender) renderMain();
     }
 
@@ -1022,50 +574,22 @@
 
     function renderHistory() {
         const container = document.getElementById('history-container');
-        if (!localUserData.history || Object.keys(localUserData.history).length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas registradas.</p>';
-            return;
-        }
+        if (!localUserData.history || Object.keys(localUserData.history).length === 0) return container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas registradas.</p>';
 
-        const items = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp);
-        
-        container.innerHTML = items.map(hist => {
-            let color = '#6366f1'; 
-            if (hist.status === 'GANADA') color = '#10b981'; 
-            if (hist.status === 'PERDIDA') color = '#f43f5e'; 
-            
-            return `
-                <div class="hist-item">
-                    <div style="flex:1; padding-right: 15px;">
-                        <strong style="font-size: 1.1rem; display: block; margin-bottom: 5px;">${hist.question}</strong>
-                        <span style="color:var(--text-muted); font-size: 0.85rem;">
-                            ${hist.picks.join(' + ')} <br> Cuota x${hist.odds.toFixed(3)}
-                        </span>
-                    </div>
-                    <div style="text-align:right; border-left: 1px solid var(--border); padding-left: 15px;">
-                        <span style="color:${color}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">${hist.status}</span><br>
-                        <strong style="font-size: 1.3rem;">${hist.amount.toFixed(3)}</strong> <span style="font-size: 0.7rem; color: var(--text-muted);">CR</span>
-                    </div>
-                </div>
-            `;
+        container.innerHTML = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp).map(hist => {
+            let color = '#6366f1'; if (hist.status === 'GANADA') color = '#10b981'; if (hist.status === 'PERDIDA') color = '#f43f5e'; if(hist.status === 'CANCELADA') color = '#94a3b8';
+            return `<div class="hist-item"><div style="flex:1; padding-right: 15px;"><strong style="font-size: 1.1rem; display: block; margin-bottom: 5px;">${hist.question}</strong><span style="color:var(--text-muted); font-size: 0.85rem;">${hist.picks.join(' + ')} <br> Cuota x${hist.odds.toFixed(3)}</span></div><div style="text-align:right; border-left: 1px solid var(--border); padding-left: 15px;"><span style="color:${color}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">${hist.status}</span><br><strong style="font-size: 1.3rem;">${hist.amount.toFixed(3)}</strong> <span style="font-size: 0.7rem; color: var(--text-muted);">CR</span></div></div>`;
         }).join('');
     }
 
     function notify(message, type = "success") {
         const container = document.getElementById('notification-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerText = (type === "success" ? "✅ " : "❌ ") + message;
+        toast.className = `toast ${type}`; toast.innerText = (type === "success" ? "✅ " : "❌ ") + message;
         container.appendChild(toast);
-        
-        setTimeout(() => { 
-            toast.style.opacity = '0'; 
-            toast.style.transform = 'translateY(-20px)';
-            setTimeout(() => toast.remove(), 400); 
-        }, 3000);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 400); }, 4000);
     }
 
-    // Inicialización
     addOptionRow(); addOptionRow();
     setInterval(updateTimers, 1000);
 
