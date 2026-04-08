@@ -10,137 +10,452 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
+        /* =========================================
+           VARIABLES GLOBALES DE DISEÑO (Pulidas)
+           ========================================= */
         :root {
-            --bg: #030305; --card: #0d0f14; --accent: #6366f1; --accent-hover: #818cf8;
-            --success: #10b981; --error: #f43f5e; --text: #f8fafc; --text-muted: #64748b;
-            --border: #1e293b; --glass: rgba(13, 15, 20, 0.8);
+            --bg-gradient: linear-gradient(135deg, #030305 0%, #0b0c13 100%); 
+            --card: rgba(13, 15, 20, 0.6); 
+            --accent: #6366f1; 
+            --accent-hover: #818cf8;
+            --success: #10b981; 
+            --error: #f43f5e; 
+            --text: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border: rgba(30, 41, 59, 0.7); 
+            --glass: rgba(10, 12, 16, 0.85);
+            --shadow-subtle: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
+        /* =========================================
+           RESETEO Y ESTILOS BASE
+           ========================================= */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
 
+        body { 
+            background: var(--bg-gradient); 
+            color: var(--text); 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        /* =========================================
+           ETIQUETA DE VERSIÓN
+           ========================================= */
         .version-tag {
             position: fixed;
             bottom: 20px;
             right: 25px;
             color: var(--text-muted);
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 0.9rem;
             z-index: 1000;
             pointer-events: none;
-            opacity: 0.8;
+            opacity: 0.6;
+            letter-spacing: 1px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* =========================================
+           ANIMACIONES
+           ========================================= */
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
 
-        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 400px; }
-        .toast { background: var(--card); border: 1px solid var(--border); padding: 14px 24px; border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; pointer-events: auto; min-width: 100%; backdrop-filter: blur(10px); border-left: 4px solid var(--accent); }
+        @keyframes slideUp { 
+            from { transform: translateY(20px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
 
-        nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
-        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; white-space: nowrap; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
-        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-        .btn-ghost:hover { border-color: var(--accent); color: var(--text); background: rgba(255,255,255,0.05); }
+        /* =========================================
+           SISTEMA DE NOTIFICACIONES (TOASTS)
+           ========================================= */
+        #notification-container { 
+            position: fixed; 
+            top: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            pointer-events: none; 
+            width: 90%; 
+            max-width: 400px; 
+        }
 
-        .view { position: absolute; inset: 75px 0 0 0; padding: 30px; transition: all 0.5s ease; overflow-y: auto; }
-        .view-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; visibility: hidden; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .toast { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 16px 24px; 
+            border-radius: 16px; 
+            color: var(--text); 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            pointer-events: auto; 
+            backdrop-filter: blur(12px); 
+            border-left: 4px solid var(--accent); 
+        }
 
-        .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.6s ease-out; }
-        .badges-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
-        .badge { padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; transition: all 0.3s; }
-        .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
-        .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--error); }
 
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 35px 0; }
-        .opt-btn { background: #161a23; border: 2px solid var(--border); padding: 22px; border-radius: 20px; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); align-items: center; }
-        .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); background: #1c212c; }
-        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
+        /* =========================================
+           NAVEGACIÓN SUPERIOR
+           ========================================= */
+        nav { 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border); 
+            z-index: 100; 
+            position: relative; 
+            animation: fadeIn 0.8s ease; 
+        }
 
-        #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
-        .admin-window { background: var(--card); width: 95vw; max-width: 650px; height: 85vh; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); transform: scale(0.95); transition: transform 0.3s ease; }
-        #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
-        #admin-overlay.open .admin-window { transform: scale(1); }
+        /* =========================================
+           BOTONES
+           ========================================= */
+        .btn { 
+            padding: 12px 22px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 0.85rem; 
+            white-space: nowrap; 
+        }
 
-        .admin-nav { display: flex; background: #11141b; border-bottom: 1px solid var(--border); overflow-x: auto; }
-        .admin-nav-item { padding: 15px 20px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.8rem; border-right: 1px solid var(--border); transition: 0.3s; white-space: nowrap; }
-        .admin-nav-item.active { color: var(--accent); background: var(--card); border-bottom: 3px solid var(--accent); }
-        .admin-content { flex: 1; padding: 25px; overflow-y: auto; }
+        .btn-primary { 
+            background: var(--accent); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
 
-        input { background: #161a23; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--accent); background: #1c212c; }
-        .hist-item { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; }
+        .btn-primary:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); 
+            background: var(--accent-hover);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
 
+        .btn-ghost { 
+            background: transparent; 
+            color: var(--text-muted); 
+            border: 1px solid transparent; 
+        }
+
+        .btn-ghost:hover { 
+            border-color: var(--border); 
+            color: var(--text); 
+            background: rgba(255,255,255,0.03); 
+        }
+
+        /* =========================================
+           VISTAS Y CONTENEDORES
+           ========================================= */
+        .view { 
+            position: absolute; 
+            inset: 75px 0 0 0; 
+            padding: 40px 20px; 
+            transition: all 0.5s ease; 
+            overflow-y: auto; 
+        }
+
+        .view-hidden { 
+            opacity: 0; 
+            transform: translateY(20px); 
+            pointer-events: none; 
+            visibility: hidden; 
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Espacio entre múltiples apuestas */
+            padding-bottom: 60px;
+        }
+
+        .main-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 28px; 
+            padding: 40px; 
+            text-align: center; 
+            box-shadow: var(--shadow-subtle); 
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        /* =========================================
+           BADGES (ETIQUETAS ESTADO)
+           ========================================= */
+        .badges-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+
+        .badge { 
+            padding: 6px 14px; 
+            border-radius: 50px; 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+
+        .badge-timer { 
+            background: rgba(99, 102, 241, 0.1); 
+            color: var(--accent); 
+            border: 1px solid rgba(99, 102, 241, 0.2); 
+        }
+
+        .badge-close { 
+            background: rgba(244, 63, 94, 0.1); 
+            color: var(--error); 
+            border: 1px solid rgba(244, 63, 94, 0.2); 
+        }
+
+        /* =========================================
+           GRILLA DE OPCIONES DE APUESTA
+           ========================================= */
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 16px; 
+            margin: 30px 0; 
+        }
+
+        .opt-btn { 
+            background: rgba(22, 26, 35, 0.7); 
+            border: 2px solid var(--border); 
+            padding: 20px; 
+            border-radius: 18px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            align-items: center; 
+        }
+
+        .opt-btn:hover:not(.disabled) { 
+            border-color: var(--accent); 
+            transform: translateY(-3px); 
+            background: rgba(28, 33, 44, 0.9); 
+        }
+
+        .opt-btn.active { 
+            border-color: var(--accent); 
+            background: rgba(99, 102, 241, 0.12); 
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); 
+        }
+
+        .opt-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* =========================================
+           INPUTS
+           ========================================= */
+        input[type="number"], input[type="text"], input[type="password"], input[type="datetime-local"] { 
+            background: rgba(22, 26, 35, 0.8); 
+            border: 1px solid var(--border); 
+            color: white; 
+            padding: 14px 18px; 
+            border-radius: 12px; 
+            width: 100%; 
+            font-weight: 600; 
+            outline: none; 
+            transition: 0.3s; 
+            font-size: 0.95rem;
+        }
+
+        input:focus { 
+            border-color: var(--accent); 
+            background: rgba(28, 33, 44, 1); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* =========================================
+           HISTORIAL DE APUESTAS
+           ========================================= */
+        .hist-item { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            border-radius: 20px; 
+            margin-bottom: 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            animation: slideUp 0.4s ease-out; 
+            backdrop-filter: blur(10px);
+        }
+
+        /* =========================================
+           PANEL DE ADMINISTRADOR
+           ========================================= */
+        #admin-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.85); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+            backdrop-filter: blur(15px); 
+        }
+
+        #admin-overlay.open { 
+            display: flex; 
+            animation: fadeIn 0.3s forwards; 
+        }
+
+        .admin-window { 
+            background: var(--bg-gradient); 
+            width: 95vw; 
+            max-width: 650px; 
+            height: 85vh; 
+            border-radius: 28px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            transform: scale(0.95); 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        #admin-overlay.open .admin-window { 
+            transform: scale(1); 
+        }
+
+        .admin-nav { 
+            display: flex; 
+            background: rgba(10, 12, 16, 0.9); 
+            border-bottom: 1px solid var(--border); 
+            overflow-x: auto; 
+        }
+
+        .admin-nav-item { 
+            padding: 18px 24px; 
+            cursor: pointer; 
+            color: var(--text-muted); 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            transition: 0.3s; 
+            white-space: nowrap; 
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-nav-item.active { 
+            color: var(--accent); 
+            border-bottom: 3px solid var(--accent); 
+            background: rgba(255,255,255,0.02);
+        }
+
+        .admin-content { 
+            flex: 1; 
+            padding: 30px; 
+            overflow-y: auto; 
+        }
+
+        .admin-bet-card {
+            background: rgba(22, 26, 35, 0.5);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVE)
+           ========================================= */
         @media (max-width: 768px) {
-            nav { padding: 10px 15px; }
-            .btn { padding: 8px 12px; font-size: 0.75rem; }
-            #balanceDisp { padding: 8px 12px !important; font-size: 0.8rem; }
-            .view { padding: 15px; inset: 65px 0 0 0; }
-            .main-card { padding: 25px 15px; border-radius: 24px; }
-            #q-text { font-size: 1.8rem !important; }
-            #q-desc { font-size: 0.9rem !important; }
+            nav { padding: 12px 20px; }
+            .btn { padding: 10px 14px; font-size: 0.8rem; }
+            #balanceDisp { padding: 10px 14px !important; font-size: 0.8rem; }
+            .view { padding: 20px 15px; inset: 65px 0 0 0; }
+            .main-card { padding: 30px 20px; border-radius: 24px; }
+            .main-card h1 { font-size: 1.8rem !important; }
+            .main-card p { font-size: 0.95rem !important; }
             .options-grid { grid-template-columns: 1fr; margin: 20px 0; }
-            #bet-controls { flex-direction: column; align-items: stretch !important; gap: 15px !important; }
-            #bet-controls div { text-align: center !important; }
-            #bet-val { width: 100% !important; text-align: center; }
-            #btn-bet-action { width: 100%; height: 50px !important; }
-            .admin-window { height: 95vh; }
+            .bet-controls-flex { flex-direction: column; align-items: stretch !important; gap: 15px !important; }
+            .bet-controls-flex div { text-align: center !important; }
+            .bet-val-input { width: 100% !important; text-align: center; }
+            .btn-action-bet { width: 100%; height: 50px !important; justify-content: center; }
+            .admin-window { height: 95vh; border-radius: 20px; }
             .version-tag { font-size: 0.8rem; bottom: 10px; right: 15px; }
         }
 
         @media (max-width: 480px) {
-            nav { flex-direction: column; gap: 10px; height: auto; }
-            .view { inset: 110px 0 0 0; }
+            nav { flex-direction: column; gap: 12px; height: auto; }
+            .view { inset: 125px 0 0 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="version-tag">v1.4.5</div>
+<div class="version-tag">v1.5</div>
+
 <div id="notification-container"></div>
 
 <nav>
     <div style="display: flex; gap: 8px; align-items: center;">
-        <input type="password" id="adminPass" placeholder="Contraseña" style="width: 100px; font-size: 0.7rem;">
+        <input type="password" id="adminPass" placeholder="Contraseña Admin" style="width: 140px; font-size: 0.75rem; padding: 10px 12px;">
         <button class="btn btn-ghost" onclick="tryOpenAdmin()">⚙️ Panel</button>
     </div>
-    <div style="display: flex; gap: 8px; align-items: center;">
-        <button class="btn btn-ghost" onclick="showView('inbox')">📥 Bandeja</button>
-        <button class="btn btn-ghost" onclick="showView('main')">🎲 Apuestas</button>
-        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">--- CR</div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="btn btn-ghost" onclick="showView('inbox')">📥 Historial</button>
+        <button class="btn btn-ghost" onclick="showView('main')" style="border-color: var(--border); background: rgba(255,255,255,0.03);">🎲 Eventos</button>
+        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.25); box-shadow: 0 4px 15px rgba(16,185,129,0.1);">--- CR</div>
     </div>
 </nav>
 
 <div id="view-main" class="view">
-    <div class="container">
-        <div class="main-card">
-            <div class="badges-row">
-                <span class="badge badge-timer" id="timer-next">COLA VACÍA</span>
-                <span class="badge badge-close" id="timer-close">CERRADO</span>
-            </div>
-            
-            <h1 id="q-text" style="font-size: 2.8rem; font-weight: 800; margin-bottom: 10px;">Cargando...</h1>
-            <p id="q-desc" style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 10px;">Conectando...</p>
-
-            <div class="options-grid" id="options-box"></div>
-
-            <div id="bet-controls" style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 35px; align-items: flex-end;">
-                <div style="text-align: left;">
-                    <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px;">APUESTA (CR)</label>
-                    <input type="number" id="bet-val" value="1.000" step="0.100" style="width: 130px; font-weight: 800; font-size: 1.25rem;">
-                    <span id="total-odds-display" style="display: block; margin-top: 8px; font-size: 0.75rem; color: var(--success); font-weight: 800;">Cuota Total: x1.000</span>
-                </div>
-                <button id="btn-bet-action" class="btn btn-primary" onclick="executeBet()" style="padding: 0 45px; height: 55px; font-size: 1rem; border-radius: 16px;">CONFIRMAR APUESTA</button>
-            </div>
-        </div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <span class="badge badge-timer" id="global-queue-badge" style="display: none; background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: var(--border);">EN COLA: 0</span>
     </div>
+
+    <div class="container" id="active-bets-container">
+        </div>
 </div>
 
 <div id="view-inbox" class="view view-hidden">
-    <div class="container">
-        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 25px;">Tus apuestas</h2>
+    <div class="container" style="max-width: 800px;">
+        <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 30px; text-align: center; color: white;">Tu Historial de Apuestas</h2>
         <div id="history-container"></div>
     </div>
 </div>
@@ -148,39 +463,43 @@
 <div id="admin-overlay">
     <div class="admin-window">
         <div class="admin-nav">
-            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">Control</div>
-            <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">Cola Global</div>
-            <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px; cursor:pointer;">✕</button>
+            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">➕ Crear Evento</div>
+            <div class="admin-nav-item" onclick="switchAdminTab(this, 'resolve')">✔️ Resolver Eventos</div>
+            <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">📋 Cola Global</div>
+            <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px 25px; cursor:pointer; font-size: 1.2rem; transition: 0.2s;">✕</button>
         </div>
         
         <div class="admin-content" id="adm-tab-create">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div style="background: rgba(99,102,241,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">ACTIVOS</span><br>
-                    <strong id="adm-count-active" style="font-size: 1.3rem; color: var(--accent);">0</strong>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <div style="background: rgba(99,102,241,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(99,102,241,0.2);">
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">EVENTOS ACTIVOS</span><br>
+                    <strong id="adm-count-active" style="font-size: 1.8rem; color: var(--accent);">0</strong>
                 </div>
-                <div style="background: rgba(244,63,94,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">FECHA Y HORA CIERRE</span><br>
-                    <input type="datetime-local" id="adm-close-time" style="margin-top:5px; height:35px; font-size:0.75rem;">
+                <div style="background: rgba(244,63,94,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(244,63,94,0.2);">
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">FECHA Y HORA CIERRE</span><br>
+                    <input type="datetime-local" id="adm-close-time" style="margin-top:8px; padding: 10px; font-size:0.8rem; background: rgba(0,0,0,0.5);">
                 </div>
             </div>
 
-            <div style="background: #11141b; padding: 20px; border-radius: 18px; border: 1px solid var(--border); margin-bottom: 20px;">
-                <input type="text" id="adm-q-input" placeholder="Pregunta..." style="margin-bottom: 12px;">
+            <div style="background: rgba(13, 15, 20, 0.8); padding: 25px; border-radius: 20px; border: 1px solid var(--border);">
+                <input type="text" id="adm-q-input" placeholder="Pregunta (Ej: ¿Quién gana la carrera?)" style="margin-bottom: 15px; font-size: 1.05rem;">
+                
                 <div id="adm-options-list"></div>
-                <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin: 8px 0; justify-content: center; font-size: 0.75rem;">+ Opción</button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button class="btn btn-ghost" onclick="saveToGlobalQueue(true)" style="border-color:var(--accent); color:var(--accent); justify-content:center;">A COLA</button>
+                <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin: 15px 0; justify-content: center; border: 1px dashed var(--border);">+ Añadir otra opción</button>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                    <button class="btn btn-ghost" onclick="saveToGlobalQueue(true)" style="border: 1px solid var(--accent); color:var(--accent); justify-content:center;">GUARDAR EN COLA</button>
                     <button class="btn btn-primary" onclick="saveToGlobalQueue(false)" style="justify-content:center;">ACTIVAR HOY</button>
                 </div>
-            </div>
-
-            <div style="border-top: 1px solid var(--border); padding-top: 15px;">
-                <h4 style="color: var(--success); font-size:0.8rem; margin-bottom:10px;">RESOLVER ACTUAL</h4>
-                <div id="adm-resolve-checks" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;"></div>
-                <button class="btn btn-ghost" onclick="completeCycle()" style="width:100%; border-color:var(--success); color:var(--success); justify-content:center; font-weight:800;">VALIDAR RESULTADOS</button>
+                <p style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 15px;">"Activar Hoy" añadirá este evento a la lista de eventos activos simultáneos.</p>
             </div>
         </div>
+
+        <div class="admin-content" id="adm-tab-resolve" style="display:none;">
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Selecciona las opciones ganadoras para cada evento y ciérralos de forma independiente.</p>
+            <div id="adm-resolve-list"></div>
+        </div>
+
         <div class="admin-content" id="adm-tab-queue" style="display:none;">
             <div id="queue-list-container"></div>
         </div>
@@ -188,6 +507,9 @@
 </div>
 
 <script>
+    // ==========================================
+    // CONFIGURACIÓN DE FIREBASE
+    // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyBo_HqMcBYGc6bI6xHfeKllOAfxH-qO6zM",
         authDomain: "predictx-clase.firebaseapp.com",
@@ -201,18 +523,41 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let uid = localStorage.getItem('px_uid') || 'u_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('px_uid', uid);
+    // ==========================================
+    // ESTADO Y VARIABLES GLOBALES
+    // ==========================================
+    
+    let uid = localStorage.getItem('px_uid');
+    if (!uid) {
+        uid = 'u_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('px_uid', uid);
+    }
 
     let localUserData = { balance: 8.000, history: {} };
-    let globalData = { current: null, queue: [], activeBetsCount: 0 };
-    let userSelection = [];
-    let marketClosed = false;
+    
+    // globalData ahora maneja un objeto de activeBets
+    let globalData = { 
+        activeBets: {}, // { "b_123": {id, question...}, "b_456": {...} }
+        queue: []
+    };
 
+    // userSelections ahora es un diccionario: clave = betId, valor = array de indices
+    // Ejemplo: { "b_123": [0, 2], "b_456": [1] }
+    let userSelections = {}; 
+
+    // Diccionario para rastrear qué mercados han cerrado por tiempo
+    let marketClosedStatus = {}; 
+
+    // ==========================================
+    // LISTENERS DE BASE DE DATOS
+    // ==========================================
+
+    // Escuchar datos del usuario
     db.ref('users/' + uid).on('value', snap => {
-        if(snap.val()) {
-            localUserData = snap.val();
-            if(!localUserData.history) localUserData.history = {};
+        const data = snap.val();
+        if (data) {
+            localUserData = data;
+            if (!localUserData.history) localUserData.history = {};
         } else {
             db.ref('users/' + uid).set({ balance: 8.000, history: {} });
         }
@@ -220,21 +565,39 @@
         renderHistory();
     });
 
+    // Escuchar datos globales (Múltiples apuestas y Cola)
     db.ref('/').on('value', snap => {
         const data = snap.val() || {};
-        globalData.current = data.currentBet || null;
         
-        // CORRECCIÓN: Asegurar que la cola se lee siempre como array
-        globalData.queue = data.queue ? Object.values(data.queue) : [];
-        globalData.activeBetsCount = data.activeBetsCount || 0;
+        // Obtenemos el objeto de apuestas activas
+        globalData.activeBets = data.activeBets || {};
         
-        if(data.lastResults) processResults(data.lastResults);
-        
-        document.getElementById('adm-count-active').innerText = globalData.activeBetsCount;
-        
-        // AUTO-ACTIVACIÓN: Si no hay apuesta actual y hay en cola, moverla
-        if((!globalData.current || globalData.current.status === 'resolved') && globalData.queue.length > 0) {
+        // Convertimos cola a array
+        if (data.queue) {
+            globalData.queue = Object.values(data.queue);
+        } else {
+            globalData.queue = [];
+        }
+
+        // Auto-activación de cola si NO hay apuestas activas
+        if (Object.keys(globalData.activeBets).length === 0 && globalData.queue.length > 0) {
             autoMoveQueue();
+        }
+
+        // Evaluar resultados globales
+        if (data.lastResults) {
+            // Evaluamos todos los resultados recibidos (último emitido)
+            processResults(data.lastResults);
+        }
+
+        // Actualizar contadores del Admin
+        const admCountElement = document.getElementById('adm-count-active');
+        if (admCountElement) admCountElement.innerText = Object.keys(globalData.activeBets).length;
+        
+        const queueBadge = document.getElementById('global-queue-badge');
+        if (queueBadge) {
+            queueBadge.style.display = globalData.queue.length > 0 ? 'inline-block' : 'none';
+            queueBadge.innerText = `EN COLA: ${globalData.queue.length}`;
         }
 
         renderMain();
@@ -242,74 +605,179 @@
         renderQueue();
     });
 
+    // ==========================================
+    // FUNCIONES PRINCIPALES (VISTA EVENTOS)
+    // ==========================================
+
     function autoMoveQueue() {
         db.ref('queue').limitToFirst(1).once('value', s => {
-            if(s.val()){
+            if (s.val()) {
                 const key = Object.keys(s.val())[0];
-                const next = s.val()[key];
+                const nextBet = s.val()[key];
+                
                 db.ref('queue/' + key).remove();
-                db.ref('currentBet').set(next);
+                // Lo pasamos a activeBets
+                db.ref('activeBets/' + nextBet.id).set(nextBet);
             }
         });
     }
 
     function renderMain() {
-        const box = document.getElementById('options-box');
-        const qText = document.getElementById('q-text');
-        const qDesc = document.getElementById('q-desc');
-        const btnBet = document.getElementById('btn-bet-action');
-        const oddsDisp = document.getElementById('total-odds-display');
+        const container = document.getElementById('active-bets-container');
+        
+        // Actualizar saldo
         document.getElementById('balanceDisp').innerText = `${(localUserData.balance || 0).toFixed(3)} CR`;
         
-        if (!globalData.current || globalData.current.status === 'resolved') {
-            qText.innerText = "No hay eventos";
-            qDesc.innerText = "Vuelve más tarde para nuevas oportunidades.";
-            box.innerHTML = '';
-            oddsDisp.innerText = "Cuota Total: x1.000";
+        const activeBetKeys = Object.keys(globalData.activeBets);
+
+        // Estado vacío
+        if (activeBetKeys.length === 0) {
+            container.innerHTML = `
+                <div class="main-card" style="padding: 60px 30px;">
+                    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; color: var(--text-muted);">Sin eventos</h1>
+                    <p style="color: var(--text-muted); font-size: 1.1rem;">No hay apuestas activas en este momento. Revisa más tarde.</p>
+                </div>
+            `;
             return;
         }
 
-        qText.innerText = globalData.current.question;
-        qDesc.innerText = "Selecciona tus opciones y apuesta.";
-        box.innerHTML = '';
-        const hasBet = localUserData.history && localUserData.history[globalData.current.id];
-
-        const currentOdds = userSelection.length > 0 
-            ? userSelection.reduce((acc, i) => acc * globalData.current.options[i].odds, 1) 
-            : 1.000;
-        oddsDisp.innerText = `Cuota Total: x${currentOdds.toFixed(3)}`;
-
-        globalData.current.options.forEach((o, i) => {
-            const btn = document.createElement('div');
-            btn.className = `opt-btn ${userSelection.includes(i) ? 'active' : ''} ${hasBet ? 'disabled' : ''}`;
-            btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${parseFloat(o.odds).toFixed(3)}</span>`;
-            
-            if(!hasBet && !marketClosed) {
-                btn.onclick = () => {
-                    if(userSelection.includes(i)) userSelection = userSelection.filter(x => x !== i);
-                    else userSelection.push(i);
-                    renderMain();
-                };
-            }
-            box.appendChild(btn);
+        let htmlContent = '';
+        
+        // Asegurar que cada apuesta tenga su array en userSelections
+        activeBetKeys.forEach(betId => {
+            if (!userSelections[betId]) userSelections[betId] = [];
         });
 
-        if(marketClosed) { btnBet.disabled = true; btnBet.innerText = "MERCADO CERRADO"; }
-        else if(hasBet) { btnBet.disabled = true; btnBet.innerText = "YA HAS APOSTADO"; }
-        else { btnBet.disabled = false; btnBet.innerText = "CONFIRMAR APUESTA"; }
+        // Iterar y crear una tarjeta por cada apuesta activa
+        activeBetKeys.forEach(betId => {
+            const bet = globalData.activeBets[betId];
+            const hasBet = localUserData.history && localUserData.history[betId];
+            const isClosed = marketClosedStatus[betId];
+
+            // Calcular cuota de esta tarjeta específica
+            let currentOdds = 1.000;
+            if (userSelections[betId].length > 0) {
+                currentOdds = userSelections[betId].reduce((acc, i) => acc * bet.options[i].odds, 1);
+            }
+
+            // Iniciar construcción de la tarjeta
+            let cardHtml = `
+                <div class="main-card" id="card-${betId}">
+                    <div class="badges-row">
+                        <span class="badge badge-close" id="timer-close-${betId}">CALCULANDO...</span>
+                    </div>
+                    
+                    <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 10px;">${bet.question}</h1>
+                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 20px;">Selecciona opciones y apuesta en este evento.</p>
+
+                    <div class="options-grid" id="options-box-${betId}">
+            `;
+
+            // Inyectar botones de opciones
+            bet.options.forEach((opcion, i) => {
+                let btnClass = 'opt-btn';
+                if (userSelections[betId].includes(i)) btnClass += ' active';
+                if (hasBet) btnClass += ' disabled';
+
+                cardHtml += `
+                    <div class="${btnClass}" onclick="toggleSelection('${betId}', ${i}, ${hasBet || isClosed})">
+                        <span>${opcion.name}</span> 
+                        <span style="font-weight:800; color:var(--success)">x${parseFloat(opcion.odds).toFixed(3)}</span>
+                    </div>
+                `;
+            });
+
+            cardHtml += `</div>`; // Cerrar options-grid
+
+            // Determinar estado del botón
+            let btnText = "CONFIRMAR APUESTA";
+            let btnClassObj = "btn btn-primary btn-action-bet";
+            let btnDisabled = "";
+            let btnStyle = "padding: 0 40px; height: 55px; font-size: 0.95rem; border-radius: 14px;";
+
+            if (isClosed) {
+                btnDisabled = "disabled";
+                btnText = "MERCADO CERRADO";
+                btnStyle += " background: var(--border); color: var(--text-muted);";
+            } else if (hasBet) {
+                btnDisabled = "disabled";
+                btnText = "YA APOSTASTE AQUÍ";
+                btnStyle += " background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.3);";
+            }
+
+            // Inyectar controles de apuesta
+            cardHtml += `
+                    <div class="bet-controls-flex" style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px; align-items: flex-end; margin-top: 10px;">
+                        <div style="text-align: left;">
+                            <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px; letter-spacing: 1px;">CRÉDITOS (CR)</label>
+                            <input type="number" id="bet-val-${betId}" class="bet-val-input" value="1.000" step="0.100" style="width: 140px; font-weight: 800; font-size: 1.2rem; text-align: center;">
+                            <span style="display: block; margin-top: 10px; font-size: 0.8rem; color: var(--success); font-weight: 800;">Cuota Total: x${currentOdds.toFixed(3)}</span>
+                        </div>
+                        <button class="${btnClassObj}" ${btnDisabled} style="${btnStyle}" onclick="executeBet('${betId}')">${btnText}</button>
+                    </div>
+                </div>
+            `;
+
+            htmlContent += cardHtml;
+        });
+
+        // Solo actualizar el innerHTML si cambió drásticamente o si es necesario re-renderizar
+        // (Nota: Para inputs numéricos puros, re-renderizar todo borra lo que el usuario está tecleando.
+        // Pero dado que querías el código sin librerías reactivas, manejaremos la re-renderización clásica).
+        // Guardamos los valores de los inputs antes de re-renderizar para no molestar la UX.
+        
+        let savedInputs = {};
+        activeBetKeys.forEach(id => {
+            const el = document.getElementById(`bet-val-${id}`);
+            if (el) savedInputs[id] = el.value;
+        });
+
+        container.innerHTML = htmlContent;
+
+        // Restaurar valores
+        activeBetKeys.forEach(id => {
+            const el = document.getElementById(`bet-val-${id}`);
+            if (el && savedInputs[id]) el.value = savedInputs[id];
+        });
     }
 
-    function executeBet() {
-        const amount = parseFloat(document.getElementById('bet-val').value);
-        if(userSelection.length === 0) return notify("Selecciona una opción", "error");
-        if(amount <= 0 || amount > localUserData.balance) return notify("Saldo insuficiente", "error");
+    // Maneja la selección múltiple en una tarjeta específica
+    window.toggleSelection = function(betId, optionIndex, isBlocked) {
+        if (isBlocked) return;
+        
+        const selArray = userSelections[betId];
+        if (selArray.includes(optionIndex)) {
+            userSelections[betId] = selArray.filter(x => x !== optionIndex);
+        } else {
+            userSelections[betId].push(optionIndex);
+        }
+        renderMain(); // Re-render visual
+    };
 
-        const finalOdds = userSelection.reduce((acc, i) => acc * globalData.current.options[i].odds, 1);
+    function executeBet(betId) {
+        const bet = globalData.activeBets[betId];
+        const inputEl = document.getElementById(`bet-val-${betId}`);
+        const amount = parseFloat(inputEl.value);
+        const selections = userSelections[betId];
+
+        if (!selections || selections.length === 0) {
+            return notify("Selecciona al menos una opción en este evento", "error");
+        }
+        if (isNaN(amount) || amount <= 0) {
+            return notify("Introduce una cantidad válida", "error");
+        }
+        if (amount > localUserData.balance) {
+            return notify("Saldo insuficiente", "error");
+        }
+
+        // Multiplicar cuotas
+        const finalOdds = selections.reduce((acc, i) => acc * bet.options[i].odds, 1);
+
         const betObj = {
-            id: globalData.current.id,
-            question: globalData.current.question,
-            picks: userSelection.map(i => globalData.current.options[i].name),
-            indices: [...userSelection],
+            id: betId,
+            question: bet.question,
+            picks: selections.map(i => bet.options[i].name),
+            indices: [...selections],
             amount: amount, 
             odds: finalOdds, 
             status: 'PENDIENTE',
@@ -317,27 +785,49 @@
         };
 
         localUserData.balance -= amount;
-        localUserData.history[globalData.current.id] = betObj;
-        db.ref('users/' + uid).set(localUserData);
-        db.ref('activeBetsCount').set(firebase.database.ServerValue.increment(1));
+        localUserData.history[betId] = betObj;
         
-        userSelection = [];
-        notify("¡Apuesta registrada!", "success");
+        db.ref('users/' + uid).set(localUserData);
+        
+        // Limpiar selecciones de este evento
+        userSelections[betId] = [];
+        notify("¡Apuesta registrada exitosamente!", "success");
     }
 
-    function processResults(res) {
-        if(localUserData.history && localUserData.history[res.betId] && localUserData.history[res.betId].status === 'PENDIENTE') {
-            const myBet = localUserData.history[res.betId];
-            const isWin = myBet.indices.every(idx => res.winners.includes(idx));
+    // ==========================================
+    // SISTEMA DE RESOLUCIÓN Y PREMIOS
+    // ==========================================
+
+    function processResults(resultObj) {
+        // resultObj llega como: { betId: "b_123", winners: [0, 1] }
+        const betId = resultObj.betId;
+        
+        if (localUserData.history && localUserData.history[betId] && localUserData.history[betId].status === 'PENDIENTE') {
+            const myBet = localUserData.history[betId];
+            
+            // Para ganar una múltiple, TODAS las selecciones deben estar en la lista de ganadores enviada
+            const isWin = myBet.indices.every(idx => resultObj.winners.includes(idx));
+            
             myBet.status = isWin ? 'GANADA' : 'PERDIDA';
-            if(isWin) localUserData.balance += (myBet.amount * myBet.odds);
+            
+            if (isWin) {
+                localUserData.balance += (myBet.amount * myBet.odds);
+                notify(`¡HAS GANADO! +${(myBet.amount * myBet.odds).toFixed(3)} CR`, "success");
+            } else {
+                notify(`Apuesta perdida: ${myBet.question}`, "error");
+            }
+            
             db.ref('users/' + uid).set(localUserData);
-            notify(isWin ? "¡HAS GANADO!" : "Has perdido", isWin ? "success" : "error");
         }
     }
 
+    // ==========================================
+    // HERRAMIENTAS DE ADMINISTRADOR
+    // ==========================================
+
     function tryOpenAdmin() {
-        if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === "Isaias2013Cerrado") {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('adm-close-time').value = now.toISOString().slice(0,16);
@@ -347,126 +837,238 @@
         }
     }
 
-    function saveToGlobalQueue(isQueue) {
-        const q = document.getElementById('adm-q-input').value;
-        const ons = document.querySelectorAll('.on');
-        const oos = document.querySelectorAll('.oo');
+    function closeAdmin() { 
+        document.getElementById('admin-overlay').classList.remove('open'); 
+    }
+
+    function switchAdminTab(el, tabName) {
+        document.querySelectorAll('.admin-nav-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        
+        document.getElementById('adm-tab-create').style.display = (tabName === 'create') ? 'block' : 'none';
+        document.getElementById('adm-tab-resolve').style.display = (tabName === 'resolve') ? 'block' : 'none';
+        document.getElementById('adm-tab-queue').style.display = (tabName === 'queue') ? 'block' : 'none';
+    }
+
+    function addOptionRow() {
+        const container = document.getElementById('adm-options-list');
+        const div = document.createElement('div');
+        div.style.display = "flex";
+        div.style.gap = "10px";
+        div.style.marginBottom = "10px";
+        div.style.animation = "slideUp 0.3s ease";
+        
+        div.innerHTML = `
+            <input type="text" placeholder="Opción" class="on" style="flex: 1;"> 
+            <input type="number" placeholder="1.100" class="oo" style="width: 100px; text-align:center;" step="0.001">
+        `;
+        container.appendChild(div);
+    }
+
+    function saveToGlobalQueue(isToQueue) {
+        const questionInput = document.getElementById('adm-q-input').value;
+        const optionNames = document.querySelectorAll('.on');
+        const optionOdds = document.querySelectorAll('.oo');
         const selectedCloseTime = document.getElementById('adm-close-time').value;
+        
         let options = [];
-        ons.forEach((n, i) => { if(n.value) options.push({name: n.value, odds: parseFloat(oos[i].value) || 1.100})});
+        optionNames.forEach((inputEl, index) => { 
+            if (inputEl.value.trim() !== "") {
+                const oddsValue = parseFloat(optionOdds[index].value);
+                options.push({ name: inputEl.value.trim(), odds: isNaN(oddsValue) ? 1.100 : oddsValue });
+            }
+        });
         
-        if(!q || options.length < 2) return notify("Completa los datos", "error");
+        if (!questionInput || options.length < 2) return notify("Faltan datos", "error");
         
+        const betId = 'b_' + Date.now();
         const newBet = { 
-            id: 'b_'+Date.now(), 
-            question: q, 
-            options, 
-            status: 'active',
+            id: betId, 
+            question: questionInput, 
+            options: options, 
             closeTime: selectedCloseTime 
         };
         
-        if(isQueue) db.ref('queue').push(newBet);
-        else db.ref('currentBet').set(newBet);
+        if (isToQueue) {
+            db.ref('queue').push(newBet);
+            notify("Añadido a la cola", "success");
+        } else {
+            // Se añade a las apuestas activas
+            db.ref('activeBets/' + betId).set(newBet);
+            notify("Evento activado", "success");
+        }
         
         document.getElementById('adm-q-input').value = "";
         document.getElementById('adm-options-list').innerHTML = "";
         addOptionRow(); addOptionRow();
-        notify("Actualizado", "success");
     }
 
-    function completeCycle() {
-        const chks = document.querySelectorAll('.resolve-chk');
+    // Renderiza la lista de apuestas activas para que el admin las resuelva independientemente
+    function renderAdminTools() {
+        const container = document.getElementById('adm-resolve-list'); 
+        container.innerHTML = '';
+        
+        const activeBetKeys = Object.keys(globalData.activeBets);
+        
+        if (activeBetKeys.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align:center;">No hay eventos activos para resolver.</p>';
+            return;
+        }
+
+        activeBetKeys.forEach(betId => {
+            const bet = globalData.activeBets[betId];
+            
+            let html = `
+                <div class="admin-bet-card">
+                    <h4 style="color: white; margin-bottom: 12px; font-size: 1.1rem;">${bet.question}</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+            `;
+            
+            bet.options.forEach((opt, idx) => {
+                html += `
+                    <label style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; cursor: pointer; display: flex; gap: 8px; align-items: center;">
+                        <input type="checkbox" class="resolve-chk-${betId}" value="${idx}"> ${opt.name}
+                    </label>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <button class="btn btn-primary" onclick="resolveSpecificBet('${betId}')" style="width: 100%; justify-content: center; background: var(--success); color: #000;">VALIDAR Y CERRAR EVENTO</button>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+    }
+
+    // Función llamada desde el panel admin para cerrar una apuesta en particular
+    window.resolveSpecificBet = function(betId) {
+        const checkboxes = document.querySelectorAll(`.resolve-chk-${betId}`);
         let winners = [];
-        chks.forEach(c => { if(c.checked) winners.push(parseInt(c.value)) });
-        if(winners.length === 0) return notify("Elige ganadores", "error");
+        checkboxes.forEach(chk => { if (chk.checked) winners.push(parseInt(chk.value)) });
+        
+        if (winners.length === 0) return notify("Elige al menos un ganador", "error");
 
-        db.ref('lastResults').set({ betId: globalData.current.id, winners: winners });
-        db.ref('activeBetsCount').set(0);
-
-        // Al completar, forzamos el movimiento de cola inmediatamente
-        autoMoveQueue();
+        // Publicar resultados para esta apuesta
+        db.ref('lastResults').set({ betId: betId, winners: winners, ts: Date.now() });
+        
+        // Eliminarla de las activas
+        db.ref('activeBets/' + betId).remove();
+        
+        notify("Evento cerrado y validado", "success");
     }
+
+    function renderQueue() {
+        const container = document.getElementById('queue-list-container');
+        if (globalData.queue.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Cola vacía</div>`;
+            return;
+        }
+        container.innerHTML = globalData.queue.map(q => {
+            const dateStr = q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A';
+            return `
+                <div style="padding:15px; border-bottom:1px solid var(--border); font-size:0.95rem; background: rgba(0,0,0,0.2);">
+                    <strong>${q.question}</strong><br>
+                    <small style="color:var(--accent)">Cierre: ${dateStr}</small>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
+    // UTILIDADES DE INTERFAZ Y TIEMPOS
+    // ==========================================
 
     function updateTimers() {
-        if (!globalData.current || !globalData.current.closeTime) {
-            document.getElementById('timer-close').innerText = "SIN LÍMITE";
-            marketClosed = false;
-        } else {
-            const now = new Date();
-            const tClose = new Date(globalData.current.closeTime);
-            const dClose = tClose - now;
+        const activeBetKeys = Object.keys(globalData.activeBets);
+        let requiresRender = false;
 
-            if(dClose <= 0) {
-                marketClosed = true;
-                document.getElementById('timer-close').innerText = "MERCADO CERRADO";
-            } else {
-                marketClosed = false;
-                const hoursTotal = Math.floor(dClose/3600000);
-                const mm = Math.floor((dClose%3600000)/60000).toString().padStart(2,'0');
-                const ss = Math.floor((dClose%60000)/1000).toString().padStart(2,'0');
-                const hh = hoursTotal.toString().padStart(2,'0');
-                document.getElementById('timer-close').innerText = `CIERRA EN ${hh}:${mm}:${ss}`;
+        activeBetKeys.forEach(betId => {
+            const bet = globalData.activeBets[betId];
+            const timerEl = document.getElementById(`timer-close-${betId}`);
+            
+            if (!bet.closeTime) {
+                if (timerEl) timerEl.innerText = "SIN LÍMITE";
+                marketClosedStatus[betId] = false;
+                return;
             }
-        }
-        
-        // Actualizar visualmente el contador de cola
-        const qCount = globalData.queue.length;
-        document.getElementById('timer-next').innerText = qCount > 0 ? `EN COLA: ${qCount}` : "COLA VACÍA";
+
+            const now = new Date();
+            const timeClose = new Date(bet.closeTime);
+            const diff = timeClose - now;
+
+            if (diff <= 0) {
+                if (!marketClosedStatus[betId]) {
+                    marketClosedStatus[betId] = true;
+                    requiresRender = true; // Forzar re-render para deshabilitar botón
+                }
+                if (timerEl) timerEl.innerText = "MERCADO CERRADO";
+            } else {
+                marketClosedStatus[betId] = false;
+                const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const mins = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                if (timerEl) timerEl.innerText = `CIERRA EN ${hours}:${mins}:${secs}`;
+            }
+        });
+
+        if (requiresRender) renderMain();
     }
 
-    function showView(n) {
-        document.getElementById('view-main').classList.toggle('view-hidden', n!=='main');
-        document.getElementById('view-inbox').classList.toggle('view-hidden', n!=='inbox');
+    function showView(viewName) {
+        document.getElementById('view-main').classList.toggle('view-hidden', viewName !== 'main');
+        document.getElementById('view-inbox').classList.toggle('view-hidden', viewName !== 'inbox');
     }
-    function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
-    function switchAdminTab(el, t) {
-        document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('adm-tab-create').style.display = t==='create' ? 'block' : 'none';
-        document.getElementById('adm-tab-queue').style.display = t==='queue' ? 'block' : 'none';
-    }
-    function addOptionRow() {
-        const div = document.createElement('div');
-        div.style = "display: flex; gap: 8px; margin-bottom: 8px; animation: slideUp 0.3s ease;";
-        div.innerHTML = `<input type="text" placeholder="Opción" class="on" style="font-size:0.8rem;"> <input type="number" placeholder="1.0" class="oo" style="width: 80px; font-size:0.8rem;" step="0.001">`;
-        document.getElementById('adm-options-list').appendChild(div);
-    }
-    function renderQueue() {
-        const c = document.getElementById('queue-list-container');
-        c.innerHTML = globalData.queue.map(q => {
-            const dateStr = q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A';
-            return `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question} <br><small style="color:var(--accent)">Cierre: ${dateStr}</small></div>`
-        }).join('') || "Cola vacía";
-    }
-    function renderAdminTools() {
-        const b = document.getElementById('adm-resolve-checks'); b.innerHTML = '';
-        if(globalData.current && globalData.current.options) {
-            globalData.current.options.forEach((o, i) => {
-                b.innerHTML += `<label style="background:#0d0f14; padding:10px; border-radius:10px; border:1px solid #1e293b; font-size:0.8rem; cursor:pointer;"><input type="checkbox" class="resolve-chk" value="${i}"> ${o.name}</label>`;
-            });
-        }
-    }
+
     function renderHistory() {
-        const c = document.getElementById('history-container');
+        const container = document.getElementById('history-container');
+        if (!localUserData.history || Object.keys(localUserData.history).length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas registradas.</p>';
+            return;
+        }
+
         const items = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp);
-        c.innerHTML = items.map(h => `
-            <div class="hist-item">
-                <div style="flex:1;"><strong>${h.question}</strong><br><small style="color:var(--text-muted)">${h.picks.join(' + ')} • x${h.odds.toFixed(3)}</small></div>
-                <div style="text-align:right"><span style="color:${h.status==='GANADA'?'#10b981':(h.status==='PERDIDA'?'#f43f5e':'#6366f1')}">${h.status}</span><br><strong>${h.amount.toFixed(3)} CR</strong></div>
-            </div>
-        `).join('') || '<p style="color:var(--text-muted); text-align:center;">No hay apuestas.</p>';
+        
+        container.innerHTML = items.map(hist => {
+            let color = '#6366f1'; 
+            if (hist.status === 'GANADA') color = '#10b981'; 
+            if (hist.status === 'PERDIDA') color = '#f43f5e'; 
+            
+            return `
+                <div class="hist-item">
+                    <div style="flex:1; padding-right: 15px;">
+                        <strong style="font-size: 1.1rem; display: block; margin-bottom: 5px;">${hist.question}</strong>
+                        <span style="color:var(--text-muted); font-size: 0.85rem;">
+                            ${hist.picks.join(' + ')} <br> Cuota x${hist.odds.toFixed(3)}
+                        </span>
+                    </div>
+                    <div style="text-align:right; border-left: 1px solid var(--border); padding-left: 15px;">
+                        <span style="color:${color}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">${hist.status}</span><br>
+                        <strong style="font-size: 1.3rem;">${hist.amount.toFixed(3)}</strong> <span style="font-size: 0.7rem; color: var(--text-muted);">CR</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
-    function notify(m, t) {
+
+    function notify(message, type = "success") {
         const container = document.getElementById('notification-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${t}`;
-        toast.innerText = m;
+        toast.className = `toast ${type}`;
+        toast.innerText = (type === "success" ? "✅ " : "❌ ") + message;
         container.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
+        
+        setTimeout(() => { 
+            toast.style.opacity = '0'; 
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 400); 
+        }, 3000);
     }
 
+    // Inicialización
     addOptionRow(); addOptionRow();
     setInterval(updateTimers, 1000);
+
 </script>
 </body>
 </html>
