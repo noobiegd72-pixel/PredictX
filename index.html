@@ -17,7 +17,20 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
+
+        /* TEXTO VERSIÓN */
+        .version-tag {
+            position: fixed;
+            bottom: 20px;
+            right: 25px;
+            color: var(--text-muted);
+            font-weight: 800;
+            font-size: 1rem;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.8;
+        }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -69,6 +82,7 @@
 </head>
 <body>
 
+<div class="version-tag">v1.4</div>
 <div id="notification-container"></div>
 
 <nav>
