@@ -28,7 +28,7 @@
             overflow: hidden;
         }
 
-        /* --- SISTEMA DE NOTIFICACIONES (TOASTS) --- */
+        /* --- SISTEMA DE NOTIFICACIONES --- */
         #notification-container {
             position: fixed;
             top: 25px;
@@ -63,17 +63,10 @@
         .toast.error { border-left: 4px solid var(--error); }
         .toast.info { border-left: 4px solid var(--accent); }
 
-        @keyframes toastIn {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes toastIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes toastOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
 
-        @keyframes toastOut {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(-20px); opacity: 0; }
-        }
-
-        /* --- ANIMACIONES GENERALES --- */
+        /* --- ANIMACIONES --- */
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .anim-slide { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -161,7 +154,7 @@
         .opt-btn:hover { border-color: var(--accent); background: #1c212c; }
         .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
 
-        /* --- ADMIN MODAL (4:3) --- */
+        /* --- ADMIN MODAL --- */
         #admin-overlay {
             position: fixed;
             inset: 0;
@@ -262,7 +255,7 @@
     <div style="display: flex; gap: 15px; align-items: center;">
         <button class="btn btn-ghost" onclick="showView('inbox')">📥 Bandeja</button>
         <button class="btn btn-ghost" onclick="showView('main')">🎲 Apuestas</button>
-        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 8px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">8.00 CR</div>
+        <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 8px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">8.000 CR</div>
     </div>
 </nav>
 
@@ -278,7 +271,7 @@
             <div style="display: flex; justify-content: center; align-items: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px;">
                 <div style="text-align: left;">
                     <label style="font-size: 0.7rem; color: var(--text-muted); font-weight: 800;">CRÉDITOS</label>
-                    <input type="number" id="bet-val" value="1.00" min="0.01" step="0.5" style="width: 120px; display: block; font-size: 1.2rem; font-weight: 800; margin-top: 5px;">
+                    <input type="number" id="bet-val" value="1.000" min="0.001" step="0.5" style="width: 120px; display: block; font-size: 1.2rem; font-weight: 800; margin-top: 5px;">
                 </div>
                 <button class="btn btn-primary" onclick="executeBet()" style="padding: 18px 45px; font-size: 1rem; border-radius: 15px;">REALIZAR APUESTA</button>
             </div>
@@ -319,8 +312,8 @@
                 <h4 style="margin-bottom: 15px; color: var(--accent);">Crear Nueva Apuesta</h4>
                 <input type="text" id="adm-q-input" placeholder="Pregunta (ej: ¿Quién llegará tarde?)" style="margin-bottom: 15px;">
                 <div id="adm-options-list">
-                    <div class="opt-input-row"><input type="text" placeholder="Opción A" class="on"><input type="number" placeholder="1.50" class="oo"></div>
-                    <div class="opt-input-row"><input type="text" placeholder="Opción B" class="on"><input type="number" placeholder="2.00" class="oo"></div>
+                    <div class="opt-input-row"><input type="text" placeholder="Opción A" class="on"><input type="number" placeholder="1.500" class="oo" step="0.001"></div>
+                    <div class="opt-input-row"><input type="text" placeholder="Opción B" class="on"><input type="number" placeholder="2.000" class="oo" step="0.001"></div>
                 </div>
                 <button class="btn btn-ghost" onclick="addOptionRow()" style="width: 100%; margin-top: 10px; justify-content: center;">+ Opción</button>
                 <button class="btn btn-primary" onclick="saveToQueue()" style="width: 100%; margin-top: 15px; justify-content: center;">Añadir a la Cola</button>
@@ -341,9 +334,8 @@
 </div>
 
 <script>
-    // --- DATABASE ---
-    let state = JSON.parse(localStorage.getItem('px_clase_v5')) || {
-        balance: 8.00,
+    let state = JSON.parse(localStorage.getItem('px_clase_v6')) || {
+        balance: 8.000,
         current: null,
         queue: [],
         history: [],
@@ -352,26 +344,19 @@
 
     let userSelection = [];
 
-    // --- SISTEMA DE NOTIFICACIONES PERSONALIZADO ---
     function notify(msg, type = 'info') {
         const container = document.getElementById('notification-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        
-        let icon = '🔔';
-        if(type === 'success') icon = '✅';
-        if(type === 'error') icon = '❌';
-
+        let icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : '🔔');
         toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
         container.appendChild(toast);
-
         setTimeout(() => {
             toast.style.animation = 'toastOut 0.4s forwards';
             setTimeout(() => toast.remove(), 400);
         }, 3500);
     }
 
-    // --- NAVIGATION ---
     function showView(name) {
         document.getElementById('view-main').classList.add('view-hidden');
         document.getElementById('view-inbox').classList.add('view-hidden');
@@ -379,12 +364,11 @@
         if(name === 'inbox') renderHistory();
     }
 
-    // --- CORE RENDERING ---
     function renderMain() {
         const box = document.getElementById('options-box');
         const qText = document.getElementById('q-text');
         const summary = document.getElementById('odds-summary');
-        document.getElementById('balanceDisp').innerText = `${state.balance.toFixed(2)} CR`;
+        document.getElementById('balanceDisp').innerText = `${state.balance.toFixed(3)} CR`;
         box.innerHTML = '';
 
         if (!state.current) {
@@ -398,7 +382,7 @@
         state.current.options.forEach((o, i) => {
             const btn = document.createElement('div');
             btn.className = `opt-btn ${userSelection.includes(i) ? 'active' : ''}`;
-            btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${o.odds.toFixed(2)}</span>`;
+            btn.innerHTML = `<span>${o.name}</span> <span style="font-weight:800; color:var(--success)">x${o.odds.toFixed(3)}</span>`;
             btn.onclick = () => {
                 const idx = userSelection.indexOf(i);
                 if(idx > -1) userSelection.splice(idx, 1);
@@ -410,7 +394,7 @@
 
         if(userSelection.length > 0) {
             const totalOdds = userSelection.reduce((acc, curr) => acc * state.current.options[curr].odds, 1);
-            summary.innerText = `Multiplicador total: x${totalOdds.toFixed(2)}`;
+            summary.innerText = `Multiplicador total: x${totalOdds.toFixed(3)}`;
             summary.style.color = 'var(--success)';
         } else {
             summary.innerText = "Selecciona tus predicciones para calcular cuota";
@@ -422,7 +406,7 @@
         const amount = parseFloat(document.getElementById('bet-val').value);
         if(!state.current) return notify("No hay ninguna apuesta activa", "error");
         if(userSelection.length === 0) return notify("Selecciona al menos una opción", "info");
-        if(amount > state.balance - 0.01) return notify("Fondos insuficientes (mínimo 0.01 CR)", "error");
+        if(amount > state.balance - 0.0001) return notify("Fondos insuficientes (mínimo 0.001 CR)", "error");
 
         const totalOdds = userSelection.reduce((acc, curr) => acc * state.current.options[curr].odds, 1);
         state.balance -= amount;
@@ -444,7 +428,6 @@
         notify("¡Apuesta registrada correctamente!", "success");
     }
 
-    // --- ADMIN ---
     function tryOpenAdmin() {
         if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
             document.getElementById('admin-overlay').style.display = 'flex';
@@ -469,7 +452,7 @@
         const div = document.createElement('div');
         div.className = 'opt-input-row';
         div.style.marginTop = "8px";
-        div.innerHTML = `<input type="text" placeholder="Opción" class="on"><input type="number" placeholder="1.00" class="oo">`;
+        div.innerHTML = `<input type="text" placeholder="Opción" class="on"><input type="number" placeholder="1.000" class="oo" step="0.001">`;
         container.appendChild(div);
     }
 
@@ -478,7 +461,7 @@
         const names = document.querySelectorAll('.on');
         const odds = document.querySelectorAll('.oo');
         let options = [];
-        names.forEach((n, i) => { if(n.value) options.push({ name: n.value, odds: parseFloat(odds[i].value) || 1.1 }); });
+        names.forEach((n, i) => { if(n.value) options.push({ name: n.value, odds: parseFloat(odds[i].value) || 1.100 }); });
 
         if(!q) return notify("Falta la pregunta", "error");
 
@@ -569,10 +552,10 @@
         }
         state.history.forEach(h => {
             container.innerHTML += `<div class="hist-item anim-slide">
-                <div><strong>${h.question}</strong><br><small>${h.picks.join(' + ')} (x${h.odds.toFixed(2)})</small></div>
+                <div><strong>${h.question}</strong><br><small>${h.picks.join(' + ')} (x${h.odds.toFixed(3)})</small></div>
                 <div style="text-align:right">
                     <div class="payout-tag ${h.status === 'GANADA' ? 'tag-win' : 'tag-loss'}">${h.status}</div>
-                    <strong>${h.status === 'GANADA' ? '+'+h.payout.toFixed(2) : '-'+h.amount.toFixed(2)} CR</strong>
+                    <strong>${h.status === 'GANADA' ? '+'+h.payout.toFixed(3) : '-'+h.amount.toFixed(3)} CR</strong>
                 </div>
             </div>`;
         });
@@ -590,7 +573,7 @@
         document.getElementById('timer').innerText = `PROXIMA APUESTA EN ${h}:${m}:${s}`;
     }
 
-    function save() { localStorage.setItem('px_clase_v5', JSON.stringify(state)); }
+    function save() { localStorage.setItem('px_clase_v6', JSON.stringify(state)); }
 
     setInterval(updateTimer, 1000);
     renderMain();
