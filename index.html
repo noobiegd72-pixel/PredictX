@@ -36,12 +36,12 @@
         @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* NOTIFICACIONES */
-        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: var(--card); border: 1px solid var(--border); padding: 14px 24px; border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; pointer-events: auto; min-width: 320px; backdrop-filter: blur(10px); border-left: 4px solid var(--accent); }
+        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 400px; }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 14px 24px; border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; pointer-events: auto; min-width: 100%; backdrop-filter: blur(10px); border-left: 4px solid var(--accent); }
 
         /* HEADER */
         nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
-        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; white-space: nowrap; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
         .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
@@ -54,7 +54,7 @@
 
         /* MAIN CARD */
         .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.6s ease-out; }
-        .badges-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        .badges-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
         .badge { padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; transition: all 0.3s; }
         .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
         .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
@@ -66,31 +66,54 @@
 
         /* ADMIN PANEL REDUCIDO */
         #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
-        .admin-window { background: var(--card); width: 90vw; max-width: 650px; height: 600px; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); transform: scale(0.95); transition: transform 0.3s ease; }
+        .admin-window { background: var(--card); width: 95vw; max-width: 650px; height: 85vh; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); transform: scale(0.95); transition: transform 0.3s ease; }
         #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
         #admin-overlay.open .admin-window { transform: scale(1); }
 
-        .admin-nav { display: flex; background: #11141b; border-bottom: 1px solid var(--border); }
-        .admin-nav-item { padding: 15px 20px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.8rem; border-right: 1px solid var(--border); transition: 0.3s; }
+        .admin-nav { display: flex; background: #11141b; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .admin-nav-item { padding: 15px 20px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.8rem; border-right: 1px solid var(--border); transition: 0.3s; white-space: nowrap; }
         .admin-nav-item.active { color: var(--accent); background: var(--card); border-bottom: 3px solid var(--accent); }
         .admin-content { flex: 1; padding: 25px; overflow-y: auto; }
 
         input { background: #161a23; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--accent); background: #1c212c; }
         .hist-item { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; }
+
+        /* RESPONSIVIDAD */
+        @media (max-width: 768px) {
+            nav { padding: 10px 15px; }
+            .btn { padding: 8px 12px; font-size: 0.75rem; }
+            #balanceDisp { padding: 8px 12px !important; font-size: 0.8rem; }
+            .view { padding: 15px; inset: 65px 0 0 0; }
+            .main-card { padding: 25px 15px; border-radius: 24px; }
+            #q-text { font-size: 1.8rem !important; }
+            #q-desc { font-size: 0.9rem !important; }
+            .options-grid { grid-template-columns: 1fr; margin: 20px 0; }
+            #bet-controls { flex-direction: column; align-items: stretch !important; gap: 15px !important; }
+            #bet-controls div { text-align: center !important; }
+            #bet-val { width: 100% !important; text-align: center; }
+            #btn-bet-action { width: 100%; height: 50px !important; }
+            .admin-window { height: 95vh; }
+            .version-tag { font-size: 0.8rem; bottom: 10px; right: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            nav { flex-direction: column; gap: 10px; height: auto; }
+            .view { inset: 110px 0 0 0; }
+        }
     </style>
 </head>
 <body>
 
-<div class="version-tag">v1.4</div>
+<div class="version-tag">v1.4.2</div>
 <div id="notification-container"></div>
 
 <nav>
-    <div style="display: flex; gap: 12px; align-items: center;">
-        <input type="password" id="adminPass" placeholder="Contraseña" style="width: 120px; font-size: 0.7rem;">
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <input type="password" id="adminPass" placeholder="Contraseña" style="width: 100px; font-size: 0.7rem;">
         <button class="btn btn-ghost" onclick="tryOpenAdmin()">⚙️ Panel</button>
     </div>
-    <div style="display: flex; gap: 15px; align-items: center;">
+    <div style="display: flex; gap: 8px; align-items: center;">
         <button class="btn btn-ghost" onclick="showView('inbox')">📥 Bandeja</button>
         <button class="btn btn-ghost" onclick="showView('main')">🎲 Apuestas</button>
         <div id="balanceDisp" style="font-weight: 800; color: var(--success); background: rgba(16,185,129,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">--- CR</div>
@@ -193,7 +216,6 @@
     let userSelection = [];
     let marketClosed = false;
 
-    // Sincronizar Usuario
     db.ref('users/' + uid).on('value', snap => {
         if(snap.val()) {
             localUserData = snap.val();
@@ -205,7 +227,6 @@
         renderHistory();
     });
 
-    // Sincronizar Global
     db.ref('/').on('value', snap => {
         const data = snap.val() || {};
         globalData.current = data.currentBet || null;
@@ -244,7 +265,6 @@
         box.innerHTML = '';
         const hasBet = localUserData.history && localUserData.history[globalData.current.id];
 
-        // Calcular cuota actual
         const currentOdds = userSelection.length > 0 
             ? userSelection.reduce((acc, i) => acc * globalData.current.options[i].odds, 1) 
             : 1.000;
@@ -307,7 +327,6 @@
         }
     }
 
-    // --- ADMIN ---
     function tryOpenAdmin() {
         if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
             document.getElementById('admin-overlay').classList.add('open');
@@ -377,7 +396,6 @@
         document.getElementById('timer-next').innerText = globalData.queue.length > 0 ? `EN COLA: ${globalData.queue.length}` : "COLA VACÍA";
     }
 
-    // UI
     function showView(n) {
         document.getElementById('view-main').classList.toggle('view-hidden', n!=='main');
         document.getElementById('view-inbox').classList.toggle('view-hidden', n!=='inbox');
@@ -412,7 +430,7 @@
         const items = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp);
         c.innerHTML = items.map(h => `
             <div class="hist-item">
-                <div><strong>${h.question}</strong><br><small style="color:var(--text-muted)">${h.picks.join(' + ')} • x${h.odds.toFixed(3)}</small></div>
+                <div style="flex:1;"><strong>${h.question}</strong><br><small style="color:var(--text-muted)">${h.picks.join(' + ')} • x${h.odds.toFixed(3)}</small></div>
                 <div style="text-align:right"><span style="color:${h.status==='GANADA'?'#10b981':(h.status==='PERDIDA'?'#f43f5e':'#6366f1')}">${h.status}</span><br><strong>${h.amount.toFixed(3)} CR</strong></div>
             </div>
         `).join('') || '<p style="color:var(--text-muted); text-align:center;">No hay apuestas.</p>';
