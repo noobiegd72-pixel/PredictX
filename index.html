@@ -19,7 +19,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
 
-        /* TEXTO VERSIÓN */
         .version-tag {
             position: fixed;
             bottom: 20px;
@@ -35,11 +34,9 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* NOTIFICACIONES */
         #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 400px; }
         .toast { background: var(--card); border: 1px solid var(--border); padding: 14px 24px; border-radius: 12px; color: var(--text); font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; pointer-events: auto; min-width: 100%; backdrop-filter: blur(10px); border-left: 4px solid var(--accent); }
 
-        /* HEADER */
         nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
         .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; white-space: nowrap; }
         .btn-primary { background: var(--accent); color: white; }
@@ -47,12 +44,10 @@
         .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
         .btn-ghost:hover { border-color: var(--accent); color: var(--text); background: rgba(255,255,255,0.05); }
 
-        /* VISTAS */
         .view { position: absolute; inset: 75px 0 0 0; padding: 30px; transition: all 0.5s ease; overflow-y: auto; }
         .view-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; visibility: hidden; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* MAIN CARD */
         .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.6s ease-out; }
         .badges-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
         .badge { padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; transition: all 0.3s; }
@@ -64,7 +59,6 @@
         .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); background: #1c212c; }
         .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
 
-        /* ADMIN PANEL REDUCIDO */
         #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
         .admin-window { background: var(--card); width: 95vw; max-width: 650px; height: 85vh; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); transform: scale(0.95); transition: transform 0.3s ease; }
         #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
@@ -79,7 +73,6 @@
         input:focus { border-color: var(--accent); background: #1c212c; }
         .hist-item { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; }
 
-        /* RESPONSIVIDAD */
         @media (max-width: 768px) {
             nav { padding: 10px 15px; }
             .btn { padding: 8px 12px; font-size: 0.75rem; }
@@ -105,7 +98,7 @@
 </head>
 <body>
 
-<div class="version-tag">v1.4.4</div>
+<div class="version-tag">v1.4.5</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -230,6 +223,8 @@
     db.ref('/').on('value', snap => {
         const data = snap.val() || {};
         globalData.current = data.currentBet || null;
+        
+        // CORRECCIÓN: Asegurar que la cola se lee siempre como array
         globalData.queue = data.queue ? Object.values(data.queue) : [];
         globalData.activeBetsCount = data.activeBetsCount || 0;
         
@@ -237,10 +232,26 @@
         
         document.getElementById('adm-count-active').innerText = globalData.activeBetsCount;
         
+        // AUTO-ACTIVACIÓN: Si no hay apuesta actual y hay en cola, moverla
+        if((!globalData.current || globalData.current.status === 'resolved') && globalData.queue.length > 0) {
+            autoMoveQueue();
+        }
+
         renderMain();
         renderAdminTools();
         renderQueue();
     });
+
+    function autoMoveQueue() {
+        db.ref('queue').limitToFirst(1).once('value', s => {
+            if(s.val()){
+                const key = Object.keys(s.val())[0];
+                const next = s.val()[key];
+                db.ref('queue/' + key).remove();
+                db.ref('currentBet').set(next);
+            }
+        });
+    }
 
     function renderMain() {
         const box = document.getElementById('options-box');
@@ -327,11 +338,9 @@
 
     function tryOpenAdmin() {
         if(document.getElementById('adminPass').value === "Isaias2013Cerrado") {
-            // Rellenar fecha actual por defecto al abrir
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('adm-close-time').value = now.toISOString().slice(0,16);
-            
             document.getElementById('admin-overlay').classList.add('open');
         } else {
             notify("Acceso denegado", "error");
@@ -374,43 +383,35 @@
         db.ref('lastResults').set({ betId: globalData.current.id, winners: winners });
         db.ref('activeBetsCount').set(0);
 
-        if(globalData.queue.length > 0) {
-            db.ref('queue').limitToFirst(1).once('value', s => {
-                const key = Object.keys(s.val())[0];
-                const next = s.val()[key];
-                db.ref('queue/' + key).remove();
-                db.ref('currentBet').set(next);
-            });
-        } else {
-            db.ref('currentBet/status').set('resolved');
-        }
+        // Al completar, forzamos el movimiento de cola inmediatamente
+        autoMoveQueue();
     }
 
     function updateTimers() {
         if (!globalData.current || !globalData.current.closeTime) {
             document.getElementById('timer-close').innerText = "SIN LÍMITE";
             marketClosed = false;
-            return;
-        }
-
-        const now = new Date();
-        const tClose = new Date(globalData.current.closeTime);
-        const dClose = tClose - now;
-
-        if(dClose <= 0) {
-            marketClosed = true;
-            document.getElementById('timer-close').innerText = "MERCADO CERRADO";
         } else {
-            marketClosed = false;
-            const hoursTotal = Math.floor(dClose/3600000);
-            const mm = Math.floor((dClose%3600000)/60000).toString().padStart(2,'0');
-            const ss = Math.floor((dClose%60000)/1000).toString().padStart(2,'0');
-            
-            // Si falta más de un día, mostramos las horas totales (ej. 48:00:00)
-            const hh = hoursTotal.toString().padStart(2,'0');
-            document.getElementById('timer-close').innerText = `CIERRA EN ${hh}:${mm}:${ss}`;
+            const now = new Date();
+            const tClose = new Date(globalData.current.closeTime);
+            const dClose = tClose - now;
+
+            if(dClose <= 0) {
+                marketClosed = true;
+                document.getElementById('timer-close').innerText = "MERCADO CERRADO";
+            } else {
+                marketClosed = false;
+                const hoursTotal = Math.floor(dClose/3600000);
+                const mm = Math.floor((dClose%3600000)/60000).toString().padStart(2,'0');
+                const ss = Math.floor((dClose%60000)/1000).toString().padStart(2,'0');
+                const hh = hoursTotal.toString().padStart(2,'0');
+                document.getElementById('timer-close').innerText = `CIERRA EN ${hh}:${mm}:${ss}`;
+            }
         }
-        document.getElementById('timer-next').innerText = globalData.queue.length > 0 ? `EN COLA: ${globalData.queue.length}` : "COLA VACÍA";
+        
+        // Actualizar visualmente el contador de cola
+        const qCount = globalData.queue.length;
+        document.getElementById('timer-next').innerText = qCount > 0 ? `EN COLA: ${qCount}` : "COLA VACÍA";
     }
 
     function showView(n) {
