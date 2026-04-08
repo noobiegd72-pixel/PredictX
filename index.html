@@ -105,7 +105,7 @@
 </head>
 <body>
 
-<div class="version-tag">v1.4.2</div>
+<div class="version-tag">v1.4.3</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -167,8 +167,8 @@
                     <strong id="adm-count-active" style="font-size: 1.3rem; color: var(--accent);">0</strong>
                 </div>
                 <div style="background: rgba(244,63,94,0.06); padding: 15px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">CIERRE</span><br>
-                    <input type="time" id="adm-close-time" onchange="updateCloseTime(this.value)" style="margin-top:5px; height:35px; font-size:0.8rem;">
+                    <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 800;">HORA CIERRE (ESTA APUESTA)</span><br>
+                    <input type="time" id="adm-close-time" value="22:00" style="margin-top:5px; height:35px; font-size:0.8rem;">
                 </div>
             </div>
 
@@ -212,7 +212,7 @@
     localStorage.setItem('px_uid', uid);
 
     let localUserData = { balance: 8.000, history: {} };
-    let globalData = { current: null, queue: [], closeTime: "22:00", activeBetsCount: 0 };
+    let globalData = { current: null, queue: [], activeBetsCount: 0 };
     let userSelection = [];
     let marketClosed = false;
 
@@ -231,12 +231,10 @@
         const data = snap.val() || {};
         globalData.current = data.currentBet || null;
         globalData.queue = data.queue ? Object.values(data.queue) : [];
-        globalData.closeTime = data.closeTime || "22:00";
         globalData.activeBetsCount = data.activeBetsCount || 0;
         
         if(data.lastResults) processResults(data.lastResults);
         
-        document.getElementById('adm-close-time').value = globalData.closeTime;
         document.getElementById('adm-count-active').innerText = globalData.activeBetsCount;
         
         renderMain();
@@ -339,11 +337,20 @@
         const q = document.getElementById('adm-q-input').value;
         const ons = document.querySelectorAll('.on');
         const oos = document.querySelectorAll('.oo');
+        const selectedCloseTime = document.getElementById('adm-close-time').value;
         let options = [];
         ons.forEach((n, i) => { if(n.value) options.push({name: n.value, odds: parseFloat(oos[i].value) || 1.100})});
         
         if(!q || options.length < 2) return notify("Completa los datos", "error");
-        const newBet = { id: 'b_'+Date.now(), question: q, options, status: 'active' };
+        
+        // Guardamos la hora de cierre dentro de este objeto específico
+        const newBet = { 
+            id: 'b_'+Date.now(), 
+            question: q, 
+            options, 
+            status: 'active',
+            closeTime: selectedCloseTime || "22:00" 
+        };
         
         if(isQueue) db.ref('queue').push(newBet);
         else db.ref('currentBet').set(newBet);
@@ -375,11 +382,15 @@
         }
     }
 
-    function updateCloseTime(val) { db.ref('closeTime').set(val); }
-
     function updateTimers() {
+        if (!globalData.current || !globalData.current.closeTime) {
+            document.getElementById('timer-close').innerText = "SIN LÍMITE";
+            marketClosed = false;
+            return;
+        }
+
         const now = new Date();
-        const [h, m] = globalData.closeTime.split(':');
+        const [h, m] = globalData.current.closeTime.split(':');
         const tClose = new Date(); tClose.setHours(h, m, 0);
         const dClose = tClose - now;
 
@@ -415,7 +426,7 @@
     }
     function renderQueue() {
         const c = document.getElementById('queue-list-container');
-        c.innerHTML = globalData.queue.map(q => `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question}</div>`).join('') || "Cola vacía";
+        c.innerHTML = globalData.queue.map(q => `<div style="padding:12px; border-bottom:1px solid #1e293b; font-size:0.9rem;">${q.question} <small style="color:var(--accent)">(${q.closeTime})</small></div>`).join('') || "Cola vacía";
     }
     function renderAdminTools() {
         const b = document.getElementById('adm-resolve-checks'); b.innerHTML = '';
