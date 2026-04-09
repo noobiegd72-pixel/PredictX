@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PredictX v1.6 | Las apuestas de la clase</title>
+    <title>PredictX v1.6.1 | Las apuestas de la clase</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
+        /* VARIABLES GLOBALES Y ESTILOS BASE */
         :root {
             --bg-gradient: linear-gradient(135deg, #030305 0%, #0b0c13 100%); 
             --card: rgba(13, 15, 20, 0.6); 
@@ -24,72 +25,374 @@
             --shadow-subtle: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-gradient); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
 
-        .version-tag { position: fixed; bottom: 20px; right: 25px; color: var(--text-muted); font-weight: 800; font-size: 0.9rem; z-index: 1000; pointer-events: none; opacity: 0.6; }
+        body { 
+            background: var(--bg-gradient); 
+            color: var(--text); 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative; 
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .version-tag { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 25px; 
+            color: var(--text-muted); 
+            font-weight: 800; 
+            font-size: 0.9rem; 
+            z-index: 1000; 
+            pointer-events: none; 
+            opacity: 0.6; 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+
+        @keyframes slideUp { 
+            from { transform: translateY(20px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
 
         /* NOTIFICACIONES */
-        #notification-container { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 450px; }
-        .toast { background: var(--card); border: 1px solid var(--border); padding: 16px 24px; border-radius: 16px; color: var(--text); font-size: 0.95rem; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: auto; backdrop-filter: blur(12px); border-left: 4px solid var(--accent); }
+        #notification-container { 
+            position: fixed; 
+            top: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            pointer-events: none; 
+            width: 90%; 
+            max-width: 450px; 
+        }
+
+        .toast { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 16px 24px; 
+            border-radius: 16px; 
+            color: var(--text); 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            pointer-events: auto; 
+            backdrop-filter: blur(12px); 
+            border-left: 4px solid var(--accent); 
+        }
+
         .toast.success { border-left-color: var(--success); }
         .toast.error { border-left-color: var(--error); }
 
         /* NAVEGACIÓN Y BOTONES */
-        nav { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 100; position: relative; animation: fadeIn 0.8s ease; }
-        .btn { padding: 12px 22px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2); }
-        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); background: var(--accent-hover); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid transparent; }
-        .btn-ghost:hover { border-color: var(--border); color: var(--text); background: rgba(255,255,255,0.03); }
+        nav { 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border); 
+            z-index: 100; 
+            position: relative; 
+            animation: fadeIn 0.8s ease; 
+        }
+
+        .btn { 
+            padding: 12px 22px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 0.85rem; 
+        }
+
+        .btn-primary { 
+            background: var(--accent); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2); 
+        }
+
+        .btn-primary:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            background: var(--accent-hover); 
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); 
+        }
+
+        .btn-primary:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+
+        .btn-ghost { 
+            background: transparent; 
+            color: var(--text-muted); 
+            border: 1px solid transparent; 
+        }
+
+        .btn-ghost:hover { 
+            border-color: var(--border); 
+            color: var(--text); 
+            background: rgba(255,255,255,0.03); 
+        }
 
         /* VISTAS */
-        .view { position: absolute; inset: 75px 0 0 0; padding: 40px 20px; transition: all 0.5s ease; overflow-y: auto; }
-        .view-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; visibility: hidden; }
-        .container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; padding-bottom: 60px; }
-        .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 40px; text-align: center; box-shadow: var(--shadow-subtle); backdrop-filter: blur(10px); animation: slideUp 0.6s; }
+        .view { 
+            position: absolute; 
+            inset: 75px 0 0 0; 
+            padding: 40px 20px; 
+            transition: all 0.5s ease; 
+            overflow-y: auto; 
+        }
+
+        .view-hidden { 
+            opacity: 0; 
+            transform: translateY(20px); 
+            pointer-events: none; 
+            visibility: hidden; 
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 30px; 
+            padding-bottom: 60px; 
+        }
+
+        .main-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 28px; 
+            padding: 40px; 
+            text-align: center; 
+            box-shadow: var(--shadow-subtle); 
+            backdrop-filter: blur(10px); 
+            animation: slideUp 0.6s; 
+        }
 
         /* BADGES Y OPCIONES */
-        .badges-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .badge { padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
-        .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
+        .badges-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+
+        .badge { 
+            padding: 6px 14px; 
+            border-radius: 50px; 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+        }
+
+        .badge-timer { 
+            background: rgba(99, 102, 241, 0.1); 
+            color: var(--accent); 
+            border: 1px solid rgba(99, 102, 241, 0.2); 
+        }
+
+        .badge-close { 
+            background: rgba(244, 63, 94, 0.1); 
+            color: var(--error); 
+            border: 1px solid rgba(244, 63, 94, 0.2); 
+        }
         
-        /* Modificado para soportar secciones completas */
-        .options-wrapper { text-align: left; margin: 30px 0; }
-        .section-header { font-size: 1.1rem; color: var(--accent); font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 25px; margin-bottom: 15px; }
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 15px;}
+        .options-wrapper { 
+            text-align: left; 
+            margin: 30px 0; 
+        }
+
+        .section-header { 
+            font-size: 1.1rem; 
+            color: var(--accent); 
+            font-weight: 800; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 10px; 
+            margin-top: 25px; 
+            margin-bottom: 15px; 
+        }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 16px; 
+            margin-bottom: 15px;
+        }
         
-        .opt-btn { background: rgba(22, 26, 35, 0.7); border: 2px solid var(--border); padding: 20px; border-radius: 18px; cursor: pointer; display: flex; justify-content: space-between; transition: all 0.25s; align-items: center; }
-        .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-3px); background: rgba(28, 33, 44, 0.9); }
-        .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.12); box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); }
-        .opt-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+        .opt-btn { 
+            background: rgba(22, 26, 35, 0.7); 
+            border: 2px solid var(--border); 
+            padding: 20px; 
+            border-radius: 18px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            transition: all 0.25s; 
+            align-items: center; 
+        }
+
+        .opt-btn:hover:not(.disabled) { 
+            border-color: var(--accent); 
+            transform: translateY(-3px); 
+            background: rgba(28, 33, 44, 0.9); 
+        }
+
+        .opt-btn.active { 
+            border-color: var(--accent); 
+            background: rgba(99, 102, 241, 0.12); 
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); 
+        }
+
+        .opt-btn.disabled { 
+            opacity: 0.4; 
+            cursor: not-allowed; 
+        }
 
         /* INPUTS Y NOTAS */
-        input[type="number"], input[type="text"], input[type="password"], input[type="datetime-local"] { background: rgba(22, 26, 35, 0.8); border: 1px solid var(--border); color: white; padding: 14px 18px; border-radius: 12px; width: 100%; font-weight: 600; outline: none; transition: 0.3s; font-size: 0.95rem; }
-        input:focus { border-color: var(--accent); background: rgba(28, 33, 44, 1); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-        .hist-item { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; backdrop-filter: blur(10px); }
+        input[type="number"], 
+        input[type="text"], 
+        input[type="password"], 
+        input[type="datetime-local"] { 
+            background: rgba(22, 26, 35, 0.8); 
+            border: 1px solid var(--border); 
+            color: white; 
+            padding: 14px 18px; 
+            border-radius: 12px; 
+            width: 100%; 
+            font-weight: 600; 
+            outline: none; 
+            transition: 0.3s; 
+            font-size: 0.95rem; 
+        }
+
+        input:focus { 
+            border-color: var(--accent); 
+            background: rgba(28, 33, 44, 1); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
+        }
+
+        .hist-item { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            border-radius: 20px; 
+            margin-bottom: 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            animation: slideUp 0.4s ease-out; 
+            backdrop-filter: blur(10px); 
+        }
 
         /* PANEL ADMIN */
-        #admin-overlay, #users-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(15px); }
-        #admin-overlay.open, #users-modal-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
-        .admin-window { background: var(--bg-gradient); width: 95vw; max-width: 850px; height: 85vh; border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
-        .admin-nav { display: flex; background: rgba(10, 12, 16, 0.9); border-bottom: 1px solid var(--border); overflow-x: auto; }
-        .admin-nav-item { padding: 18px 24px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.85rem; transition: 0.3s; white-space: nowrap; border-bottom: 3px solid transparent; }
-        .admin-nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: rgba(255,255,255,0.02); }
-        .admin-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .admin-bet-card { background: rgba(22, 26, 35, 0.5); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+        #admin-overlay, 
+        #users-modal-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.85); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+            backdrop-filter: blur(15px); 
+        }
 
-        .creator-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        #admin-overlay.open, 
+        #users-modal-overlay.open { 
+            display: flex; 
+            animation: fadeIn 0.3s forwards; 
+        }
+
+        .admin-window { 
+            background: var(--bg-gradient); 
+            width: 95vw; 
+            max-width: 850px; 
+            height: 85vh; 
+            border-radius: 28px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8); 
+        }
+
+        .admin-nav { 
+            display: flex; 
+            background: rgba(10, 12, 16, 0.9); 
+            border-bottom: 1px solid var(--border); 
+            overflow-x: auto; 
+        }
+
+        .admin-nav-item { 
+            padding: 18px 24px; 
+            cursor: pointer; 
+            color: var(--text-muted); 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            transition: 0.3s; 
+            white-space: nowrap; 
+            border-bottom: 3px solid transparent; 
+        }
+
+        .admin-nav-item.active { 
+            color: var(--accent); 
+            border-bottom: 3px solid var(--accent); 
+            background: rgba(255,255,255,0.02); 
+        }
+
+        .admin-content { 
+            flex: 1; 
+            padding: 30px; 
+            overflow-y: auto; 
+        }
+
+        .admin-bet-card { 
+            background: rgba(22, 26, 35, 0.5); 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            border-radius: 16px; 
+            margin-bottom: 20px; 
+        }
+
+        .creator-row { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 10px; 
+            align-items: center; 
+            background: rgba(0,0,0,0.3); 
+            padding: 10px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+        }
     </style>
 </head>
 <body>
 
-<div class="version-tag">v1.6</div>
+<div class="version-tag">v1.6.1</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -217,7 +520,7 @@
     let localUserData = { balance: 8.000, history: {} };
     let globalData = { activeBets: {}, queue: [] };
     let allUsersData = {}; 
-    let userSelections = {}; // Estructura: { betId: { opts: [0,2], nums: {3: "5"} } }
+    let userSelections = {}; 
     let marketClosedStatus = {}; 
 
     // ==========================================
@@ -305,27 +608,30 @@
             let opt = bet.options[i];
             let val = parseFloat(sel.nums[i]);
             if(opt && !isNaN(val)) {
-                let baseOdds = parseFloat(opt.odds || 1.1);
+                let baseOdds = parseFloat(opt.odds || 1.0);
                 let baseNum = parseFloat(opt.baseNum || 0);
+                let force = parseFloat(opt.expForce || 1.0);
                 
                 if(opt.type === 'number') {
-                    // Si se aleja, sube la cuota (simulación básica)
-                    odds *= (baseOdds + (Math.abs(val - baseNum) * 0.15));
+                    // Cálculo Exponencial: Cuota = Base * Fuerza^(Diferencia)
+                    let diff = Math.abs(val - baseNum);
+                    odds *= (baseOdds * Math.pow(force, diff));
                 } else if (opt.type === 'range') {
                     let min = parseFloat(opt.min || 0);
                     let max = parseFloat(opt.max || 10);
                     if(val >= min && val <= max) {
-                        // Rango más amplio = menor cuota
+                        // Rango más amplio = menor cuota exponencialmente
                         let rangeSize = Math.abs(max - min);
-                        odds *= (baseOdds - (rangeSize * 0.02)); 
+                        odds *= (baseOdds / Math.pow(force, rangeSize)); 
                     } else {
-                        // Fuera de rango es inválido (lo reseteamos luego, pero por ahora no da cuota extra)
                         odds *= 1.0;
                     }
                 }
             }
         });
-        return Math.max(1.00, odds); // Minimo 1.00
+        
+        // El mínimo absoluto es 1.00 según lo solicitado
+        return Math.max(1.00, odds); 
     }
 
     function renderMain() {
@@ -344,7 +650,6 @@
 
         let htmlContent = '';
         
-        // Inicializar selecciones si no existen
         activeBetKeys.forEach(betId => { 
             if (!userSelections[betId] || Array.isArray(userSelections[betId])) {
                 userSelections[betId] = { opts: [], nums: {} };
@@ -366,12 +671,9 @@
 
             let currentSectionSingle = bet.isGlobalSingle;
             let currentGridOpen = false;
-
-            // Retrocompatibilidad: Si no hay 'options' sino un array simple
             let optsArray = bet.options || [];
 
             optsArray.forEach((opcion, i) => {
-                // Retrocompatibilidad con apuestas antiguas sin tipo
                 let optType = opcion.type || 'normal';
 
                 if (optType === 'section') {
@@ -396,7 +698,7 @@
                     
                     cardHtml += `
                         <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
-                            <label style="display:block; color:var(--text-muted); font-size:0.85rem; margin-bottom:8px;">${opcion.name} <span style="color:var(--accent); font-weight:bold;">(Cuota Base x${opcion.odds})</span></label>
+                            <label style="display:block; color:var(--text-muted); font-size:0.85rem; margin-bottom:8px;">${opcion.name} <span style="color:var(--accent); font-weight:bold;">(Fuerza x${opcion.expForce || 1.0})</span></label>
                             <input type="number" placeholder="${placeholder}" value="${uVal}" 
                                    onchange="updateNumSelection('${betId}', ${i}, this.value, '${optType}', ${opcion.min}, ${opcion.max}, ${opcion.baseNum})" 
                                    ${hasBet || isClosed ? 'disabled' : ''}>
@@ -424,7 +726,6 @@
             htmlContent += cardHtml;
         });
 
-        // Guardar valores del input de dinero para no perderlos al renderizar
         let savedInputs = {};
         activeBetKeys.forEach(id => { const el = document.getElementById(`bet-val-${id}`); if (el) savedInputs[id] = el.value; });
         
@@ -433,7 +734,6 @@
         activeBetKeys.forEach(id => { 
             const el = document.getElementById(`bet-val-${id}`); 
             if (el && savedInputs[id]) el.value = savedInputs[id]; 
-            // Añadir listener para calcular ganancias en tiempo real
             if(el) {
                 el.addEventListener('input', () => {
                     let val = parseFloat(el.value || 0);
@@ -449,8 +749,6 @@
         const sel = userSelections[betId];
         
         if (isSingle) {
-            // Simplificación: Si es single, limpia las opciones normales previas 
-            // (Para ser perfecto limpiaría solo las de su sección, pero así evita trampas globales)
             sel.opts = [optionIndex];
         } else {
             if(sel.opts.includes(optionIndex)) {
@@ -464,9 +762,8 @@
 
     window.updateNumSelection = function(betId, idx, val, type, min, max, base) {
         let num = parseFloat(val);
-        if(isNaN(num)) num = base || 0; // Fallback
+        if(isNaN(num)) num = base || 0; 
         
-        // Si es rango, forzar límites
         if(type === 'range') {
             if(num < min) num = min;
             if(num > max) num = max;
@@ -487,7 +784,6 @@
 
         const finalOdds = calculateOdds(betId);
         
-        // Formatear las selecciones para el historial
         let picksNames = [];
         sel.opts.forEach(i => picksNames.push(bet.options[i].name));
         Object.keys(sel.nums).forEach(i => picksNames.push(`${bet.options[i].name}: ${sel.nums[i]}`));
@@ -523,29 +819,17 @@
                 localUserData.balance += myBet.amount;
                 notify(`Evento cancelado: ${myBet.question}. CR devueltos.`, "error");
             } else {
-                // Logica de subconjunto para opciones normales (todas las que apostó el usuario deben haber ocurrido)
                 let optsWin = true;
                 if(myBet.opts && myBet.opts.length > 0) {
                     optsWin = myBet.opts.every(idx => (resultObj.winners || []).includes(idx));
                 }
 
-                // Logica para numeros y rangos
                 let numsWin = true;
                 if(myBet.nums) {
                     Object.keys(myBet.nums).forEach(i => {
                         let userVal = parseFloat(myBet.nums[i]);
                         let actualVal = parseFloat(resultObj.numResults[i]);
-                        let optData = resultObj.optDetails ? resultObj.optDetails[i] : null;
-
-                        if(optData && optData.type === 'range') {
-                            // En la v1.6 se pidió que si el número real cae en el rango apostado?
-                            // No, el admin valida un número, y si el usuario apostó dentro del rango.. 
-                            // Corrección: El user elige un número DENTRO del rango. Si acierta el número exacto, gana. 
-                            // Simplificación para cumplir estricto: Debe coincidir.
-                            if(userVal !== actualVal) numsWin = false;
-                        } else {
-                            if(userVal !== actualVal) numsWin = false;
-                        }
+                        if(userVal !== actualVal) numsWin = false;
                     });
                 }
 
@@ -599,31 +883,33 @@
         if (type === 'section') {
             div.innerHTML = `
                 <span style="color:var(--text-muted); font-size:0.7rem; font-weight:bold; width:60px;">SECCIÓN</span>
-                <input type="text" class="o-name" placeholder="Título de la Sección" value="${data.name||''}" style="flex:1;">
+                <input type="text" class="o-name" placeholder="Título" value="${data.name||''}" style="flex:1;">
                 <label style="font-size:0.75rem; color:var(--text-muted);"><input type="checkbox" class="o-single" ${data.isSingle?'checked':''}> Única</label>
                 <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
             `;
         } else if (type === 'number') {
             div.innerHTML = `
                 <span style="color:var(--accent); font-size:0.7rem; font-weight:bold; width:60px;">NÚMERO</span>
-                <input type="text" class="o-name" placeholder="Ej: Disparos a puerta" value="${data.name||''}" style="flex:1;">
-                <input type="number" class="o-base" placeholder="Base" value="${data.baseNum||0}" style="width:70px;">
-                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:80px;">
+                <input type="text" class="o-name" placeholder="Nombre" value="${data.name||''}" style="flex:1;">
+                <input type="number" class="o-base" placeholder="Base" value="${data.baseNum||0}" style="width:60px;">
+                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.000}" step="0.001" style="width:70px;">
+                <input type="number" class="o-force" placeholder="Fuerza" value="${data.expForce||1.000}" step="0.01" style="width:70px;">
                 <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
             `;
         } else if (type === 'range') {
             div.innerHTML = `
                 <span style="color:var(--success); font-size:0.7rem; font-weight:bold; width:60px;">RANGO</span>
-                <input type="text" class="o-name" placeholder="Ej: Minuto del gol" value="${data.name||''}" style="flex:1;">
-                <input type="number" class="o-min" placeholder="Min" value="${data.min||0}" style="width:60px;">
-                <input type="number" class="o-max" placeholder="Max" value="${data.max||10}" style="width:60px;">
-                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:70px;">
+                <input type="text" class="o-name" placeholder="Nombre" value="${data.name||''}" style="flex:1;">
+                <input type="number" class="o-min" placeholder="Min" value="${data.min||0}" style="width:55px;">
+                <input type="number" class="o-max" placeholder="Max" value="${data.max||10}" style="width:55px;">
+                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.000}" step="0.001" style="width:70px;">
+                <input type="number" class="o-force" placeholder="Fuerza" value="${data.expForce||1.000}" step="0.01" style="width:70px;">
                 <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
             `;
         } else {
             div.innerHTML = `
                 <span style="color:var(--text); font-size:0.7rem; font-weight:bold; width:60px;">NORMAL</span>
-                <input type="text" class="o-name" placeholder="Opción normal" value="${data.name||''}" style="flex:1;">
+                <input type="text" class="o-name" placeholder="Opción" value="${data.name||''}" style="flex:1;">
                 <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:80px;">
                 <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
             `;
@@ -644,9 +930,9 @@
             if(type === 'section') {
                 options.push({ type, name, isSingle: row.querySelector('.o-single').checked });
             } else if (type === 'number') {
-                options.push({ type, name, baseNum: row.querySelector('.o-base').value, odds: row.querySelector('.o-odds').value });
+                options.push({ type, name, baseNum: row.querySelector('.o-base').value, odds: row.querySelector('.o-odds').value, expForce: row.querySelector('.o-force').value });
             } else if (type === 'range') {
-                options.push({ type, name, min: row.querySelector('.o-min').value, max: row.querySelector('.o-max').value, odds: row.querySelector('.o-odds').value });
+                options.push({ type, name, min: row.querySelector('.o-min').value, max: row.querySelector('.o-max').value, odds: row.querySelector('.o-odds').value, expForce: row.querySelector('.o-force').value });
             } else {
                 options.push({ type, name, odds: row.querySelector('.o-odds').value || 1.100 });
             }
@@ -665,16 +951,14 @@
         
         if (isToQueue) { 
             db.ref('queue/' + newBet.id).set(newBet); 
-            notify(existingId ? "Actualizado en cola" : "Añadido a la cola", "success"); 
+            notify("Añadido a la cola", "success"); 
         } 
         else { 
             db.ref('activeBets/' + newBet.id).set(newBet); 
-            notify(existingId ? "Evento actualizado" : "Evento activado", "success"); 
-            // Eliminar de cola si estaba editando desde ahi
+            notify("Evento publicado", "success"); 
             if(existingId) db.ref('queue/' + existingId).remove();
         }
         
-        // Reset
         document.getElementById('edit-bet-id').value = "";
         document.getElementById('adm-q-input').value = ""; 
         document.getElementById('adm-global-single').checked = false;
@@ -698,7 +982,6 @@
         if(el) el.innerText = totalActiveBets;
     }
 
-    // Modal para ver apuestas de usuarios
     window.openUsersModal = function(betId, betQuestion) {
         document.getElementById('users-modal-title').innerText = `Apuestas: ${betQuestion}`;
         const content = document.getElementById('users-modal-content');
@@ -713,7 +996,7 @@
         });
 
         if(usersList.length === 0) {
-            content.innerHTML = '<p style="color:var(--text-muted);">Nadie ha apostado en este evento todavía.</p>';
+            content.innerHTML = '<p style="color:var(--text-muted);">Nadie ha apostado todavía.</p>';
         } else {
             usersList.forEach(item => {
                 let d = new Date(item.betData.timestamp).toLocaleString();
@@ -738,7 +1021,6 @@
         document.getElementById('users-modal-overlay').classList.add('open');
     }
 
-    // Editar evento activo o en cola
     window.loadBetToEdit = function(betId, fromQueue = false) {
         let bet = fromQueue ? globalData.queue.find(x => x.id === betId) : globalData.activeBets[betId];
         if(!bet) return;
@@ -753,7 +1035,6 @@
             addOptionRow(o.type || 'normal', o);
         });
 
-        // Cambiar a la pestaña de crear
         document.querySelectorAll('.admin-nav-item')[0].click();
     }
 
@@ -767,12 +1048,9 @@
 
         activeBetKeys.forEach(betId => {
             const bet = globalData.activeBets[betId];
-            
             let participants = 0;
             Object.values(allUsersData).forEach(user => {
-                if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
-                    participants++;
-                }
+                if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') participants++;
             });
             
             let html = `
@@ -782,7 +1060,7 @@
                         <button class="btn btn-ghost" onclick="loadBetToEdit('${betId}', false)" style="padding:5px 10px; font-size:0.75rem;">✏️ Editar</button>
                     </div>
                     
-                    <button onclick="openUsersModal('${betId}', '${bet.question.replace(/'/g, "\\'")}')" class="btn btn-ghost" style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 15px; border:1px solid var(--accent); width:100%; justify-content:center;">👥 Ver Apuestas (${participants} personas)</button>
+                    <button onclick="openUsersModal('${betId}', '${bet.question.replace(/'/g, "\\'")}')" class="btn btn-ghost" style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 15px; border:1px solid var(--accent); width:100%; justify-content:center;">👥 Ver Apuestas (${participants})</button>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
             `;
@@ -798,8 +1076,8 @@
                 } else if (t === 'number' || t === 'range') {
                     html += `
                         <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; grid-column: 1/-1;">
-                            <label style="display:block; margin-bottom:5px; color:var(--text-muted);">Resultado real: ${opt.name}</label>
-                            <input type="number" class="resolve-num-${betId}" data-idx="${idx}" placeholder="Ingresa el número real" style="width:100%;">
+                            <label style="display:block; margin-bottom:5px; color:var(--text-muted);">Real: ${opt.name}</label>
+                            <input type="number" class="resolve-num-${betId}" data-idx="${idx}" placeholder="Resultado real" style="width:100%;">
                         </div>
                     `;
                 }
@@ -809,7 +1087,7 @@
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <button class="btn btn-primary" onclick="resolveSpecificBet('${betId}')" style="flex: 1; justify-content: center; background: var(--success); color: #000;">VALIDAR Y CERRAR</button>
-                        <button class="btn btn-primary" onclick="deleteSpecificBet('${betId}')" style="background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid var(--error); justify-content: center;">🗑️ ELIMINAR EVENTO</button>
+                        <button class="btn btn-primary" onclick="deleteSpecificBet('${betId}')" style="background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid var(--error); justify-content: center;">🗑️ ELIMINAR</button>
                     </div>
                 </div>
             `;
@@ -826,48 +1104,22 @@
             if(inp.value !== "") numResults[inp.dataset.idx] = parseFloat(inp.value);
         });
 
-        // Pasamos optDetails para verificar el tipo (range vs number) al procesar en los clientes
         let bet = globalData.activeBets[betId];
         let optDetails = {};
         if(bet && bet.options) {
             bet.options.forEach((o,i) => optDetails[i] = o);
         }
 
-        let participants = 0;
-        let correctGuesses = 0;
-        
-        Object.values(allUsersData).forEach(user => {
-            if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
-                participants++;
-                let myBet = user.history[betId];
-                
-                // Mismo cálculo que en processResults para saber estadísticas previas
-                let optsWin = true;
-                if(myBet.opts) optsWin = myBet.opts.every(idx => winners.includes(idx));
-                
-                let numsWin = true;
-                if(myBet.nums) {
-                    Object.keys(myBet.nums).forEach(i => {
-                        if(parseFloat(myBet.nums[i]) !== parseFloat(numResults[i])) numsWin = false;
-                    });
-                }
-
-                if(optsWin && numsWin) correctGuesses++;
-            }
-        });
-
         db.ref('lastResults').set({ betId: betId, winners: winners, numResults: numResults, optDetails: optDetails, ts: Date.now() });
         db.ref('activeBets/' + betId).remove();
-        
-        notify(`✅ Evento cerrado. Acertaron ${correctGuesses} / ${participants} personas.`, "success");
+        notify(`✅ Evento cerrado.`, "success");
     }
 
     window.deleteSpecificBet = function(betId) {
-        if(!confirm("¿Seguro que quieres eliminar este evento? Se devolverán los créditos a todos los que hayan apostado.")) return;
-        
+        if(!confirm("¿Eliminar? Se devolverán los créditos.")) return;
         db.ref('lastResults').set({ betId: betId, cancelled: true, ts: Date.now() });
         db.ref('activeBets/' + betId).remove();
-        notify("Evento eliminado y créditos devueltos.", "success");
+        notify("Evento eliminado.", "success");
     }
 
     function renderQueue() {
@@ -886,7 +1138,7 @@
     }
 
     // ==========================================
-    // TIEMPOS E HISTORIAL (BORRADO/COLOR)
+    // TIEMPOS E HISTORIAL
     // ==========================================
 
     function updateTimers() {
@@ -902,7 +1154,6 @@
                 if (timerEl) timerEl.innerText = "MERCADO CERRADO";
             } else {
                 marketClosedStatus[betId] = false;
-
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -928,7 +1179,7 @@
 
     function renderHistory() {
         const container = document.getElementById('history-container');
-        if (!localUserData.history || Object.keys(localUserData.history).length === 0) return container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas registradas.</p>';
+        if (!localUserData.history || Object.keys(localUserData.history).length === 0) return container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas.</p>';
 
         container.innerHTML = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp).map(hist => {
             let color = 'var(--accent)'; 
@@ -942,11 +1193,8 @@
                 color = 'var(--error)'; 
                 moneyStr = `-${hist.amount.toFixed(3)} CR`; 
             }
-            if (hist.status === 'CANCELADA') { 
-                color = 'var(--text-muted)'; 
-            }
+            if (hist.status === 'CANCELADA') color = 'var(--text-muted)'; 
 
-            // Picks string retrocompatible
             let picksStr = Array.isArray(hist.picks) ? hist.picks.join(' | ') : 'Opciones antiguas';
 
             return `
@@ -966,21 +1214,17 @@
         }).join('');
     }
 
-    // Borrar historial / Cancelar si es PENDIENTE
     window.deleteFromHistory = function(betId, status, amount) {
         if(status === 'PENDIENTE') {
-            if(marketClosedStatus[betId]) {
-                return notify("No puedes cancelar, el mercado ya está cerrado.", "error");
-            }
-            if(confirm("¿Seguro que quieres CANCELAR esta apuesta? Se te devolverán los créditos y podrás volver a apostar.")) {
+            if(marketClosedStatus[betId]) return notify("Mercado cerrado.", "error");
+            if(confirm("¿Cancelar apuesta?")) {
                 localUserData.balance += amount;
                 delete localUserData.history[betId];
                 db.ref('users/' + uid).set(localUserData);
-                notify("Apuesta cancelada. Créditos devueltos.", "success");
+                notify("Cancelada.", "success");
             }
         } else {
-            // Solo borrar del historial visual (ya procesada)
-            if(confirm("¿Eliminar este registro de tu historial?")) {
+            if(confirm("¿Eliminar del historial?")) {
                 delete localUserData.history[betId];
                 db.ref('users/' + uid).set(localUserData);
             }
@@ -990,7 +1234,8 @@
     function notify(message, type = "success") {
         const container = document.getElementById('notification-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`; toast.innerText = (type === "success" ? "✅ " : "❌ ") + message;
+        toast.className = `toast ${type}`; 
+        toast.innerText = (type === "success" ? "✅ " : "❌ ") + message;
         container.appendChild(toast);
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 400); }, 4000);
     }
