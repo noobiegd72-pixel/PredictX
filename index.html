@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PredictX | Las apuestas de la clase</title>
+    <title>PredictX v1.6 | Las apuestas de la clase</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <style>
-        /* VARIABLES GLOBALES */
         :root {
             --bg-gradient: linear-gradient(135deg, #030305 0%, #0b0c13 100%); 
             --card: rgba(13, 15, 20, 0.6); 
@@ -59,7 +58,12 @@
         .badge { padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .badge-timer { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
         .badge-close { background: rgba(244, 63, 94, 0.1); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin: 30px 0; }
+        
+        /* Modificado para soportar secciones completas */
+        .options-wrapper { text-align: left; margin: 30px 0; }
+        .section-header { font-size: 1.1rem; color: var(--accent); font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 25px; margin-bottom: 15px; }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 15px;}
+        
         .opt-btn { background: rgba(22, 26, 35, 0.7); border: 2px solid var(--border); padding: 20px; border-radius: 18px; cursor: pointer; display: flex; justify-content: space-between; transition: all 0.25s; align-items: center; }
         .opt-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-3px); background: rgba(28, 33, 44, 0.9); }
         .opt-btn.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.12); box-shadow: 0 0 25px rgba(99, 102, 241, 0.15); }
@@ -71,29 +75,21 @@
         .hist-item { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.4s ease-out; backdrop-filter: blur(10px); }
 
         /* PANEL ADMIN */
-        #admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(15px); }
-        #admin-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
-        .admin-window { background: var(--bg-gradient); width: 95vw; max-width: 800px; height: 85vh; border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); transform: scale(0.95); transition: transform 0.3s; }
-        #admin-overlay.open .admin-window { transform: scale(1); }
+        #admin-overlay, #users-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(15px); }
+        #admin-overlay.open, #users-modal-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
+        .admin-window { background: var(--bg-gradient); width: 95vw; max-width: 850px; height: 85vh; border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
         .admin-nav { display: flex; background: rgba(10, 12, 16, 0.9); border-bottom: 1px solid var(--border); overflow-x: auto; }
         .admin-nav-item { padding: 18px 24px; cursor: pointer; color: var(--text-muted); font-weight: 700; font-size: 0.85rem; transition: 0.3s; white-space: nowrap; border-bottom: 3px solid transparent; }
         .admin-nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: rgba(255,255,255,0.02); }
         .admin-content { flex: 1; padding: 30px; overflow-y: auto; }
         .admin-bet-card { background: rgba(22, 26, 35, 0.5); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-bottom: 20px; }
 
-        @media (max-width: 768px) {
-            nav { padding: 12px 20px; } .btn { padding: 10px 14px; font-size: 0.8rem; }
-            .view { padding: 20px 15px; inset: 65px 0 0 0; } .main-card { padding: 30px 20px; }
-            .options-grid { grid-template-columns: 1fr; }
-            .admin-window { height: 95vh; border-radius: 20px; }
-            .admin-stat-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 480px) { nav { flex-direction: column; gap: 12px; height: auto; } .view { inset: 125px 0 0 0; } }
+        .creator-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
-<div class="version-tag">v1.5.1</div>
+<div class="version-tag">v1.6</div>
 <div id="notification-container"></div>
 
 <nav>
@@ -110,7 +106,7 @@
 
 <div id="view-main" class="view">
     <div style="text-align: center; margin-bottom: 20px;">
-        <span class="badge badge-timer" id="global-queue-badge" style="display: none; background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: var(--border);">EN COLA: 0</span>
+        <span class="badge badge-timer" id="global-queue-badge" style="display: none;">EN COLA: 0</span>
     </div>
     <div class="container" id="active-bets-container"></div>
 </div>
@@ -122,44 +118,66 @@
     </div>
 </div>
 
+<div id="users-modal-overlay">
+    <div class="admin-window" style="height: 70vh; max-width: 600px;">
+        <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="users-modal-title" style="color: white;">Detalles de Apuestas</h3>
+            <button onclick="closeUsersModal()" class="btn btn-ghost">✕</button>
+        </div>
+        <div class="admin-content" id="users-modal-content"></div>
+    </div>
+</div>
+
 <div id="admin-overlay">
     <div class="admin-window">
         <div class="admin-nav">
-            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">➕ Crear Evento</div>
+            <div class="admin-nav-item active" onclick="switchAdminTab(this, 'create')">➕ Crear / Editar Evento</div>
             <div class="admin-nav-item" onclick="switchAdminTab(this, 'resolve')">✔️ Resolver Eventos</div>
             <div class="admin-nav-item" onclick="switchAdminTab(this, 'queue')">📋 Cola Global</div>
             <button onclick="closeAdmin()" style="margin-left: auto; background:none; border:none; color:white; padding:15px 25px; cursor:pointer; font-size: 1.2rem;">✕</button>
         </div>
         
         <div class="admin-content" id="adm-tab-create">
+            <input type="hidden" id="edit-bet-id">
             <div class="admin-stat-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                 <div style="background: rgba(99,102,241,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(99,102,241,0.2);">
-                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">EVENTOS ACTIVOS</span><br>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800;">EVENTOS ACTIVOS</span><br>
                     <strong id="adm-count-active" style="font-size: 1.8rem; color: var(--accent);">0</strong>
                 </div>
                 <div style="background: rgba(16,185,129,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(16,185,129,0.2);">
-                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">TOTAL APUESTAS (GLOBAL)</span><br>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800;">APUESTAS GLOBALES</span><br>
                     <strong id="adm-count-total-bets" style="font-size: 1.8rem; color: var(--success);">0</strong>
                 </div>
                 <div style="background: rgba(244,63,94,0.08); padding: 20px; border-radius: 16px; border: 1px solid rgba(244,63,94,0.2);">
-                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">HORA CIERRE</span><br>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800;">HORA CIERRE</span><br>
                     <input type="datetime-local" id="adm-close-time" style="margin-top:8px; padding: 10px; font-size:0.8rem; background: rgba(0,0,0,0.5);">
                 </div>
             </div>
 
             <div style="background: rgba(13, 15, 20, 0.8); padding: 25px; border-radius: 20px; border: 1px solid var(--border);">
                 <input type="text" id="adm-q-input" placeholder="Pregunta (Ej: ¿Quién gana la carrera?)" style="margin-bottom: 15px; font-size: 1.05rem;">
+                <label style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px; display:block;">
+                    <input type="checkbox" id="adm-global-single"> Forzar TODA la apuesta a ser Selección Única
+                </label>
+                
                 <div id="adm-options-list"></div>
-                <button class="btn btn-ghost" onclick="addOptionRow()" style="width:100%; margin: 15px 0; justify-content: center; border: 1px dashed var(--border);">+ Añadir otra opción</button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
-                    <button class="btn btn-ghost" onclick="saveToGlobalQueue(true)" style="border: 1px solid var(--accent); color:var(--accent); justify-content:center;">GUARDAR EN COLA</button>
-                    <button class="btn btn-primary" onclick="saveToGlobalQueue(false)" style="justify-content:center;">ACTIVAR HOY</button>
+                
+                <div style="display:flex; gap: 8px; margin-top: 15px; flex-wrap:wrap;">
+                    <button class="btn btn-ghost" onclick="addOptionRow('normal')" style="border: 1px dashed var(--border); font-size:0.75rem;">+ Opción Normal</button>
+                    <button class="btn btn-ghost" onclick="addOptionRow('section')" style="border: 1px dashed var(--border); font-size:0.75rem;">+ Sección</button>
+                    <button class="btn btn-ghost" onclick="addOptionRow('number')" style="border: 1px dashed var(--border); font-size:0.75rem;">+ Número</button>
+                    <button class="btn btn-ghost" onclick="addOptionRow('range')" style="border: 1px dashed var(--border); font-size:0.75rem;">+ Rango</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px;">
+                    <button class="btn btn-ghost" onclick="saveEvent(true)" style="border: 1px solid var(--accent); color:var(--accent); justify-content:center;">GUARDAR EN COLA</button>
+                    <button class="btn btn-primary" onclick="saveEvent(false)" style="justify-content:center;">PUBLICAR/ACTUALIZAR HOY</button>
                 </div>
             </div>
         </div>
 
         <div class="admin-content" id="adm-tab-resolve" style="display:none;">
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Selecciona las opciones ganadoras para cada evento. También puedes eliminar el evento (se devolverán los créditos).</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Introduce los resultados reales y valida.</p>
             <div id="adm-resolve-list"></div>
         </div>
 
@@ -198,15 +216,14 @@
 
     let localUserData = { balance: 8.000, history: {} };
     let globalData = { activeBets: {}, queue: [] };
-    let allUsersData = {}; // Para calcular estadísticas globales
-    let userSelections = {}; 
+    let allUsersData = {}; 
+    let userSelections = {}; // Estructura: { betId: { opts: [0,2], nums: {3: "5"} } }
     let marketClosedStatus = {}; 
 
     // ==========================================
     // LISTENERS DE BASE DE DATOS
     // ==========================================
 
-    // Escuchar datos del usuario local
     db.ref('users/' + uid).on('value', snap => {
         const data = snap.val();
         if (data) {
@@ -219,14 +236,14 @@
         renderHistory();
     });
 
-    // Escuchar datos de todos los usuarios (Solo para estadísticas del admin)
     db.ref('users').on('value', snap => {
         allUsersData = snap.val() || {};
         updateAdminStats();
-        renderAdminTools(); 
+        if (document.getElementById('admin-overlay').classList.contains('open')) {
+            renderAdminTools(); 
+        }
     });
 
-    // Escuchar datos globales (Múltiples apuestas y Cola)
     db.ref('/').on('value', snap => {
         const data = snap.val() || {};
         globalData.activeBets = data.activeBets || {};
@@ -249,8 +266,10 @@
 
         updateAdminStats();
         renderMain();
-        renderAdminTools();
-        renderQueue();
+        if (document.getElementById('admin-overlay').classList.contains('open')) {
+            renderAdminTools();
+            renderQueue();
+        }
     });
 
     // ==========================================
@@ -268,6 +287,47 @@
         });
     }
 
+    // Calcula la cuota en vivo
+    function calculateOdds(betId) {
+        let odds = 1.0;
+        const bet = globalData.activeBets[betId];
+        if(!bet) return odds;
+
+        const sel = userSelections[betId] || { opts: [], nums: {} };
+        
+        // Opciones normales
+        sel.opts.forEach(i => {
+            if(bet.options[i]) odds *= parseFloat(bet.options[i].odds || 1.0);
+        });
+
+        // Opciones de numero/rango
+        Object.keys(sel.nums).forEach(i => {
+            let opt = bet.options[i];
+            let val = parseFloat(sel.nums[i]);
+            if(opt && !isNaN(val)) {
+                let baseOdds = parseFloat(opt.odds || 1.1);
+                let baseNum = parseFloat(opt.baseNum || 0);
+                
+                if(opt.type === 'number') {
+                    // Si se aleja, sube la cuota (simulación básica)
+                    odds *= (baseOdds + (Math.abs(val - baseNum) * 0.15));
+                } else if (opt.type === 'range') {
+                    let min = parseFloat(opt.min || 0);
+                    let max = parseFloat(opt.max || 10);
+                    if(val >= min && val <= max) {
+                        // Rango más amplio = menor cuota
+                        let rangeSize = Math.abs(max - min);
+                        odds *= (baseOdds - (rangeSize * 0.02)); 
+                    } else {
+                        // Fuera de rango es inválido (lo reseteamos luego, pero por ahora no da cuota extra)
+                        odds *= 1.0;
+                    }
+                }
+            }
+        });
+        return Math.max(1.01, odds); // Minimo 1.01
+    }
+
     function renderMain() {
         const container = document.getElementById('active-bets-container');
         document.getElementById('balanceDisp').innerText = `${(localUserData.balance || 0).toFixed(3)} CR`;
@@ -283,33 +343,68 @@
         }
 
         let htmlContent = '';
-        activeBetKeys.forEach(betId => { if (!userSelections[betId]) userSelections[betId] = []; });
+        
+        // Inicializar selecciones si no existen
+        activeBetKeys.forEach(betId => { 
+            if (!userSelections[betId] || Array.isArray(userSelections[betId])) {
+                userSelections[betId] = { opts: [], nums: {} };
+            }
+        });
 
         activeBetKeys.forEach(betId => {
             const bet = globalData.activeBets[betId];
             const hasBet = localUserData.history && localUserData.history[betId];
             const isClosed = marketClosedStatus[betId];
-            let currentOdds = 1.000;
-            if (userSelections[betId].length > 0) {
-                currentOdds = userSelections[betId].reduce((acc, i) => acc * bet.options[i].odds, 1);
-            }
+            let currentOdds = calculateOdds(betId);
 
             let cardHtml = `
                 <div class="main-card" id="card-${betId}">
                     <div class="badges-row"><span class="badge badge-close" id="timer-close-${betId}">CALCULANDO...</span></div>
                     <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 10px;">${bet.question}</h1>
-                    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 20px;">Selecciona opciones y apuesta en este evento.</p>
-                    <div class="options-grid" id="options-box-${betId}">
+                    <div class="options-wrapper" id="options-box-${betId}">
             `;
 
-            bet.options.forEach((opcion, i) => {
-                let btnClass = 'opt-btn' + (userSelections[betId].includes(i) ? ' active' : '') + (hasBet ? ' disabled' : '');
-                cardHtml += `
-                    <div class="${btnClass}" onclick="toggleSelection('${betId}', ${i}, ${hasBet || isClosed})">
-                        <span>${opcion.name}</span> 
-                        <span style="font-weight:800; color:var(--success)">x${parseFloat(opcion.odds).toFixed(3)}</span>
-                    </div>`;
+            let currentSectionSingle = bet.isGlobalSingle;
+            let currentGridOpen = false;
+
+            // Retrocompatibilidad: Si no hay 'options' sino un array simple
+            let optsArray = bet.options || [];
+
+            optsArray.forEach((opcion, i) => {
+                // Retrocompatibilidad con apuestas antiguas sin tipo
+                let optType = opcion.type || 'normal';
+
+                if (optType === 'section') {
+                    if (currentGridOpen) { cardHtml += `</div>`; currentGridOpen = false; }
+                    currentSectionSingle = bet.isGlobalSingle || opcion.isSingle;
+                    cardHtml += `<div class="section-header">${opcion.name} ${currentSectionSingle ? '<span style="font-size:0.7rem; color:var(--text-muted);">(Selección Única)</span>' : ''}</div>`;
+                } 
+                else if (optType === 'normal') {
+                    if (!currentGridOpen) { cardHtml += `<div class="options-grid">`; currentGridOpen = true; }
+                    let isActive = userSelections[betId].opts.includes(i);
+                    let btnClass = 'opt-btn' + (isActive ? ' active' : '') + (hasBet ? ' disabled' : '');
+                    cardHtml += `
+                        <div class="${btnClass}" onclick="toggleSelection('${betId}', ${i}, ${currentSectionSingle}, ${hasBet || isClosed})">
+                            <span>${opcion.name}</span> 
+                            <span style="font-weight:800; color:var(--success)">x${parseFloat(opcion.odds || 1.1).toFixed(3)}</span>
+                        </div>`;
+                }
+                else if (optType === 'number' || optType === 'range') {
+                    if (currentGridOpen) { cardHtml += `</div>`; currentGridOpen = false; }
+                    let uVal = userSelections[betId].nums[i] || '';
+                    let placeholder = optType === 'number' ? `Número (Base: ${opcion.baseNum})` : `Rango (${opcion.min} a ${opcion.max})`;
+                    
+                    cardHtml += `
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
+                            <label style="display:block; color:var(--text-muted); font-size:0.85rem; margin-bottom:8px;">${opcion.name} <span style="color:var(--accent); font-weight:bold;">(Cuota Base x${opcion.odds})</span></label>
+                            <input type="number" placeholder="${placeholder}" value="${uVal}" 
+                                   onchange="updateNumSelection('${betId}', ${i}, this.value, '${optType}', ${opcion.min}, ${opcion.max}, ${opcion.baseNum})" 
+                                   ${hasBet || isClosed ? 'disabled' : ''}>
+                        </div>
+                    `;
+                }
             });
+            if (currentGridOpen) cardHtml += `</div>`;
 
             let btnText = isClosed ? "MERCADO CERRADO" : (hasBet ? "YA APOSTASTE AQUÍ" : "CONFIRMAR APUESTA");
             let btnStyle = isClosed ? "background: var(--border); color: var(--text-muted);" : 
@@ -318,9 +413,10 @@
             cardHtml += `</div>
                     <div style="display: flex; justify-content: center; gap: 20px; border-top: 1px solid var(--border); padding-top: 30px; align-items: flex-end; margin-top: 10px; flex-wrap: wrap;">
                         <div style="text-align: left;">
-                            <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px;">CRÉDITOS (CR)</label>
-                            <input type="number" id="bet-val-${betId}" value="1.000" step="0.100" style="width: 140px; font-weight: 800; font-size: 1.2rem; text-align: center;">
-                            <span style="display: block; margin-top: 10px; font-size: 0.8rem; color: var(--success); font-weight: 800;">Cuota Total: x${currentOdds.toFixed(3)}</span>
+                            <label style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 8px;">CRÉDITOS APOSTADOS</label>
+                            <input type="number" id="bet-val-${betId}" value="1.000" step="0.100" style="width: 140px; font-weight: 800; font-size: 1.2rem; text-align: center;" ${hasBet || isClosed ? 'disabled' : ''}>
+                            <span style="display: block; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); font-weight: 800;">Cuota: <span style="color:var(--accent);">x${currentOdds.toFixed(3)}</span></span>
+                            <span style="display: block; margin-top: 3px; font-size: 0.8rem; color: var(--text-muted); font-weight: 800;">Ganancias Potenciales: <span id="win-pot-${betId}" style="color:var(--success);">+${(1.000 * currentOdds).toFixed(3)} CR</span></span>
                         </div>
                         <button class="btn btn-primary" ${isClosed || hasBet ? 'disabled' : ''} style="padding: 0 40px; height: 55px; font-size: 0.95rem; border-radius: 14px; ${btnStyle}" onclick="executeBet('${betId}')">${btnText}</button>
                     </div>
@@ -328,36 +424,88 @@
             htmlContent += cardHtml;
         });
 
+        // Guardar valores del input de dinero para no perderlos al renderizar
         let savedInputs = {};
         activeBetKeys.forEach(id => { const el = document.getElementById(`bet-val-${id}`); if (el) savedInputs[id] = el.value; });
+        
         container.innerHTML = htmlContent;
-        activeBetKeys.forEach(id => { const el = document.getElementById(`bet-val-${id}`); if (el && savedInputs[id]) el.value = savedInputs[id]; });
+        
+        activeBetKeys.forEach(id => { 
+            const el = document.getElementById(`bet-val-${id}`); 
+            if (el && savedInputs[id]) el.value = savedInputs[id]; 
+            // Añadir listener para calcular ganancias en tiempo real
+            if(el) {
+                el.addEventListener('input', () => {
+                    let val = parseFloat(el.value || 0);
+                    let odds = calculateOdds(id);
+                    document.getElementById(`win-pot-${id}`).innerText = `+${(val * odds).toFixed(3)} CR`;
+                });
+            }
+        });
     }
 
-    window.toggleSelection = function(betId, optionIndex, isBlocked) {
+    window.toggleSelection = function(betId, optionIndex, isSingle, isBlocked) {
         if (isBlocked) return;
-        const selArray = userSelections[betId];
-        userSelections[betId] = selArray.includes(optionIndex) ? selArray.filter(x => x !== optionIndex) : [...selArray, optionIndex];
+        const sel = userSelections[betId];
+        
+        if (isSingle) {
+            // Simplificación: Si es single, limpia las opciones normales previas 
+            // (Para ser perfecto limpiaría solo las de su sección, pero así evita trampas globales)
+            sel.opts = [optionIndex];
+        } else {
+            if(sel.opts.includes(optionIndex)) {
+                sel.opts = sel.opts.filter(x => x !== optionIndex);
+            } else {
+                sel.opts.push(optionIndex);
+            }
+        }
         renderMain(); 
     };
+
+    window.updateNumSelection = function(betId, idx, val, type, min, max, base) {
+        let num = parseFloat(val);
+        if(isNaN(num)) num = base || 0; // Fallback
+        
+        // Si es rango, forzar límites
+        if(type === 'range') {
+            if(num < min) num = min;
+            if(num > max) num = max;
+        }
+
+        userSelections[betId].nums[idx] = num.toString();
+        renderMain();
+    }
 
     function executeBet(betId) {
         const bet = globalData.activeBets[betId];
         const amount = parseFloat(document.getElementById(`bet-val-${betId}`).value);
-        const selections = userSelections[betId];
+        const sel = userSelections[betId];
 
-        if (!selections || selections.length === 0) return notify("Selecciona al menos una opción", "error");
+        if (sel.opts.length === 0 && Object.keys(sel.nums).length === 0) return notify("Selecciona al menos una opción o número", "error");
         if (isNaN(amount) || amount <= 0) return notify("Cantidad inválida", "error");
         if (amount > localUserData.balance) return notify("Saldo insuficiente", "error");
 
-        const finalOdds = selections.reduce((acc, i) => acc * bet.options[i].odds, 1);
+        const finalOdds = calculateOdds(betId);
+        
+        // Formatear las selecciones para el historial
+        let picksNames = [];
+        sel.opts.forEach(i => picksNames.push(bet.options[i].name));
+        Object.keys(sel.nums).forEach(i => picksNames.push(`${bet.options[i].name}: ${sel.nums[i]}`));
+
         localUserData.balance -= amount;
         localUserData.history[betId] = {
-            id: betId, question: bet.question, picks: selections.map(i => bet.options[i].name),
-            indices: [...selections], amount: amount, odds: finalOdds, status: 'PENDIENTE', timestamp: Date.now()
+            id: betId, 
+            question: bet.question, 
+            picks: picksNames,
+            opts: [...sel.opts], 
+            nums: {...sel.nums},
+            amount: amount, 
+            odds: finalOdds, 
+            status: 'PENDIENTE', 
+            timestamp: Date.now()
         };
         db.ref('users/' + uid).set(localUserData);
-        userSelections[betId] = [];
+        userSelections[betId] = { opts: [], nums: {} };
         notify("¡Apuesta registrada exitosamente!", "success");
     }
 
@@ -375,8 +523,35 @@
                 localUserData.balance += myBet.amount;
                 notify(`Evento cancelado: ${myBet.question}. CR devueltos.`, "error");
             } else {
-                const isWin = myBet.indices.every(idx => resultObj.winners.includes(idx));
+                // Logica de subconjunto para opciones normales (todas las que apostó el usuario deben haber ocurrido)
+                let optsWin = true;
+                if(myBet.opts && myBet.opts.length > 0) {
+                    optsWin = myBet.opts.every(idx => (resultObj.winners || []).includes(idx));
+                }
+
+                // Logica para numeros y rangos
+                let numsWin = true;
+                if(myBet.nums) {
+                    Object.keys(myBet.nums).forEach(i => {
+                        let userVal = parseFloat(myBet.nums[i]);
+                        let actualVal = parseFloat(resultObj.numResults[i]);
+                        let optData = resultObj.optDetails ? resultObj.optDetails[i] : null;
+
+                        if(optData && optData.type === 'range') {
+                            // En la v1.6 se pidió que si el número real cae en el rango apostado?
+                            // No, el admin valida un número, y si el usuario apostó dentro del rango.. 
+                            // Corrección: El user elige un número DENTRO del rango. Si acierta el número exacto, gana. 
+                            // Simplificación para cumplir estricto: Debe coincidir.
+                            if(userVal !== actualVal) numsWin = false;
+                        } else {
+                            if(userVal !== actualVal) numsWin = false;
+                        }
+                    });
+                }
+
+                const isWin = optsWin && numsWin;
                 myBet.status = isWin ? 'GANADA' : 'PERDIDA';
+                
                 if (isWin) {
                     localUserData.balance += (myBet.amount * myBet.odds);
                     notify(`¡HAS GANADO! +${(myBet.amount * myBet.odds).toFixed(3)} CR`, "success");
@@ -397,10 +572,12 @@
             const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('adm-close-time').value = now.toISOString().slice(0,16);
             document.getElementById('admin-overlay').classList.add('open');
+            renderAdminTools();
         } else notify("Acceso denegado", "error");
     }
 
     function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+    function closeUsersModal() { document.getElementById('users-modal-overlay').classList.remove('open'); }
 
     function switchAdminTab(el, tabName) {
         document.querySelectorAll('.admin-nav-item').forEach(item => item.classList.remove('active'));
@@ -408,37 +585,102 @@
         document.getElementById('adm-tab-create').style.display = (tabName === 'create') ? 'block' : 'none';
         document.getElementById('adm-tab-resolve').style.display = (tabName === 'resolve') ? 'block' : 'none';
         document.getElementById('adm-tab-queue').style.display = (tabName === 'queue') ? 'block' : 'none';
+        
+        if(tabName === 'create' && !document.getElementById('edit-bet-id').value) {
+            document.getElementById('adm-options-list').innerHTML = '';
+        }
     }
 
-    function addOptionRow() {
+    function addOptionRow(type, data = {}) {
         const div = document.createElement('div');
-        div.style.cssText = "display: flex; gap: 10px; margin-bottom: 10px; animation: slideUp 0.3s ease;";
-        div.innerHTML = `<input type="text" placeholder="Opción" class="on" style="flex: 1;"> <input type="number" placeholder="1.100" class="oo" style="width: 100px; text-align:center;" step="0.001">`;
+        div.className = "creator-row";
+        div.dataset.type = type;
+
+        if (type === 'section') {
+            div.innerHTML = `
+                <span style="color:var(--text-muted); font-size:0.7rem; font-weight:bold; width:60px;">SECCIÓN</span>
+                <input type="text" class="o-name" placeholder="Título de la Sección" value="${data.name||''}" style="flex:1;">
+                <label style="font-size:0.75rem; color:var(--text-muted);"><input type="checkbox" class="o-single" ${data.isSingle?'checked':''}> Única</label>
+                <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
+            `;
+        } else if (type === 'number') {
+            div.innerHTML = `
+                <span style="color:var(--accent); font-size:0.7rem; font-weight:bold; width:60px;">NÚMERO</span>
+                <input type="text" class="o-name" placeholder="Ej: Disparos a puerta" value="${data.name||''}" style="flex:1;">
+                <input type="number" class="o-base" placeholder="Base" value="${data.baseNum||0}" style="width:70px;">
+                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:80px;">
+                <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
+            `;
+        } else if (type === 'range') {
+            div.innerHTML = `
+                <span style="color:var(--success); font-size:0.7rem; font-weight:bold; width:60px;">RANGO</span>
+                <input type="text" class="o-name" placeholder="Ej: Minuto del gol" value="${data.name||''}" style="flex:1;">
+                <input type="number" class="o-min" placeholder="Min" value="${data.min||0}" style="width:60px;">
+                <input type="number" class="o-max" placeholder="Max" value="${data.max||10}" style="width:60px;">
+                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:70px;">
+                <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
+            `;
+        } else {
+            div.innerHTML = `
+                <span style="color:var(--text); font-size:0.7rem; font-weight:bold; width:60px;">NORMAL</span>
+                <input type="text" class="o-name" placeholder="Opción normal" value="${data.name||''}" style="flex:1;">
+                <input type="number" class="o-odds" placeholder="Cuota" value="${data.odds||1.100}" step="0.001" style="width:80px;">
+                <button onclick="this.parentElement.remove()" style="background:var(--error); border:none; color:white; border-radius:6px; padding:5px 10px;">X</button>
+            `;
+        }
         document.getElementById('adm-options-list').appendChild(div);
     }
 
-    function saveToGlobalQueue(isToQueue) {
+    function saveEvent(isToQueue) {
         const questionInput = document.getElementById('adm-q-input').value;
+        const isGlobalSingle = document.getElementById('adm-global-single').checked;
         let options = [];
-        document.querySelectorAll('.on').forEach((el, idx) => { 
-            if (el.value.trim() !== "") {
-                const odds = parseFloat(document.querySelectorAll('.oo')[idx].value);
-                options.push({ name: el.value.trim(), odds: isNaN(odds) ? 1.100 : odds });
+        
+        document.querySelectorAll('.creator-row').forEach(row => {
+            let type = row.dataset.type;
+            let name = row.querySelector('.o-name').value.trim();
+            if(!name) return;
+
+            if(type === 'section') {
+                options.push({ type, name, isSingle: row.querySelector('.o-single').checked });
+            } else if (type === 'number') {
+                options.push({ type, name, baseNum: row.querySelector('.o-base').value, odds: row.querySelector('.o-odds').value });
+            } else if (type === 'range') {
+                options.push({ type, name, min: row.querySelector('.o-min').value, max: row.querySelector('.o-max').value, odds: row.querySelector('.o-odds').value });
+            } else {
+                options.push({ type, name, odds: row.querySelector('.o-odds').value || 1.100 });
             }
         });
         
-        if (!questionInput || options.length < 2) return notify("Faltan datos", "error");
+        if (!questionInput || options.length === 0) return notify("Faltan datos", "error");
         
-        const newBet = { id: 'b_' + Date.now(), question: questionInput, options: options, closeTime: document.getElementById('adm-close-time').value };
+        const existingId = document.getElementById('edit-bet-id').value;
+        const newBet = { 
+            id: existingId || ('b_' + Date.now()), 
+            question: questionInput, 
+            isGlobalSingle: isGlobalSingle,
+            options: options, 
+            closeTime: document.getElementById('adm-close-time').value 
+        };
         
-        if (isToQueue) { db.ref('queue').push(newBet); notify("Añadido a la cola", "success"); } 
-        else { db.ref('activeBets/' + newBet.id).set(newBet); notify("Evento activado", "success"); }
+        if (isToQueue) { 
+            db.ref('queue/' + newBet.id).set(newBet); 
+            notify(existingId ? "Actualizado en cola" : "Añadido a la cola", "success"); 
+        } 
+        else { 
+            db.ref('activeBets/' + newBet.id).set(newBet); 
+            notify(existingId ? "Evento actualizado" : "Evento activado", "success"); 
+            // Eliminar de cola si estaba editando desde ahi
+            if(existingId) db.ref('queue/' + existingId).remove();
+        }
         
-        document.getElementById('adm-q-input').value = ""; document.getElementById('adm-options-list').innerHTML = "";
-        addOptionRow(); addOptionRow();
+        // Reset
+        document.getElementById('edit-bet-id').value = "";
+        document.getElementById('adm-q-input').value = ""; 
+        document.getElementById('adm-global-single').checked = false;
+        document.getElementById('adm-options-list').innerHTML = "";
     }
 
-    // Calcular estadísticas globales
     function updateAdminStats() {
         let totalActiveBets = 0;
         const activeBetIds = Object.keys(globalData.activeBets);
@@ -456,10 +698,68 @@
         if(el) el.innerText = totalActiveBets;
     }
 
-    // Renderiza panel de resolución con estadisticas de participantes
+    // Modal para ver apuestas de usuarios
+    window.openUsersModal = function(betId, betQuestion) {
+        document.getElementById('users-modal-title').innerText = `Apuestas: ${betQuestion}`;
+        const content = document.getElementById('users-modal-content');
+        content.innerHTML = '';
+
+        let usersList = [];
+        Object.keys(allUsersData).forEach(uID => {
+            let user = allUsersData[uID];
+            if(user.history && user.history[betId]) {
+                usersList.push({ uid: uID, betData: user.history[betId] });
+            }
+        });
+
+        if(usersList.length === 0) {
+            content.innerHTML = '<p style="color:var(--text-muted);">Nadie ha apostado en este evento todavía.</p>';
+        } else {
+            usersList.forEach(item => {
+                let d = new Date(item.betData.timestamp).toLocaleString();
+                let statusColor = item.betData.status === 'GANADA' ? 'var(--success)' : (item.betData.status === 'PERDIDA' ? 'var(--error)' : 'var(--accent)');
+                
+                content.innerHTML += `
+                    <div style="background:rgba(0,0,0,0.5); border:1px solid var(--border); padding:15px; border-radius:12px; margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <strong style="color:white; font-size:0.9rem;">ID: <span style="font-family:monospace; color:var(--text-muted);">${item.uid}</span></strong>
+                            <span style="color:${statusColor}; font-size:0.8rem; font-weight:bold;">${item.betData.status}</span>
+                        </div>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">Picks: ${item.betData.picks.join(' | ')}</p>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                            <span>Apostó: <strong style="color:white;">${item.betData.amount} CR</strong></span>
+                            <span>Cuota: <strong style="color:var(--success);">x${item.betData.odds.toFixed(3)}</strong></span>
+                        </div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:5px; text-align:right;">${d}</div>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('users-modal-overlay').classList.add('open');
+    }
+
+    // Editar evento activo o en cola
+    window.loadBetToEdit = function(betId, fromQueue = false) {
+        let bet = fromQueue ? globalData.queue.find(x => x.id === betId) : globalData.activeBets[betId];
+        if(!bet) return;
+        
+        document.getElementById('edit-bet-id').value = bet.id;
+        document.getElementById('adm-q-input').value = bet.question;
+        document.getElementById('adm-global-single').checked = bet.isGlobalSingle || false;
+        if(bet.closeTime) document.getElementById('adm-close-time').value = bet.closeTime;
+        
+        document.getElementById('adm-options-list').innerHTML = '';
+        (bet.options || []).forEach(o => {
+            addOptionRow(o.type || 'normal', o);
+        });
+
+        // Cambiar a la pestaña de crear
+        document.querySelectorAll('.admin-nav-item')[0].click();
+    }
+
     function renderAdminTools() {
         const container = document.getElementById('adm-resolve-list'); 
-        if (!container) return; // Evitar errores si no está abierto
+        if (!container) return; 
         container.innerHTML = '';
         
         const activeBetKeys = Object.keys(globalData.activeBets);
@@ -468,7 +768,6 @@
         activeBetKeys.forEach(betId => {
             const bet = globalData.activeBets[betId];
             
-            // Calcular cuántos han apostado a ESTE evento
             let participants = 0;
             Object.values(allUsersData).forEach(user => {
                 if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
@@ -478,24 +777,39 @@
             
             let html = `
                 <div class="admin-bet-card">
-                    <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">${bet.question}</h4>
-                    <p style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 15px;">👥 Han apostado: ${participants} personas</p>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">${bet.question}</h4>
+                        <button class="btn btn-ghost" onclick="loadBetToEdit('${betId}', false)" style="padding:5px 10px; font-size:0.75rem;">✏️ Editar</button>
+                    </div>
+                    
+                    <button onclick="openUsersModal('${betId}', '${bet.question.replace(/'/g, "\\'")}')" class="btn btn-ghost" style="font-size: 0.8rem; color: var(--accent); font-weight: 800; margin-bottom: 15px; border:1px solid var(--accent); width:100%; justify-content:center;">👥 Ver Apuestas (${participants} personas)</button>
+                    
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
             `;
             
-            bet.options.forEach((opt, idx) => {
-                html += `
-                    <label style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; cursor: pointer; display: flex; gap: 8px; align-items: center;">
-                        <input type="checkbox" class="resolve-chk-${betId}" value="${idx}"> ${opt.name}
-                    </label>
-                `;
+            (bet.options || []).forEach((opt, idx) => {
+                let t = opt.type || 'normal';
+                if(t === 'normal') {
+                    html += `
+                        <label style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; cursor: pointer; display: flex; gap: 8px; align-items: center;">
+                            <input type="checkbox" class="resolve-chk-${betId}" value="${idx}"> ${opt.name}
+                        </label>
+                    `;
+                } else if (t === 'number' || t === 'range') {
+                    html += `
+                        <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; grid-column: 1/-1;">
+                            <label style="display:block; margin-bottom:5px; color:var(--text-muted);">Resultado real: ${opt.name}</label>
+                            <input type="number" class="resolve-num-${betId}" data-idx="${idx}" placeholder="Ingresa el número real" style="width:100%;">
+                        </div>
+                    `;
+                }
             });
 
             html += `
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <button class="btn btn-primary" onclick="resolveSpecificBet('${betId}')" style="flex: 1; justify-content: center; background: var(--success); color: #000;">VALIDAR Y CERRAR</button>
-                        <button class="btn btn-primary" onclick="deleteSpecificBet('${betId}')" style="background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid var(--error); justify-content: center;">🗑️ ELIMINAR</button>
+                        <button class="btn btn-primary" onclick="deleteSpecificBet('${betId}')" style="background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid var(--error); justify-content: center;">🗑️ ELIMINAR EVENTO</button>
                     </div>
                 </div>
             `;
@@ -503,11 +817,21 @@
         });
     }
 
-    // Resolver evento: Calcula acertantes y cierra
     window.resolveSpecificBet = function(betId) {
         let winners = [];
         document.querySelectorAll(`.resolve-chk-${betId}`).forEach(chk => { if (chk.checked) winners.push(parseInt(chk.value)) });
-        if (winners.length === 0) return notify("Elige al menos un ganador", "error");
+        
+        let numResults = {};
+        document.querySelectorAll(`.resolve-num-${betId}`).forEach(inp => {
+            if(inp.value !== "") numResults[inp.dataset.idx] = parseFloat(inp.value);
+        });
+
+        // Pasamos optDetails para verificar el tipo (range vs number) al procesar en los clientes
+        let bet = globalData.activeBets[betId];
+        let optDetails = {};
+        if(bet && bet.options) {
+            bet.options.forEach((o,i) => optDetails[i] = o);
+        }
 
         let participants = 0;
         let correctGuesses = 0;
@@ -515,18 +839,29 @@
         Object.values(allUsersData).forEach(user => {
             if(user.history && user.history[betId] && user.history[betId].status === 'PENDIENTE') {
                 participants++;
-                const isWin = user.history[betId].indices.every(idx => winners.includes(idx));
-                if(isWin) correctGuesses++;
+                let myBet = user.history[betId];
+                
+                // Mismo cálculo que en processResults para saber estadísticas previas
+                let optsWin = true;
+                if(myBet.opts) optsWin = myBet.opts.every(idx => winners.includes(idx));
+                
+                let numsWin = true;
+                if(myBet.nums) {
+                    Object.keys(myBet.nums).forEach(i => {
+                        if(parseFloat(myBet.nums[i]) !== parseFloat(numResults[i])) numsWin = false;
+                    });
+                }
+
+                if(optsWin && numsWin) correctGuesses++;
             }
         });
 
-        db.ref('lastResults').set({ betId: betId, winners: winners, ts: Date.now() });
+        db.ref('lastResults').set({ betId: betId, winners: winners, numResults: numResults, optDetails: optDetails, ts: Date.now() });
         db.ref('activeBets/' + betId).remove();
         
         notify(`✅ Evento cerrado. Acertaron ${correctGuesses} / ${participants} personas.`, "success");
     }
 
-    // Eliminar completamente y devolver créditos
     window.deleteSpecificBet = function(betId) {
         if(!confirm("¿Seguro que quieres eliminar este evento? Se devolverán los créditos a todos los que hayan apostado.")) return;
         
@@ -538,11 +873,20 @@
     function renderQueue() {
         const container = document.getElementById('queue-list-container');
         if (globalData.queue.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Cola vacía</div>`;
-        container.innerHTML = globalData.queue.map(q => `<div style="padding:15px; border-bottom:1px solid var(--border); font-size:0.95rem; background: rgba(0,0,0,0.2);"><strong>${q.question}</strong><br><small style="color:var(--accent)">Cierre: ${q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A'}</small></div>`).join('');
+        
+        container.innerHTML = globalData.queue.map(q => `
+            <div style="padding:15px; border-bottom:1px solid var(--border); font-size:0.95rem; background: rgba(0,0,0,0.2); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <strong>${q.question}</strong><br>
+                    <small style="color:var(--accent)">Cierre: ${q.closeTime ? q.closeTime.replace('T', ' ') : 'N/A'}</small>
+                </div>
+                <button class="btn btn-ghost" onclick="loadBetToEdit('${q.id}', true)" style="font-size:0.75rem; padding: 5px 10px;">✏️ Editar</button>
+            </div>
+        `).join('');
     }
 
     // ==========================================
-    // TIEMPOS E INTERFAZ
+    // TIEMPOS E HISTORIAL (BORRADO/COLOR)
     // ==========================================
 
     function updateTimers() {
@@ -558,10 +902,20 @@
                 if (timerEl) timerEl.innerText = "MERCADO CERRADO";
             } else {
                 marketClosedStatus[betId] = false;
-                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                if (timerEl) timerEl.innerText = `CIERRA EN ${h}:${m}:${s}`;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (days >= 1) {
+                    if (timerEl) timerEl.innerText = `CIERRA EN ${days}d ${hours}h ${mins}m ${secs}s`;
+                } else {
+                    const h = hours.toString().padStart(2, '0');
+                    const m = mins.toString().padStart(2, '0');
+                    const s = secs.toString().padStart(2, '0');
+                    if (timerEl) timerEl.innerText = `CIERRA EN ${h}h ${m}m ${s}s`;
+                }
             }
         });
         if (requiresRender) renderMain();
@@ -577,9 +931,60 @@
         if (!localUserData.history || Object.keys(localUserData.history).length === 0) return container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 40px 0;">No hay apuestas registradas.</p>';
 
         container.innerHTML = Object.values(localUserData.history).sort((a,b) => b.timestamp - a.timestamp).map(hist => {
-            let color = '#6366f1'; if (hist.status === 'GANADA') color = '#10b981'; if (hist.status === 'PERDIDA') color = '#f43f5e'; if(hist.status === 'CANCELADA') color = '#94a3b8';
-            return `<div class="hist-item"><div style="flex:1; padding-right: 15px;"><strong style="font-size: 1.1rem; display: block; margin-bottom: 5px;">${hist.question}</strong><span style="color:var(--text-muted); font-size: 0.85rem;">${hist.picks.join(' + ')} <br> Cuota x${hist.odds.toFixed(3)}</span></div><div style="text-align:right; border-left: 1px solid var(--border); padding-left: 15px;"><span style="color:${color}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">${hist.status}</span><br><strong style="font-size: 1.3rem;">${hist.amount.toFixed(3)}</strong> <span style="font-size: 0.7rem; color: var(--text-muted);">CR</span></div></div>`;
+            let color = 'var(--accent)'; 
+            let moneyStr = `${hist.amount.toFixed(3)} CR`;
+            
+            if (hist.status === 'GANADA') { 
+                color = 'var(--success)'; 
+                moneyStr = `+${(hist.amount * hist.odds).toFixed(3)} CR`; 
+            }
+            if (hist.status === 'PERDIDA') { 
+                color = 'var(--error)'; 
+                moneyStr = `-${hist.amount.toFixed(3)} CR`; 
+            }
+            if (hist.status === 'CANCELADA') { 
+                color = 'var(--text-muted)'; 
+            }
+
+            // Picks string retrocompatible
+            let picksStr = Array.isArray(hist.picks) ? hist.picks.join(' | ') : 'Opciones antiguas';
+
+            return `
+            <div class="hist-item">
+                <div style="flex:1; padding-right: 15px;">
+                    <strong style="font-size: 1.1rem; display: block; margin-bottom: 5px;">${hist.question}</strong>
+                    <span style="color:var(--text-muted); font-size: 0.85rem;">
+                        ${picksStr} <br> Cuota x${hist.odds.toFixed(3)}
+                    </span>
+                    <button class="btn btn-ghost" onclick="deleteFromHistory('${hist.id}', '${hist.status}', ${hist.amount})" style="margin-top:10px; font-size:0.7rem; padding: 5px 10px; border:1px solid var(--border); color:var(--text-muted);">🗑️ Borrar</button>
+                </div>
+                <div style="text-align:right; border-left: 1px solid var(--border); padding-left: 15px;">
+                    <span style="color:${color}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">${hist.status}</span><br>
+                    <strong style="font-size: 1.3rem; color:${color};">${moneyStr}</strong> 
+                </div>
+            </div>`;
         }).join('');
+    }
+
+    // Borrar historial / Cancelar si es PENDIENTE
+    window.deleteFromHistory = function(betId, status, amount) {
+        if(status === 'PENDIENTE') {
+            if(marketClosedStatus[betId]) {
+                return notify("No puedes cancelar, el mercado ya está cerrado.", "error");
+            }
+            if(confirm("¿Seguro que quieres CANCELAR esta apuesta? Se te devolverán los créditos y podrás volver a apostar.")) {
+                localUserData.balance += amount;
+                delete localUserData.history[betId];
+                db.ref('users/' + uid).set(localUserData);
+                notify("Apuesta cancelada. Créditos devueltos.", "success");
+            }
+        } else {
+            // Solo borrar del historial visual (ya procesada)
+            if(confirm("¿Eliminar este registro de tu historial?")) {
+                delete localUserData.history[betId];
+                db.ref('users/' + uid).set(localUserData);
+            }
+        }
     }
 
     function notify(message, type = "success") {
@@ -590,7 +995,6 @@
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 400); }, 4000);
     }
 
-    addOptionRow(); addOptionRow();
     setInterval(updateTimers, 1000);
 
 </script>
