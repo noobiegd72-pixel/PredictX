@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PredictX v1.7-beta | Las apuestas de la clase</title>
+    <title>PredictX v1.7 | Las apuestas de la clase</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
@@ -36,6 +36,7 @@
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --text-tertiary: #475569;
+            --text-muted: #64748b;
             --border-subtle: rgba(255, 255, 255, 0.1);
             --border-focus: rgba(255, 255, 255, 0.25);
             
@@ -63,6 +64,7 @@
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-tertiary: #94a3b8;
+            --text-muted: #64748b;
             --border-subtle: rgba(0, 0, 0, 0.08);
             --border-focus: rgba(0, 0, 0, 0.2);
             --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
@@ -418,6 +420,28 @@
             display: flex;
             gap: 10px;
             align-items: center;
+        }
+
+        .numeric-row-grid {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .numeric-row-grid > div {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .numeric-input-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            font-weight: 700;
         }
 
         /* Controles de Acción (Monto y Botón) */
@@ -955,12 +979,37 @@
         </div>
     </div>
 
+
+    <div id="participants-modal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 900px;">
+            <div class="modal-header">
+                <div class="modal-title" id="pm-title">Participantes del Mercado</div>
+                <button class="modal-close" onclick="AdminCore.closeParticipantsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Predicción</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pm-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         
         <header class="glass-panel">
             <div class="brand-container">
                 <span class="brand-logo">PredictX</span>
-                <span class="brand-version">v1.7-beta</span>
+                <span class="brand-version">v1.7</span>
             </div>
             
             <div class="user-widget">
@@ -975,6 +1024,8 @@
         <nav class="main-tabs glass-panel">
             <button class="tab-btn active" onclick="UIManager.switchTab('tab-markets')">🔥 Mercados Activos</button>
             <button class="tab-btn" onclick="UIManager.switchTab('tab-profile')">👤 Mi Perfil</button>
+            <button class="tab-btn" onclick="UIManager.switchTab('tab-login')">🔐 Vincular UID</button>
+            <button class="tab-btn" onclick="UIManager.switchTab('tab-privacy')">🔕 Notificaciones</button>
             <button class="tab-btn" onclick="UIManager.switchTab('tab-feedback')">💬 Feedback</button>
             <button class="tab-btn" onclick="UIManager.switchTab('tab-settings')">⚙️ Ajustes</button>
             <button class="tab-btn" onclick="UIManager.switchTab('tab-changelog')" style="color: var(--semantic-info);">📄 Changelog</button>
@@ -995,7 +1046,7 @@
             <div id="markets-container">
                 <div style="text-align:center; padding: 60px; color: var(--text-secondary);">
                     <div style="font-size: 2rem; margin-bottom: 15px;">📡</div>
-                    Conectando con la base de datos de PredictX...
+                    Conectando con la base de datos de la clase...
                 </div>
             </div>
         </main>
@@ -1027,13 +1078,61 @@
                 </div>
             </div>
             
-            <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 1.4rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">📜 Historial de Operaciones</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; gap: 15px;">
+                <h3 style="font-size: 1.4rem;">📜 Historial de Operaciones</h3>
+                <button class="btn-tool" onclick="UserDashboard.clearResolvedHistory()" style="white-space:nowrap;">🧹 Borrar resueltas</button>
+            </div>
             <div id="user-history-container" class="history-list">
                 </div>
 
             <div style="margin-top: 60px; text-align: center; border-top: 1px dashed var(--border-subtle); padding-top: 30px;">
                 <p style="color: var(--text-tertiary); font-size: 0.8rem; margin-bottom: 15px;">Zona Restringida. Solo personal autorizado.</p>
                 <button onclick="AuthManager.openAdminAuthModal()" class="btn-tool" style="opacity: 0.5;">🛡️ Desbloquear Terminal de Administración</button>
+            </div>
+        </main>
+
+
+        <main id="tab-login" class="tab-content glass-panel" style="padding: 30px;">
+            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 10px;">Vinculación de Cuenta</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">Inserta una UID válida para cargar esa cuenta en este dispositivo. La sesión anterior se conserva como respaldo.</p>
+            <div style="max-width: 560px;">
+                <div class="market-card" style="padding: 20px;">
+                    <div class="form-group">
+                        <label>UID de la cuenta</label>
+                        <input type="text" id="login-uid-input" class="input-control" placeholder="PXABC123">
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-submit" style="flex:1;" onclick="AuthManager.loginWithUID()">🔗 Vincular ahora</button>
+                        <button class="btn-tool" style="flex:1;" onclick="AuthManager.logoutToBackup()">↩️ Volver a la sesión anterior</button>
+                    </div>
+                    <div id="login-session-info" style="margin-top: 12px; color: var(--text-secondary); font-size: 0.85rem;"></div>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-privacy" class="tab-content glass-panel" style="padding: 30px;">
+            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 10px;">Notificaciones y Privacidad</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">Controla los avisos visuales, los permisos del navegador y la sesión actual.</p>
+            <div style="max-width: 760px; display: grid; gap: 20px;">
+                <div class="market-card" style="padding: 20px;">
+                    <h3 style="margin-bottom: 10px;">🔔 Estado de las notificaciones</h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="toggle-pill active" id="btn-notif-on" onclick="AuthManager.toggleNotifications(true)">Activadas</button>
+                        <button class="toggle-pill" id="btn-notif-off" onclick="AuthManager.toggleNotifications(false)">Desactivadas</button>
+                    </div>
+                    <button onclick="Notifier.requestPermission()" class="btn-submit" style="background: var(--semantic-info); width: 100%; margin-top: 12px;">Solicitar permisos</button>
+                </div>
+                <div class="market-card" style="padding: 20px;">
+                    <h3 style="margin-bottom: 10px;">🧾 Sesión actual</h3>
+                    <div id="privacy-session" style="font-family: var(--font-mono); color: var(--text-secondary);">Cargando...</div>
+                </div>
+                <div class="market-card" style="padding: 20px;">
+                    <h3 style="margin-bottom: 10px;">🧹 Limpieza rápida</h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-tool" onclick="UserDashboard.clearResolvedHistory()">Eliminar validadas del historial</button>
+                        <button class="btn-tool" onclick="AuthManager.copyUID()">Copiar UID</button>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -1083,18 +1182,65 @@
 
                 <div class="market-card" style="padding: 20px;">
                     <h3 style="margin-bottom: 10px;">🔔 Notificaciones Push</h3>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px;">Permite a PredictX avisarte de resultados de apuestas incluso si estás en otra pestaña.</p>
-                    <button onclick="Notifier.requestPermission()" class="btn-submit" style="background: var(--semantic-info); width: 100%;">Solicitar Permisos de Navegador</button>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px;">Permite avisarte de resultados y eventos importantes.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="toggle-pill active" id="btn-notifs-enable" onclick="AuthManager.toggleNotifications(true)" style="flex:1;">Activadas</button>
+                        <button class="toggle-pill" id="btn-notifs-disable" onclick="AuthManager.toggleNotifications(false)" style="flex:1;">Desactivadas</button>
+                    </div>
+                    <button onclick="Notifier.requestPermission()" class="btn-submit" style="background: var(--semantic-info); width: 100%; margin-top: 12px;">Solicitar Permisos de Navegador</button>
                 </div>
             </div>
         </main>
 
         <main id="tab-changelog" class="tab-content glass-panel" style="padding: 30px;">
+            <div class="patch-notes-container" style="max-height: 450px; overflow-y: auto; padding-right: 10px;">
+    
+    <section class="patch-version" style="margin-bottom: 30px; border-left: 4px solid var(--accent-primary); padding-left: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
+                <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7</div>
+                <div>
+                    <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Nuevas pestañas, login UID y limpieza de historial</p>
+                </div>
+            </div>
+        
+        <ul style="list-style: none; padding: 0; font-size: 0.9rem; line-height: 1.6;">
+            <li style="margin-bottom: 10px;">
+                <b style="color: var(--semantic-info);">🔐 Vinculación rápida por UID:</b> 
+                Ya puedes abrir una cuenta guardada desde otro dispositivo y conservar una sesión anterior como respaldo para volver atrás.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b style="color: var(--semantic-success);">📈 Cuotas exponenciales por fuerza:</b> 
+                El admin puede definir una cuota base y un exponente para que las opciones numéricas, más que y menos que escalen de forma exponencial según la distancia al valor base.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b style="color: var(--accent-hover);">🎯 Selección por sección:</b> 
+                Cada sección independiente admite su propia selección única o múltiple sin bloquear las demás.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b style="color: var(--semantic-warning);">🔄 Deselección y limpieza:</b> 
+                Al volver a pulsar una opción ya marcada se desactiva, y los campos vacíos de número, rango, más que y menos que no cuentan para la cuota.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b style="color: #a855f7;">⚡ Panel admin mejorado:</b> 
+                Los créditos son editables al pulsar sobre ellos, la vista de apuestas del mercado funciona de nuevo, y las validadas pueden borrarse del historial.
+            </li>
+            <li style="margin-bottom: 10px;">
+                <b style="color: var(--semantic-info);">➕ Más que / Menos que separados:</b> 
+                Ahora se crean como opciones independientes, con cuota creciente o decreciente según el lado correcto de la línea marcada por el admin.
+            </li>
+        </ul>
+    </section>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+    
+</div>
+
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
                 <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7-beta</div>
                 <div>
                     <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Descubre todas las novedades implementadas en la nueva versión de PredictX.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Revamp de interfaz, motor avanzado de apuestas, etc.</p>
                 </div>
             </div>
 
@@ -1102,9 +1248,10 @@
                 <div style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--accent-primary); padding: 20px; border-radius: 0 12px 12px 0;">
                     <h3 style="color: var(--accent-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>⚙️</span> Motor de Apuestas Avanzado</h3>
                     <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
-                        <li><strong>Opciones Dinámicas:</strong> Los administradores ahora pueden crear apuestas con opciones mezcladas (Normal, Rango, Número Exacto, y Más/Menos que) en un mismo mercado.</li>
-                        <li><strong>Selección Única Forzada:</strong> Capacidad de forzar que toda una apuesta, o una sección específica dentro de ella, solo permita elegir una opción.</li>
+                        <li><strong>Opciones Dinámicas:</strong> Los administradores ahora pueden crear apuestas con opciones mezcladas (Normal, Rango, Número Exacto, Más Que y Menos Que) en un mismo mercado.</li>
+                        <li><strong>Selección Única Forzada:</strong> Capacidad de forzar que toda una apuesta, o una sección específica dentro de ella, solo permita elegir una opción por bloque.</li>
                         <li><strong>Horarios de Cierre:</strong> Las apuestas ahora respetan un temporizador estricto. Una vez superada la "Hora de Cierre", el mercado se bloquea automáticamente.</li>
+                        <li><strong>Más Que / Menos Que Separados:</strong> La creación y evaluación de cuotas ya distingue cada lado como opción independiente, con la fuerza del exponente aplicada desde la cuota base del admin.</li>
                     </ul>
                 </div>
 
@@ -1144,6 +1291,8 @@
                     <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-queue')">⏳ Cola y Borradores</button>
                     <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-resolve')">✅ Gestión y Resolución</button>
                     <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-users')">👥 Control de Alumnos</button>
+                    <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-wallet')">💳 Créditos</button>
+                    <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-cleanup')">🧹 Limpieza</button>
                     <button class="admin-nav-btn" onclick="AdminCore.switchTab('adm-feedback')">📥 Bandeja Feedback</button>
                 </div>
 
@@ -1213,7 +1362,8 @@
                                 <button onclick="AdminCore.addDynamicRow('normal')" class="btn-tool" style="color: #34d399; border-color: rgba(52, 211, 153, 0.5);">+ Opción Normal</button>
                                 <button onclick="AdminCore.addDynamicRow('number')" class="btn-tool" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.5);">+ Predecir Número</button>
                                 <button onclick="AdminCore.addDynamicRow('range')" class="btn-tool" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.5);">+ Rango (Min-Max)</button>
-                                <button onclick="AdminCore.addDynamicRow('ou')" class="btn-tool" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.5);">+ Más/Menos Que</button>
+                                <button onclick="AdminCore.addDynamicRow('over')" class="btn-tool" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.5);">+ Más Que</button>
+                                <button onclick="AdminCore.addDynamicRow('under')" class="btn-tool" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.5);">+ Menos Que</button>
                             </div>
 
                             <div id="dynamic-rows-container" style="display: flex; flex-direction: column; gap: 10px; min-height: 100px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
@@ -1276,6 +1426,35 @@
                         </div>
                     </div>
 
+
+                    <div id="adm-wallet" class="admin-panel-content">
+                        <h3 style="font-size: 1.4rem; margin-bottom: 10px;">Gestión rápida de créditos</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Haz clic sobre los saldos para cambiarlos al instante.</p>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>UID</th>
+                                        <th>Alumno</th>
+                                        <th>Créditos</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-wallet-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="adm-cleanup" class="admin-panel-content">
+                        <h3 style="font-size: 1.4rem; margin-bottom: 10px;">Limpieza de historial validado</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Elimina apuestas ya resueltas para liberar espacio en Firebase.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 15px;">
+                            <button class="btn-tool" onclick="AdminCore.renderCleanupList()">🔄 Refrescar lista</button>
+                            <button class="btn-cancel" onclick="AdminCore.purgeAllResolvedHistory()">🧨 Borrar resueltas de todos</button>
+                        </div>
+                        <div id="admin-cleanup-list" style="display:flex; flex-direction:column; gap:15px;"></div>
+                    </div>
+
                     <div id="adm-feedback" class="admin-panel-content">
                         <h3 style="font-size: 1.4rem; margin-bottom: 20px;">Comunicaciones Recibidas</h3>
                         <div id="admin-feedback-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
@@ -1309,6 +1488,30 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
+
+        const escapeHTML = (value) => {
+            const str = value === null || value === undefined ? '' : String(value);
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
+
+        const safeNumber = (value, fallback = 0) => {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : fallback;
+        };
+
+        const deepClone = (value) => {
+            try {
+                return JSON.parse(JSON.stringify(value ?? null));
+            } catch (error) {
+                return value === undefined ? null : value;
+            }
+        };
+
 
         /**
          * ========================================================================
@@ -1372,15 +1575,34 @@
         };
 
         const Notifier = {
+            enabled: true,
+            permissionState: typeof Notification !== 'undefined' ? Notification.permission : 'unsupported',
+
+            sync() {
+                this.enabled = !(AppState?.settings && AppState.settings.notificationsEnabled === false);
+                this.permissionState = typeof Notification !== 'undefined' ? Notification.permission : 'unsupported';
+
+                if (typeof AppState !== 'undefined' && AppState && typeof AppState.applySettingsButtons === 'function') {
+                    AppState.applySettingsButtons();
+                }
+
+                return {
+                    enabled: this.enabled,
+                    permissionState: this.permissionState
+                };
+            },
+
             toast(msg, type = 'info') {
                 const container = document.getElementById('toast-container');
+                if (!container) return;
+
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
                 
                 let icon = 'ℹ️';
-                if(type === 'success') { icon = '✅'; AudioEngine.play('success'); }
-                if(type === 'error') { icon = '❌'; AudioEngine.play('error'); }
-                if(type === 'warning') { icon = '⚠️'; }
+                if (type === 'success') { icon = '✅'; AudioEngine.play('success'); }
+                if (type === 'error') { icon = '❌'; AudioEngine.play('error'); }
+                if (type === 'warning') { icon = '⚠️'; }
 
                 toast.innerHTML = `<span class="toast-icon">${icon}</span> <div class="toast-content"><span class="toast-title">${type.toUpperCase()}</span><span class="toast-msg">${msg}</span></div>`;
                 container.appendChild(toast);
@@ -1390,18 +1612,41 @@
                     setTimeout(() => toast.remove(), 400);
                 }, 4000);
             },
+
             requestPermission() {
                 if (!("Notification" in window)) {
                     this.toast("Tu navegador no soporta notificaciones", "error");
-                } else if (Notification.permission === "granted") {
-                    this.toast("Notificaciones ya activadas", "info");
-                } else if (Notification.permission !== "denied") {
-                    Notification.requestPermission().then(p => {
-                        if (p === "granted") this.toast("Notificaciones activadas", "success");
-                    });
+                    return;
                 }
+
+                if (AppState?.settings && AppState.settings.notificationsEnabled === false) {
+                    this.toast("Las notificaciones están desactivadas en ajustes.", "warning");
+                    return;
+                }
+
+                if (Notification.permission === "granted") {
+                    this.toast("Notificaciones ya activadas", "info");
+                    return;
+                }
+
+                if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(p => {
+                        if (p === "granted") {
+                            this.toast("Notificaciones activadas", "success");
+                            this.sync();
+                        } else {
+                            this.toast("Permiso de notificaciones denegado", "warning");
+                        }
+                    });
+                    return;
+                }
+
+                this.toast("El navegador ha bloqueado las notificaciones.", "warning");
             },
+
             push(title, body) {
+                if (AppState?.settings && AppState.settings.notificationsEnabled === false) return;
+                if (!("Notification" in window)) return;
                 if (Notification.permission === 'granted') {
                     new Notification(title, { body: body });
                 }
@@ -1454,6 +1699,9 @@
             activeMarkets: {},
             queueMarkets: {},
             localSelections: {},
+            currentSelection: {},
+            settings: { notificationsEnabled: true },
+            sessionBackup: null,
             clockInterval: null,
 
             init() {
@@ -1461,13 +1709,124 @@
                     this.uid = 'PX' + Math.random().toString(36).substr(2, 6).toUpperCase();
                     localStorage.setItem('px_v17_uid', this.uid);
                 }
+
+                if (!this.settings) {
+                    this.settings = { notificationsEnabled: true };
+                }
+
                 ThemeManager.init();
+                this.loadLocalSettings();
+                this.loadSessionBackup();
+                this.refreshSessionUI();
+                this.applySettingsButtons();
                 this.startDatabaseListeners();
                 
                 this.clockInterval = setInterval(() => {
                     this.updateBanClock();
                     MarketEngine.checkClosingTimes();
                 }, 1000);
+            },
+
+
+            loadLocalSettings() {
+                try {
+                    const raw = localStorage.getItem('px_v17_settings');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        this.settings = { notificationsEnabled: true, ...parsed };
+                    } else if (!this.settings) {
+                        this.settings = { notificationsEnabled: true };
+                    }
+                } catch (error) {
+                    this.settings = { notificationsEnabled: true };
+                }
+                Notifier.sync();
+            },
+
+            persistLocalSettings() {
+                localStorage.setItem('px_v17_settings', JSON.stringify(this.settings));
+            },
+
+            loadSessionBackup() {
+                try {
+                    const raw = localStorage.getItem('px_v17_login_backup');
+                    this.sessionBackup = raw ? JSON.parse(raw) : null;
+                } catch (error) {
+                    this.sessionBackup = null;
+                }
+            },
+
+            saveSessionBackup() {
+                this.sessionBackup = {
+                    uid: this.uid,
+                    user: deepClone(this.user),
+                    savedAt: Date.now()
+                };
+                localStorage.setItem('px_v17_login_backup', JSON.stringify(this.sessionBackup));
+                this.refreshSessionUI();
+            },
+
+            refreshSessionUI() {
+                const loginInfo = document.getElementById('login-session-info');
+                if (loginInfo) {
+                    loginInfo.innerHTML = this.sessionBackup
+                        ? `Respaldo guardado para <b>${escapeHTML(this.sessionBackup.uid)}</b>.`
+                        : `Todavía no has guardado una sesión de respaldo.`;
+                }
+
+                const privacy = document.getElementById('privacy-session');
+                if (privacy) {
+                    privacy.textContent = `UID activa: ${this.uid}`;
+                }
+            },
+
+            setNotificationsEnabled(state) {
+                this.settings.notificationsEnabled = !!state;
+                this.persistLocalSettings();
+                Notifier.sync();
+                this.applySettingsButtons();
+                Notifier.toast(state ? "Notificaciones activadas." : "Notificaciones desactivadas.", "info");
+            },
+
+            applySettingsButtons() {
+                const enabled = this.settings.notificationsEnabled !== false;
+                const idsOn = ['btn-notif-on', 'btn-notifs-enable'];
+                const idsOff = ['btn-notif-off', 'btn-notifs-disable'];
+                idsOn.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.toggle('active', enabled);
+                });
+                idsOff.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.toggle('active', !enabled);
+                });
+            },
+
+            switchUid(newUid, keepBackup = true) {
+                if (!newUid || newUid === this.uid) return false;
+                if (keepBackup) this.saveSessionBackup();
+                this.uid = newUid;
+                localStorage.setItem('px_v17_uid', newUid);
+                this.user = this.allUsers[newUid] || null;
+                if (!this.user) return false;
+                this.currentSelection = this.currentSelection || {};
+                this.localSelections = this.localSelections || {};
+                this.settings = { notificationsEnabled: true, ...(this.user.settings || {}) };
+                this.persistLocalSettings();
+                Notifier.sync();
+                this.applySettingsButtons();
+                UserDashboard.updateHeaderUI();
+                UserDashboard.renderProfile();
+                this.checkBanState();
+                MarketEngine.renderMarkets();
+                this.refreshSessionUI();
+                return true;
+            },
+
+            restoreBackup() {
+                if (!this.sessionBackup || !this.sessionBackup.uid) return false;
+                if (!this.allUsers[this.sessionBackup.uid]) return false;
+                return this.switchUid(this.sessionBackup.uid, false);
             },
 
             startDatabaseListeners() {
@@ -1480,6 +1839,7 @@
                             balance: 8.00, // CR INICIAL
                             role: 'user',
                             history: {},
+                            settings: { notificationsEnabled: true },
                             createdAt: Date.now()
                         };
                         db.ref(`users/${this.uid}`).set(newUser);
@@ -1491,12 +1851,19 @@
                         }
 
                         this.user = this.allUsers[this.uid];
+                        this.settings = { notificationsEnabled: true, ...(this.user.settings || {}) };
+                        this.persistLocalSettings();
+                        Notifier.sync();
+                        this.applySettingsButtons();
                         UserDashboard.updateHeaderUI();
                         UserDashboard.renderProfile();
                         this.checkBanState();
+                        this.refreshSessionUI();
 
                         if (AuthManager.isAdminActive) {
                             AdminCore.renderUsersTable();
+                            AdminCore.renderWalletTable();
+                            AdminCore.renderCleanupList();
                             AdminCore.updateGlobalStats();
                         }
                     }
@@ -1549,7 +1916,7 @@
          */
         const AuthManager = {
             isAdminActive: false,
-            
+
             copyUID() {
                 navigator.clipboard.writeText(AppState.uid).then(() => {
                     Notifier.toast("UID copiado al portapapeles", "success");
@@ -1571,9 +1938,9 @@
                 if (pass === "Isaias2013Cerrado") {
                     this.isAdminActive = true;
                     this.closeAdminAuthModal();
-                    
+
                     const navContainer = document.getElementById('admin-nav-container');
-                    if(navContainer.innerHTML === '') {
+                    if (navContainer.innerHTML === '') {
                         navContainer.innerHTML = `<button class="tab-btn" onclick="UIManager.switchTab('tab-admin')" style="background: rgba(245, 158, 11, 0.1); color: var(--semantic-warning); border-color: var(--semantic-warning); font-weight: 800;">⚡ Terminal Admin</button>`;
                     }
                     UIManager.switchTab('tab-admin');
@@ -1582,8 +1949,109 @@
                 } else {
                     Notifier.toast("Contraseña incorrecta. Intento registrado.", "error");
                 }
+            },
+
+            loginWithUID() {
+                const input = document.getElementById('login-uid-input');
+                const uid = (input?.value || '').trim();
+                if (!uid) return Notifier.toast("Introduce una UID.", "warning");
+
+                db.ref(`users/${uid}`).once('value').then(snapshot => {
+                    if (!snapshot.exists()) return Notifier.toast("UID no encontrada.", "error");
+                    const ok = AppState.switchUid(uid, true);
+                    if (ok) {
+                        if (input) input.value = '';
+                        Notifier.toast("Cuenta vinculada correctamente.", "success");
+                    } else {
+                        Notifier.toast("No se pudo vincular la cuenta.", "error");
+                    }
+                }).catch(() => Notifier.toast("Error al buscar la UID.", "error"));
+            },
+
+            loginFromProfile() {
+                const input = document.getElementById('profile-login-uid');
+                const uid = (input?.value || '').trim();
+                if (!uid) return Notifier.toast("Introduce una UID.", "warning");
+
+                db.ref(`users/${uid}`).once('value').then(snapshot => {
+                    if (!snapshot.exists()) return Notifier.toast("UID no encontrada.", "error");
+                    const ok = AppState.switchUid(uid, true);
+                    if (ok) {
+                        if (input) input.value = '';
+                        Notifier.toast("Sesión vinculada desde el perfil.", "success");
+                    } else {
+                        Notifier.toast("No se pudo vincular la cuenta.", "error");
+                    }
+                }).catch(() => Notifier.toast("Error al buscar la UID.", "error"));
+            },
+
+            logoutToBackup() {
+                const ok = AppState.restoreBackup();
+                if (ok) {
+                    Notifier.toast("Sesión anterior restaurada.", "success");
+                } else {
+                    Notifier.toast("No hay una sesión anterior disponible.", "warning");
+                }
+            },
+
+            toggleNotifications(state) {
+                AppState.setNotificationsEnabled(state);
             }
         };
+        /**
+         * ========================================================================
+         * 4.1. UTILIDAD DE ESTADO PARA MERCADOS
+         * ========================================================================
+         * Inicializa y normaliza el estado local de selección para un mercado.
+         * Se usa en renderizado y handlers para evitar referencias indefinidas
+         * cuando Firebase entrega mercados nuevos o cuando el usuario recarga
+         * la vista sin haber interactuado todavía con ese mercado.
+         */
+        function ensureMarketSelectionState(mId) {
+            if (!AppState.currentSelection || typeof AppState.currentSelection !== 'object') {
+                AppState.currentSelection = {};
+            }
+
+            if (!AppState.localSelections || typeof AppState.localSelections !== 'object') {
+                AppState.localSelections = {};
+            }
+
+            if (!AppState.currentSelection[mId] || typeof AppState.currentSelection[mId] !== 'object') {
+                AppState.currentSelection[mId] = {};
+            }
+
+            if (!AppState.localSelections[mId] || typeof AppState.localSelections[mId] !== 'object') {
+                AppState.localSelections[mId] = {
+                    optionsIdx: [],
+                    nums: {},
+                    ou: {}
+                };
+            }
+
+            if (!Array.isArray(AppState.localSelections[mId].optionsIdx)) {
+                AppState.localSelections[mId].optionsIdx = [];
+            }
+
+            if (!AppState.localSelections[mId].nums || typeof AppState.localSelections[mId].nums !== 'object') {
+                AppState.localSelections[mId].nums = {};
+            }
+
+            if (!AppState.localSelections[mId].ou || typeof AppState.localSelections[mId].ou !== 'object') {
+                AppState.localSelections[mId].ou = {};
+            }
+
+            const currentSelection = AppState.currentSelection[mId];
+            Object.keys(currentSelection).forEach((key) => {
+                if (!Array.isArray(currentSelection[key])) {
+                    currentSelection[key] = [];
+                }
+            });
+
+            return {
+                selection: AppState.currentSelection[mId],
+                local: AppState.localSelections[mId]
+            };
+        }
 
         /**
          * ========================================================================
@@ -1650,9 +2118,7 @@
                 let html = '';
                 
                 for (const mId in markets) {
-                    if (!AppState.localSelections[mId]) {
-                        AppState.localSelections[mId] = { optionsIdx: [], nums: {}, ou: {} };
-                    }
+                    ensureMarketSelectionState(mId);
                 }
 
                 for (const [mId, m] of Object.entries(markets)) {
@@ -1677,6 +2143,8 @@
                     const optionsArray = m.items || m.options || [];
                     let currentGridOpen = false;
                     let currentSectionIsSingle = m.isGlobalSingle;
+                    let currentSectionKey = '0';
+                    let sectionCounter = 0;
 
                     optionsArray.forEach((opt, idx) => {
                         const type = opt.type || 'normal';
@@ -1684,6 +2152,7 @@
                         if (type === 'section') {
                             if (currentGridOpen) { html += `</div>`; currentGridOpen = false; }
                             currentSectionIsSingle = m.isGlobalSingle || opt.isSingle;
+                            currentSectionKey = String(sectionCounter++);
                             html += `
                                 <div class="option-section-header">
                                     <span>${opt.name || opt.text}</span>
@@ -1693,30 +2162,49 @@
                         }
                         else if (type === 'normal') {
                             if (!currentGridOpen) { html += `<div class="options-grid">`; currentGridOpen = true; }
-                            const isSelected = AppState.localSelections[mId].optionsIdx.includes(idx);
+                            ensureMarketSelectionState(mId);
+                            const isSelected = Object.values(AppState.currentSelection[mId]).some(arr => Array.isArray(arr) && arr.includes(idx));
                             const activeClass = isSelected ? 'selected' : '';
                             const oddsText = opt.odds ? parseFloat(opt.odds).toFixed(2) : '1.10';
 
                             html += `
-                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', ${idx}, ${currentSectionIsSingle})">
+                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', '${currentSectionKey}', ${idx}, ${currentSectionIsSingle})">
                                     <span>${opt.name || opt.text}</span>
                                     <span class="opt-odds">x${oddsText}</span>
                                 </button>
                             `;
                         }
-                        else if (type === 'number' || type === 'range') {
+                        else if (type === 'number' || type === 'range' || type === 'over' || type === 'under') {
                             if (currentGridOpen) { html += `</div>`; currentGridOpen = false; }
-                            const currentVal = AppState.localSelections[mId].nums[idx] || '';
-                            const placeholder = type === 'number' ? `Escribe un número exacto...` : `Entre ${opt.min} y ${opt.max}`;
-                            
+                            const currentVal = AppState.localSelections[mId].nums[idx] ?? '';
+                            const isSelectedNumeric = currentVal !== '' && currentVal !== undefined && currentVal !== null;
+                            const label = opt.name || opt.text || (type === 'number' ? 'Número exacto' : type === 'range' ? 'Rango' : type === 'over' ? 'Más que' : 'Menos que');
+                            const placeholder = type === 'number'
+                                ? 'Escribe un número exacto...'
+                                : type === 'range'
+                                    ? `Entre ${opt.min} y ${opt.max}`
+                                    : `Línea base (Ej: 2.5)`;
+                            const baseValue = type === 'range' ? (opt.baseNum ?? ((opt.min || 0) + (opt.max || 0)) / 2) : (opt.baseNum ?? opt.line ?? 0);
+                            const forceValue = opt.force || 1.25;
+                            const oddsBaseValue = opt.oddsBase || opt.odds || 1.1;
+                            const numericId = `num-${mId}-${idx}`;
+
                             html += `
                                 <div class="complex-opt-row">
                                     <div class="complex-opt-header">
-                                        <span>${opt.name || opt.text}</span>
-                                        <span style="font-size:0.75rem; color:var(--accent-primary);">Base: x${opt.odds || 1.10}</span>
+                                        <span>${label}</span>
+                                        <span style="font-size:0.75rem; color:var(--accent-primary);">Base: ${baseValue} · Cuota base: x${oddsBaseValue} · Fuerza: ${forceValue}</span>
                                     </div>
-                                    <input type="number" class="input-control" placeholder="${placeholder}" value="${currentVal}" 
-                                           onchange="MarketEngine.handleNumInput('${mId}', ${idx}, this.value, '${type}', ${opt.min}, ${opt.max})">
+                                    <div class="numeric-row-grid">
+                                        <div>
+                                            <div class="numeric-input-label">Valor</div>
+                                            <input type="number" class="input-control" id="${numericId}" placeholder="${placeholder}" value="${currentVal}" 
+                                                   oninput="MarketEngine.handleNumInput('${mId}', ${idx}, this.value, '${type}', ${opt.min ?? 'null'}, ${opt.max ?? 'null'})">
+                                        </div>
+                                        <button class="opt-btn ${isSelectedNumeric ? 'selected' : ''}" onclick="MarketEngine.toggleNumericSelection('${mId}', ${idx}, '${type}')">
+                                            ${isSelectedNumeric ? 'Quitar' : 'Seleccionar'}
+                                        </button>
+                                    </div>
                                 </div>
                             `;
                         }
@@ -1775,24 +2263,61 @@
                 }
             },
 
-            handleOptionClick(mId, idx, isSingle) {
-                const sel = AppState.localSelections[mId];
-                if (isSingle) {
-                    sel.optionsIdx = [idx];
-                } else {
-                    if (sel.optionsIdx.includes(idx)) sel.optionsIdx = sel.optionsIdx.filter(i => i !== idx);
-                    else sel.optionsIdx.push(idx);
+            handleOptionClick: function(marketId, sectionIdx, optionIdx, isMultiple) {
+                if (!AppState.currentSelection) AppState.currentSelection = {};
+                if (!AppState.currentSelection[marketId]) AppState.currentSelection[marketId] = {};
+
+                const sKey = sectionIdx.toString();
+
+                if (!AppState.currentSelection[marketId][sKey]) {
+                    AppState.currentSelection[marketId][sKey] = [];
                 }
-                AudioEngine.play('click');
+
+                const currentSection = AppState.currentSelection[marketId][sKey];
+                const existingIndex = currentSection.indexOf(optionIdx);
+
+                if (existingIndex > -1) {
+                    currentSection.splice(existingIndex, 1);
+                    if (currentSection.length === 0) {
+                        delete AppState.currentSelection[marketId][sKey];
+                    }
+                } else {
+                    if (isMultiple) {
+                        currentSection.push(optionIdx);
+                    } else {
+                        AppState.currentSelection[marketId][sKey] = [optionIdx];
+                    }
+                }
+
+                if (!AppState.localSelections[marketId]) {
+                    AppState.localSelections[marketId] = { optionsIdx: [], nums: {}, ou: {} };
+                }
+
+                const flattened = [];
+                Object.values(AppState.currentSelection[marketId]).forEach(arr => {
+                    if (Array.isArray(arr)) flattened.push(...arr);
+                });
+                AppState.localSelections[marketId].optionsIdx = flattened;
+
                 this.renderMarkets();
             },
 
             handleNumInput(mId, idx, val, type, min, max) {
+                ensureMarketSelectionState(mId);
+
+                if (val === '' || val === null || val === undefined) {
+                    delete AppState.localSelections[mId].nums[idx];
+                    this.updatePreviewOdds(mId);
+                    return;
+                }
+
                 let num = parseFloat(val);
                 if (!isNaN(num)) {
-                    if(type === 'range' && min !== undefined && max !== undefined) {
-                        if(num < min) num = min;
-                        if(num > max) num = max;
+                    if (type === 'range' && min !== undefined && max !== undefined) {
+                        const minNum = parseFloat(min);
+                        const maxNum = parseFloat(max);
+                        if (Number.isFinite(minNum) && num < minNum) num = minNum;
+                        if (Number.isFinite(maxNum) && num > maxNum) num = maxNum;
                     }
                     AppState.localSelections[mId].nums[idx] = num;
                 } else {
@@ -1803,32 +2328,87 @@
 
             handleOUClick(mId, idx, dir) {
                 AudioEngine.play('click');
-                AppState.localSelections[mId].ou[idx] = dir;
+                ensureMarketSelectionState(mId);
+                const current = AppState.localSelections[mId].ou[idx];
+                if (current === dir || (current && typeof current === 'object' && (current.dir === dir || current.direction === dir))) {
+                    delete AppState.localSelections[mId].ou[idx];
+                } else {
+                    AppState.localSelections[mId].ou[idx] = dir;
+                }
+                this.renderMarkets();
+            },
+
+            toggleNumericSelection(mId, idx, type) {
+                ensureMarketSelectionState(mId);
+                const input = document.getElementById(`num-${mId}-${idx}`);
+                const hasValue = AppState.localSelections[mId].nums[idx] !== undefined;
+                if (hasValue) {
+                    delete AppState.localSelections[mId].nums[idx];
+                    if (input) input.value = '';
+                } else if (input && input.value !== '') {
+                    this.handleNumInput(mId, idx, input.value, type, input.min, input.max);
+                }
                 this.renderMarkets();
             },
 
             calculateTotalOdds(mId) {
                 const m = AppState.activeMarkets[mId];
-                const sel = AppState.localSelections[mId];
-                if (!m || !sel) return 1.0;
+                const sel = AppState.localSelections[mId] || { optionsIdx: [], nums: {}, ou: {} };
+                if (!m) return 1.0;
 
                 let totalOdds = 1.0;
                 const opts = m.items || m.options || [];
 
-                sel.optionsIdx.forEach(idx => {
-                    const o = opts[idx];
-                    if (o && o.odds) totalOdds *= parseFloat(o.odds);
+                const currentSelection = AppState.currentSelection?.[mId] || {};
+                Object.values(currentSelection).forEach(arr => {
+                    if (!Array.isArray(arr)) return;
+                    arr.forEach(idx => {
+                        const o = opts[idx];
+                        if (o && o.odds) totalOdds *= parseFloat(o.odds);
+                    });
                 });
 
-                Object.keys(sel.nums).forEach(idx => {
+                Object.keys(sel.nums || {}).forEach(idx => {
                     const o = opts[idx];
-                    if (o) totalOdds *= parseFloat(o.odds || 1.1);
+                    const value = parseFloat(sel.nums[idx]);
+                    if (!o || !Number.isFinite(value)) return;
+
+                    const type = String(o.type || 'number').toLowerCase();
+                    const baseOdds = safeNumber(o.oddsBase ?? o.odds ?? 1.1, 1.1);
+                    const force = Math.max(1.01, safeNumber(o.force, 1.25));
+                    const baseNum = safeNumber(o.baseNum ?? o.line ?? ((safeNumber(o.min, 0) + safeNumber(o.max, 0)) / 2), 0);
+                    let odds = baseOdds;
+
+                    if (type === 'number' || type === 'range') {
+                        odds = baseOdds * Math.pow(force, Math.abs(value - baseNum));
+                    } else if (type === 'over') {
+                        odds = baseOdds * Math.pow(force, value - baseNum);
+                    } else if (type === 'under') {
+                        odds = baseOdds * Math.pow(force, baseNum - value);
+                    } else {
+                        odds = baseOdds;
+                    }
+
+                    totalOdds *= Math.max(1.0, odds);
                 });
 
-                Object.keys(sel.ou).forEach(idx => {
+                Object.keys(sel.ou || {}).forEach(idx => {
                     const o = opts[idx];
-                    const dir = sel.ou[idx];
-                    if (o) {
+                    const current = sel.ou[idx];
+                    if (!o || !current) return;
+
+                    const dir = typeof current === 'object' ? (current.dir || current.direction) : current;
+                    const value = typeof current === 'object' ? safeNumber(current.value, 0) : null;
+                    const line = safeNumber(o.line || o.baseNum, 2.5);
+                    const baseOdds = safeNumber(o.oddsBase || o.oddsOver || o.oddsUnder || 1.85, 1.85);
+                    const force = Math.max(1.01, safeNumber(o.force || o.forceOver || o.forceUnder, 1.25));
+
+                    if (typeof current === 'object' && value !== null) {
+                        const odds = dir === 'UNDER'
+                            ? baseOdds * Math.pow(force, line - value)
+                            : baseOdds * Math.pow(force, value - line);
+                        totalOdds *= Math.max(1.0, odds);
+                    } else {
                         if (dir === 'OVER') totalOdds *= parseFloat(o.oddsOver || 1.85);
                         else if (dir === 'UNDER') totalOdds *= parseFloat(o.oddsUnder || 1.85);
                     }
@@ -1844,7 +2424,7 @@
 
                 const amount = parseFloat(amtInput.value) || 0;
                 const odds = this.calculateTotalOdds(mId);
-                previewEl.innerText = `+${(amount * odds).toFixed(2)} CR`;
+                previewEl.innerText = `${(amount * odds).toFixed(2)} CR`;
             }
         };
 
@@ -1861,24 +2441,48 @@
 
                 const amtInput = document.getElementById(`amt-${mId}`);
                 const amount = parseFloat(amtInput.value);
+                ensureMarketSelectionState(mId);
                 const sel = AppState.localSelections[mId];
 
-                if (sel.optionsIdx.length === 0 && Object.keys(sel.nums).length === 0 && Object.keys(sel.ou).length === 0) {
+                const hasNormal = sel?.optionsIdx && sel.optionsIdx.length > 0;
+                const hasNumbers = sel?.nums && Object.keys(sel.nums).length > 0;
+                const hasOu = sel?.ou && Object.keys(sel.ou).length > 0;
+
+                if (!hasNormal && !hasNumbers && !hasOu) {
                     return Notifier.toast("Debes seleccionar al menos una predicción.", "warning");
                 }
-                
+
                 if (isNaN(amount) || amount <= 0) return Notifier.toast("Introduce una cantidad válida en CR.", "error");
                 if (amount > AppState.user.balance) return Notifier.toast("Saldo insuficiente en tu cuenta.", "error");
 
                 let picksText = [];
                 const opts = m.items || m.options || [];
-                
-                sel.optionsIdx.forEach(i => picksText.push(opts[i].name || opts[i].text));
-                Object.keys(sel.nums).forEach(i => picksText.push(`${opts[i].name || opts[i].text}: ${sel.nums[i]}`));
-                Object.keys(sel.ou).forEach(i => {
-                    const dirText = sel.ou[i] === 'OVER' ? 'MÁS DE' : 'MENOS DE';
-                    const line = opts[i].line || opts[i].baseNum || 2.5;
-                    picksText.push(`${opts[i].name || opts[i].text}: ${dirText} ${line}`);
+
+                (sel.optionsIdx || []).forEach(i => {
+                    const item = opts[i] || {};
+                    picksText.push(item.name || item.text || `Opción ${i + 1}`);
+                });
+
+                Object.keys(sel.nums || {}).forEach(i => {
+                    const item = opts[i] || {};
+                    const type = String(item.type || 'number').toLowerCase();
+                    const label = item.name || item.text || `Valor ${i}`;
+                    const value = sel.nums[i];
+
+                    if (type === 'over') picksText.push(`${label}: MÁS QUE ${value}`);
+                    else if (type === 'under') picksText.push(`${label}: MENOS QUE ${value}`);
+                    else picksText.push(`${label}: ${value}`);
+                });
+
+                Object.keys(sel.ou || {}).forEach(i => {
+                    const item = opts[i] || {};
+                    const current = sel.ou[i];
+                    const dir = typeof current === 'object' ? (current.dir || current.direction) : current;
+                    const value = typeof current === 'object' ? current.value : null;
+                    const dirText = String(dir || 'OVER').toUpperCase() === 'UNDER' ? 'MENOS DE' : 'MÁS DE';
+                    const label = item.name || item.text || `Más/Menos ${i}`;
+                    const line = item.line || item.baseNum || 2.5;
+                    picksText.push(value !== null ? `${label}: ${dirText} ${value}` : `${label}: ${dirText} ${line}`);
                 });
 
                 const finalOdds = MarketEngine.calculateTotalOdds(mId);
@@ -1889,7 +2493,7 @@
                     marketId: mId,
                     question: m.question || m.title,
                     picks: picksText,
-                    rawSelections: sel, 
+                    rawSelections: sel,
                     amount: amount,
                     odds: finalOdds,
                     status: 'PENDIENTE',
@@ -1898,7 +2502,7 @@
 
                 try {
                     const userRef = db.ref(`users/${AppState.uid}`);
-                    
+
                     userRef.transaction((curr) => {
                         if (curr && curr.balance >= amount) {
                             curr.balance -= amount;
@@ -1906,7 +2510,7 @@
                             curr.history[ticketId] = newBet;
                             return curr;
                         }
-                        return; 
+                        return;
                     }).then((result) => {
                         if (result.committed) {
                             Notifier.toast("¡Ticket registrado correctamente!", "success");
@@ -1925,6 +2529,9 @@
         };
 
         /**
+         * ========================================================================
+         * 7. PANEL DE USUARIO (UserDashboard)
+         * ========================================================================
          * ========================================================================
          * 7. PANEL DE USUARIO (UserDashboard)
          * ========================================================================
@@ -2035,6 +2642,7 @@
                                     TKT: ${b.id.slice(-8)} • ${new Date(b.timestamp).toLocaleString()} • Cuota: x${b.odds.toFixed(2)}
                                 </div>
                                 ${cancelBtn}
+                                ${b.status !== 'PENDIENTE' ? `<button class="btn-cancel" onclick="UserDashboard.deleteResolvedBet('${b.id}')" style="margin-top:10px; background:rgba(244,63,94,0.12); color:var(--semantic-error);">🗑️ Eliminar del historial</button>` : ''}
                             </div>
                             <div class="history-item-right">
                                 <div class="history-item-amount" style="color:${statusColor};">${amountDisplay}</div>
@@ -2052,6 +2660,23 @@
                 document.getElementById('stat-profit').style.color = profit >= 0 ? 'var(--semantic-success)' : 'var(--semantic-error)';
                 document.getElementById('stat-total-bets').innerText = totalBets;
                 document.getElementById('stat-winrate').innerText = winRate + '%';
+            },
+
+            deleteResolvedBet(betId) {
+                if (!confirm("¿Eliminar esta apuesta del historial?")) return;
+                db.ref(`users/${AppState.uid}/history/${betId}`).remove().then(() => {
+                    Notifier.toast("Apuesta eliminada del historial.", "success");
+                });
+            },
+
+            clearResolvedHistory() {
+                const history = AppState.user.history || {};
+                const toDelete = Object.entries(history).filter(([_, b]) => b.status === 'GANADA' || b.status === 'PERDIDA' || b.status === 'CANCELADA' || b.status === 'CANCELLED_REFUNDED');
+                if (toDelete.length === 0) return Notifier.toast("No hay apuestas resueltas para borrar.", "info");
+                if (!confirm(`¿Borrar ${toDelete.length} apuestas resueltas del historial?`)) return;
+                const updates = {};
+                toDelete.forEach(([betId]) => updates[`users/${AppState.uid}/history/${betId}`] = null);
+                db.ref().update(updates).then(() => Notifier.toast("Historial resuelto limpiado.", "success"));
             },
 
             cancelPendingBet(betId, amount) {
@@ -2084,6 +2709,8 @@
                 this.updateGlobalStats();
                 this.renderResolveList();
                 this.renderQueueList();
+                this.renderWalletTable();
+                this.renderCleanupList();
                 this.loadFeedback();
             },
 
@@ -2106,54 +2733,72 @@
 
                 let html = '';
                 const name = existingData ? (existingData.name || existingData.text || '') : '';
-                const odds = existingData ? (existingData.odds || 1.1) : 1.1;
 
                 if (type === 'section') {
-                    const isSingle = existingData ? existingData.isSingle : false;
+                    const isSingle = existingData ? !!existingData.isSingle : false;
                     html = `
                         <div class="dynamic-row-type type-section">SECCIÓN</div>
-                        <input type="text" class="input-control d-name" placeholder="Título (Ej: Primera Parte)" value="${name}" style="flex:1;">
+                        <input type="text" class="input-control d-name" placeholder="Título (Ej: Primera Parte)" value="${escapeHTML(name)}" style="flex:1;">
                         <label style="display:flex; align-items:center; gap:5px; color:var(--text-secondary); font-size:0.8rem;">
-                            <input type="checkbox" class="d-single" ${isSingle?'checked':''} style="width:16px; height:16px; accent-color:var(--accent-primary);"> Sel. Única
+                            <input type="checkbox" class="d-single" ${isSingle ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--accent-primary);"> Sel. Única
                         </label>
                     `;
-                } 
-                else if (type === 'normal') {
+                } else if (type === 'normal') {
+                    const odds = existingData ? safeNumber(existingData.odds ?? existingData.oddsBase, 1.1) : 1.1;
                     html = `
                         <div class="dynamic-row-type type-normal">NORMAL</div>
-                        <input type="text" class="input-control d-name" placeholder="Opción (Ej: Equipo A)" value="${name}" style="flex:1;">
-                        <input type="number" class="input-control d-odds" placeholder="Cuota" value="${odds}" step="0.01" style="width:90px;">
+                        <input type="text" class="input-control d-name" placeholder="Opción (Ej: Equipo A)" value="${escapeHTML(name)}" style="flex:1;">
+                        <input type="number" class="input-control d-odds" placeholder="Cuota base" value="${odds}" step="0.01" style="width:100px;">
                     `;
-                }
-                else if (type === 'number') {
+                } else if (type === 'number') {
+                    const baseNum = existingData ? safeNumber(existingData.baseNum, 0) : 0;
+                    const oddsBase = existingData ? safeNumber(existingData.oddsBase ?? existingData.odds, 1.1) : 1.1;
+                    const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
                     html = `
                         <div class="dynamic-row-type type-number">NÚMERO</div>
-                        <input type="text" class="input-control d-name" placeholder="Texto (Ej: Goles exactos)" value="${name}" style="flex:1;">
-                        <input type="number" class="input-control d-odds" placeholder="Cuota Rsg" value="${odds}" step="0.01" style="width:100px;">
+                        <input type="text" class="input-control d-name" placeholder="Texto (Ej: Goles exactos)" value="${escapeHTML(name)}" style="flex:1;">
+                        <input type="number" class="input-control d-base" placeholder="Base" value="${baseNum}" step="0.01" style="width:80px;">
+                        <input type="number" class="input-control d-odds" placeholder="Cuota base" value="${oddsBase}" step="0.01" style="width:100px;">
+                        <input type="number" class="input-control d-force" placeholder="Exponente" value="${force}" step="0.01" style="width:90px;">
                     `;
-                }
-                else if (type === 'range') {
-                    const min = existingData ? existingData.min : 0;
-                    const max = existingData ? existingData.max : 10;
+                } else if (type === 'range') {
+                    const min = existingData ? safeNumber(existingData.min, 0) : 0;
+                    const max = existingData ? safeNumber(existingData.max, 10) : 10;
+                    const baseNum = existingData ? safeNumber(existingData.baseNum, (min + max) / 2) : ((min + max) / 2);
+                    const oddsBase = existingData ? safeNumber(existingData.oddsBase ?? existingData.odds, 1.1) : 1.1;
+                    const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
                     html = `
                         <div class="dynamic-row-type type-range">RANGO</div>
-                        <input type="text" class="input-control d-name" placeholder="Texto" value="${name}" style="flex:1;">
+                        <input type="text" class="input-control d-name" placeholder="Texto" value="${escapeHTML(name)}" style="flex:1;">
                         <input type="number" class="input-control d-min" placeholder="Min" value="${min}" style="width:70px;">
                         <input type="number" class="input-control d-max" placeholder="Max" value="${max}" style="width:70px;">
-                        <input type="number" class="input-control d-odds" placeholder="Cuota" value="${odds}" step="0.01" style="width:80px;">
+                        <input type="number" class="input-control d-base" placeholder="Base" value="${baseNum}" step="0.01" style="width:80px;">
+                        <input type="number" class="input-control d-odds" placeholder="Cuota base" value="${oddsBase}" step="0.01" style="width:100px;">
+                        <input type="number" class="input-control d-force" placeholder="Exponente" value="${force}" step="0.01" style="width:90px;">
                     `;
-                }
-                else if (type === 'ou' || type === 'over_under') {
-                    row.dataset.type = 'ou';
-                    const line = existingData ? (existingData.line || existingData.baseNum) : 2.5;
-                    const oOver = existingData ? existingData.oddsOver : 1.85;
-                    const oUnder = existingData ? existingData.oddsUnder : 1.85;
+                } else if (type === 'over' || type === 'under') {
+                    const line = existingData ? safeNumber(existingData.line ?? existingData.baseNum, 2.5) : 2.5;
+                    const oddsBase = existingData ? safeNumber(existingData.oddsBase ?? existingData.odds, 1.85) : 1.85;
+                    const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
+                    html = `
+                        <div class="dynamic-row-type type-ou">${type === 'over' ? 'MÁS' : 'MENOS'}</div>
+                        <input type="text" class="input-control d-name" placeholder="${type === 'over' ? 'Más que' : 'Menos que'}" value="${escapeHTML(name)}" style="flex:1;">
+                        <input type="number" class="input-control d-line" placeholder="Línea" value="${line}" step="0.01" style="width:90px;">
+                        <input type="number" class="input-control d-odds" placeholder="Cuota base" value="${oddsBase}" step="0.01" style="width:100px;">
+                        <input type="number" class="input-control d-force" placeholder="Exponente" value="${force}" step="0.01" style="width:90px;">
+                    `;
+                } else if (type === 'ou' || type === 'over_under') {
+                    const line = existingData ? safeNumber(existingData.line ?? existingData.baseNum, 2.5) : 2.5;
+                    const oddsBaseOver = existingData ? safeNumber(existingData.oddsOver ?? existingData.odds, 1.85) : 1.85;
+                    const oddsBaseUnder = existingData ? safeNumber(existingData.oddsUnder ?? existingData.odds, 1.85) : 1.85;
+                    const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
                     html = `
                         <div class="dynamic-row-type type-ou">MÁS/MENOS</div>
-                        <input type="text" class="input-control d-name" placeholder="Texto (Ej: Tarjetas)" value="${name}" style="flex:1;">
-                        <input type="number" class="input-control d-line" placeholder="Línea (Ej 2.5)" value="${line}" step="0.5" style="width:80px;">
-                        <input type="number" class="input-control d-oOver" placeholder="Ct Más" value="${oOver}" step="0.01" style="width:80px;">
-                        <input type="number" class="input-control d-oUnder" placeholder="Ct Menos" value="${oUnder}" step="0.01" style="width:80px;">
+                        <input type="text" class="input-control d-name" placeholder="Texto (Ej: Tarjetas)" value="${escapeHTML(name)}" style="flex:1;">
+                        <input type="number" class="input-control d-line" placeholder="Línea" value="${line}" step="0.01" style="width:90px;">
+                        <input type="number" class="input-control d-oOver" placeholder="Ct Más" value="${oddsBaseOver}" step="0.01" style="width:80px;">
+                        <input type="number" class="input-control d-oUnder" placeholder="Ct Menos" value="${oddsBaseUnder}" step="0.01" style="width:80px;">
+                        <input type="number" class="input-control d-force" placeholder="Exponente" value="${force}" step="0.01" style="width:90px;">
                     `;
                 }
 
@@ -2163,35 +2808,49 @@
             },
 
             saveMarket(toQueue = false) {
-                const title = document.getElementById('m-title').value;
+                const title = document.getElementById('m-title').value.trim();
                 const closeTime = document.getElementById('m-close-time').value;
                 const isGlobalSingle = document.getElementById('m-global-single').checked;
-                
+
                 if (!title) return Notifier.toast("El título es obligatorio", "error");
 
                 let items = [];
                 const rows = document.querySelectorAll('.dynamic-row');
-                
+
                 rows.forEach(r => {
                     const type = r.dataset.type;
                     const nameInput = r.querySelector('.d-name');
                     if (!nameInput || !nameInput.value.trim()) return;
-                    
+
                     let item = { type: type, text: nameInput.value.trim() };
-                    
+
                     if (type === 'section') {
                         item.isSingle = r.querySelector('.d-single').checked;
-                    } else if (type === 'normal' || type === 'number') {
+                    } else if (type === 'normal') {
                         item.odds = parseFloat(r.querySelector('.d-odds').value) || 1.1;
+                    } else if (type === 'number') {
+                        item.baseNum = parseFloat(r.querySelector('.d-base').value) || 0;
+                        item.oddsBase = parseFloat(r.querySelector('.d-odds').value) || 1.1;
+                        item.force = parseFloat(r.querySelector('.d-force').value) || 1.25;
                     } else if (type === 'range') {
                         item.min = parseFloat(r.querySelector('.d-min').value) || 0;
                         item.max = parseFloat(r.querySelector('.d-max').value) || 10;
-                        item.odds = parseFloat(r.querySelector('.d-odds').value) || 1.1;
+                        item.baseNum = parseFloat(r.querySelector('.d-base').value) || ((item.min + item.max) / 2);
+                        item.oddsBase = parseFloat(r.querySelector('.d-odds').value) || 1.1;
+                        item.force = parseFloat(r.querySelector('.d-force').value) || 1.25;
+                    } else if (type === 'over' || type === 'under') {
+                        item.line = parseFloat(r.querySelector('.d-line').value) || 2.5;
+                        item.baseNum = item.line;
+                        item.oddsBase = parseFloat(r.querySelector('.d-odds').value) || 1.85;
+                        item.force = parseFloat(r.querySelector('.d-force').value) || 1.25;
                     } else if (type === 'ou') {
                         item.line = parseFloat(r.querySelector('.d-line').value) || 2.5;
+                        item.baseNum = item.line;
                         item.oddsOver = parseFloat(r.querySelector('.d-oOver').value) || 1.85;
                         item.oddsUnder = parseFloat(r.querySelector('.d-oUnder').value) || 1.85;
+                        item.force = parseFloat(r.querySelector('.d-force').value) || 1.25;
                     }
+
                     items.push(item);
                 });
 
@@ -2211,10 +2870,10 @@
                 };
 
                 const targetPath = toQueue ? `queue/${mId}` : `activeBets/${mId}`;
-                
+
                 db.ref(targetPath).set(marketData).then(() => {
                     Notifier.toast(toQueue ? "Guardado en la Cola." : "Mercado Publicado.", "success");
-                    
+
                     if (existingId) {
                         if (toQueue && AppState.activeMarkets[existingId]) db.ref(`activeBets/${existingId}`).remove();
                         if (!toQueue && AppState.queueMarkets[existingId]) db.ref(`queue/${existingId}`).remove();
@@ -2242,7 +2901,7 @@
 
                 const container = document.getElementById('dynamic-rows-container');
                 container.innerHTML = '';
-                
+
                 const items = m.items || m.options || [];
                 items.forEach(item => this.addDynamicRow(item.type || 'normal', item));
 
@@ -2320,7 +2979,7 @@
                                     <label for="res-${mId}-${idx}" style="color:var(--text-primary); cursor:pointer; margin:0;">${item.text || item.name}</label>
                                 </div>
                             `;
-                        } else if (type === 'number' || type === 'range' || type === 'ou') {
+                        } else if (type === 'number' || type === 'range' || type === 'over' || type === 'under' || type === 'ou') {
                             // Input numérico para datos de la vida real
                             html += `
                                 <div style="display:flex; flex-direction:column; gap:5px; background:var(--bg-input); padding:10px; border-radius:var(--radius-sm);">
@@ -2346,26 +3005,27 @@
 
             openParticipantsModal(mId) {
                 const m = AppState.activeMarkets[mId];
-                document.getElementById('pm-title').innerText = `Participantes: ${m.title || m.question}`;
-                
+                if (!m) return Notifier.toast("No se encontró el mercado.", "error");
+                document.getElementById('utm-title').innerText = `Participantes: ${m.title || m.question}`;
+
                 const tbody = document.getElementById('pm-tbody');
                 let html = '';
+                const users = AppState.allUsers || {};
 
-                Object.entries(AppState.allUsers).forEach(([uid, u]) => {
-                    if (u.history) {
-                        Object.values(u.history).forEach(bet => {
-                            if (bet.marketId === mId) {
-                                html += `
-                                    <tr>
-                                        <td><b>${u.username}</b><br><span style="font-size:0.7rem; color:var(--text-secondary);">${uid.substring(0,8)}</span></td>
-                                        <td style="font-size:0.85rem; color:var(--accent-primary);">${bet.picks.join(', ')}</td>
-                                        <td style="font-family:var(--font-mono); font-weight:bold;">${bet.amount.toFixed(2)} CR</td>
-                                        <td><span class="option-section-badge">${bet.status}</span></td>
-                                    </tr>
-                                `;
-                            }
-                        });
-                    }
+                Object.entries(users).forEach(([uid, u]) => {
+                    const history = u.history || {};
+                    Object.values(history).forEach(bet => {
+                        if (bet.marketId !== mId) return;
+                        const picksStr = Array.isArray(bet.picks) ? bet.picks.join(', ') : (bet.picks || 'Sin datos');
+                        html += `
+                            <tr>
+                                <td><b>${u.username || 'Usuario'}</b><br><span style="font-size:0.7rem; color:var(--text-secondary);">${uid.substring(0,8)}</span></td>
+                                <td style="font-size:0.85rem; color:var(--accent-primary);">${picksStr}</td>
+                                <td style="font-family:var(--font-mono); font-weight:bold;">${Number(bet.amount || 0).toFixed(2)} CR</td>
+                                <td><span class="option-section-badge">${bet.status || 'PENDIENTE'}</span></td>
+                            </tr>
+                        `;
+                    });
                 });
 
                 if (html === '') html = '<tr><td colspan="4" style="text-align:center;">Nadie ha apostado aún en este mercado.</td></tr>';
@@ -2382,7 +3042,6 @@
 
                 Notifier.toast("Evaluando tickets y procesando pagos...", "info");
 
-                // 1. Recoger datos de resolución introducidos por el admin
                 const winningIndexes = [];
                 document.querySelectorAll(`.res-chk-${mId}`).forEach(chk => {
                     if (chk.checked) winningIndexes.push(parseInt(chk.value));
@@ -2393,67 +3052,69 @@
                     if (inp.value !== '') realNumbers[inp.dataset.idx] = parseFloat(inp.value);
                 });
 
-                // 2. Marcar mercado como finalizado
                 db.ref(`activeBets/${mId}/status`).set('FINALIZADO');
                 const m = AppState.activeMarkets[mId];
                 const items = m.items || m.options || [];
 
-                // 3. Evaluar cada ticket en la base de usuarios
                 const updates = {};
                 for (const [uid, uData] of Object.entries(AppState.allUsers)) {
                     if (!uData.history) continue;
-                    let newBalance = uData.balance;
+                    let newBalance = Number(uData.balance || 0);
                     let modified = false;
 
                     for (const [bId, bet] of Object.entries(uData.history)) {
-                        if (bet.marketId === mId && bet.status === 'PENDIENTE') {
-                            modified = true;
-                            const sel = bet.rawSelections; // Lo que seleccionó el usuario
-                            let isWin = false;
+                        if (bet.marketId !== mId || bet.status !== 'PENDIENTE') continue;
 
-                            // Evaluar Opciones Normales/Checkboxes: ¿El usuario seleccionó alguna opción que el admin marcó como ganadora?
-                            // Interpretación flexible: Si el user eligió la opcion 2, y el admin la marcó como ganadora, gana.
-                            if (sel.optionsIdx && sel.optionsIdx.length > 0) {
-                                isWin = sel.optionsIdx.some(idx => winningIndexes.includes(idx));
-                            }
+                        modified = true;
+                        const sel = bet.rawSelections || {};
+                        let isWin = false;
 
-                            // Evaluar Números o Rangos
-                            if (!isWin && sel.nums) {
-                                for (const [idxStr, userNum] of Object.entries(sel.nums)) {
-                                    const realNum = realNumbers[idxStr];
-                                    if (realNum !== undefined) {
-                                        const type = items[idxStr] ? items[idxStr].type : null;
-                                        if (type === 'number' && userNum === realNum) {
-                                            isWin = true;
-                                        } else if (type === 'range') {
-                                            // En rango, si el usuario predice un número dentro del rango, asume que predice el valor real
-                                            // Simplificación: coincidencia exacta por ahora.
-                                            if (userNum === realNum) isWin = true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Evaluar Over/Under
-                            if (!isWin && sel.ou) {
-                                for (const [idxStr, userDir] of Object.entries(sel.ou)) {
-                                    const realNum = realNumbers[idxStr];
-                                    const line = items[idxStr] ? (items[idxStr].line || items[idxStr].baseNum) : 0;
-                                    if (realNum !== undefined) {
-                                        if (userDir === 'OVER' && realNum > line) isWin = true;
-                                        if (userDir === 'UNDER' && realNum < line) isWin = true;
-                                    }
-                                }
-                            }
-                            
-                            if (isWin) {
-                                bet.status = 'GANADA';
-                                newBalance += (bet.amount * bet.odds);
-                            } else {
-                                bet.status = 'PERDIDA';
-                            }
-                            updates[`users/${uid}/history/${bId}/status`] = bet.status;
+                        if (sel.optionsIdx && sel.optionsIdx.length > 0) {
+                            isWin = sel.optionsIdx.some(idx => winningIndexes.includes(idx));
                         }
+
+                        if (!isWin && sel.nums) {
+                            for (const [idxStr, userNumRaw] of Object.entries(sel.nums)) {
+                                const userNum = parseFloat(userNumRaw);
+                                const realNum = realNumbers[idxStr];
+                                const item = items[idxStr] || {};
+                                const type = String(item.type || 'number').toLowerCase();
+                                const baseLine = safeNumber(item.line ?? item.baseNum, 0);
+                                const min = safeNumber(item.min, -Infinity);
+                                const max = safeNumber(item.max, Infinity);
+
+                                if (realNum === undefined || !Number.isFinite(userNum)) continue;
+
+                                if (type === 'number') {
+                                    if (userNum === realNum) isWin = true;
+                                } else if (type === 'range') {
+                                    if (realNum >= min && realNum <= max && userNum >= min && userNum <= max) isWin = true;
+                                } else if (type === 'over') {
+                                    if (realNum > baseLine && userNum > baseLine) isWin = true;
+                                } else if (type === 'under') {
+                                    if (realNum < baseLine && userNum < baseLine) isWin = true;
+                                }
+                            }
+                        }
+
+                        if (!isWin && sel.ou) {
+                            for (const [idxStr, userDir] of Object.entries(sel.ou)) {
+                                const realNum = realNumbers[idxStr];
+                                const line = items[idxStr] ? (items[idxStr].line || items[idxStr].baseNum) : 0;
+                                if (realNum !== undefined) {
+                                    if (userDir === 'OVER' && realNum > line) isWin = true;
+                                    if (userDir === 'UNDER' && realNum < line) isWin = true;
+                                }
+                            }
+                        }
+
+                        if (isWin) {
+                            bet.status = 'GANADA';
+                            newBalance += (bet.amount * bet.odds);
+                        } else {
+                            bet.status = 'PERDIDA';
+                        }
+                        updates[`users/${uid}/history/${bId}/status`] = bet.status;
                     }
                     if (modified) updates[`users/${uid}/balance`] = newBalance;
                 }
@@ -2525,14 +3186,14 @@
                     const isBanned = u.bannedUntil && u.bannedUntil > Date.now();
                     const statusBdg = isBanned ? `<span style="color:var(--semantic-error); font-weight:bold;">BLOQUEADO</span>` : `<span style="color:var(--semantic-success);">ACTIVO</span>`;
                     const tCount = u.history ? Object.keys(u.history).length : 0;
-                    
+
                     return `
                         <tr>
                             <td>
                                 <b style="font-size:1.1rem;">${u.username}</b><br>
                                 <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary);">${uid}</span>
                             </td>
-                            <td style="font-family:var(--font-mono); font-weight:bold; color:var(--semantic-info);">${parseFloat(u.balance).toFixed(2)} CR</td>
+                            <td style="font-family:var(--font-mono); font-weight:bold; color:var(--semantic-info); cursor:pointer;" onclick="AdminCore.editUserBalance('${uid}', ${parseFloat(u.balance) || 0})" title="Clic para editar el saldo">${Number(u.balance || 0).toFixed(2)} CR</td>
                             <td>
                                 <button class="btn-tool" style="padding: 4px 10px;" onclick="AdminCore.openUserTicketsModal('${uid}', '${u.username}')">${tCount} Tkt</button>
                             </td>
@@ -2544,6 +3205,16 @@
                         </tr>
                     `;
                 }).join('');
+            },
+
+            editUserBalance(uid, currentBalance) {
+                const raw = prompt(`Nuevo saldo para ${uid}`, Number(currentBalance || 0).toFixed(2));
+                if (raw === null) return;
+                const next = parseFloat(raw);
+                if (!Number.isFinite(next) || next < 0) return Notifier.toast("Saldo inválido.", "warning");
+                db.ref(`users/${uid}/balance`).set(next).then(() => {
+                    Notifier.toast("Saldo actualizado.", "success");
+                });
             },
 
             deleteUser(uid) {
@@ -2643,6 +3314,75 @@
                 }).then(() => {
                     Notifier.toast("Ticket actualizado en Firebase.", "success");
                 });
+            },
+
+            renderWalletTable() {
+                const tbody = document.getElementById('admin-wallet-tbody');
+                if (!tbody) return;
+                const users = Object.entries(AppState.allUsers || {});
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Sin usuarios.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = users.map(([uid, u]) => `
+                    <tr>
+                        <td><b>${u.username || 'Usuario'}</b><br><span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary);">${uid}</span></td>
+                        <td style="font-family:var(--font-mono);">${Number(u.balance || 0).toFixed(2)} CR</td>
+                        <td><button class="btn-tool" onclick="AdminCore.editUserBalance('${uid}', ${Number(u.balance || 0)})">Editar saldo</button></td>
+                    </tr>
+                `).join('');
+            },
+
+            renderCleanupList() {
+                const container = document.getElementById('admin-cleanup-list');
+                if (!container) return;
+                const users = Object.entries(AppState.allUsers || {});
+                if (users.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);">No hay usuarios.</p>';
+                    return;
+                }
+                container.innerHTML = users.map(([uid, u]) => {
+                    const history = u.history || {};
+                    const resolved = Object.values(history).filter(b => b.status === 'GANADA' || b.status === 'PERDIDA' || b.status === 'CANCELADA' || b.status === 'CANCELLED_REFUNDED');
+                    return `
+                        <div class="glass-panel" style="padding:15px; display:flex; justify-content:space-between; align-items:center; gap:15px;">
+                            <div>
+                                <b>${u.username || 'Usuario'}</b><br>
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">${uid}</span><br>
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">Resueltas: ${resolved.length}</span>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-tool" onclick="AdminCore.purgeResolvedHistory('${uid}')">Limpiar resueltas</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            purgeResolvedHistory(uid) {
+                const user = AppState.allUsers?.[uid];
+                if (!user || !user.history) return Notifier.toast("Usuario no encontrado.", "error");
+                if (!confirm(`¿Eliminar apuestas ya resueltas de ${user.username || uid}?`)) return;
+                const updates = {};
+                Object.entries(user.history).forEach(([betId, bet]) => {
+                    if (bet.status === 'GANADA' || bet.status === 'PERDIDA' || bet.status === 'CANCELADA' || bet.status === 'CANCELLED_REFUNDED') {
+                        updates[`users/${uid}/history/${betId}`] = null;
+                    }
+                });
+                db.ref().update(updates).then(() => Notifier.toast("Historial resuelto limpiado.", "success"));
+            },
+
+            purgeAllResolvedHistory() {
+                if (!confirm("¿Eliminar apuestas ya resueltas de todos los usuarios?")) return;
+                const updates = {};
+                Object.entries(AppState.allUsers || {}).forEach(([uid, user]) => {
+                    Object.entries(user.history || {}).forEach(([betId, bet]) => {
+                        if (bet.status === 'GANADA' || bet.status === 'PERDIDA' || bet.status === 'CANCELADA' || bet.status === 'CANCELLED_REFUNDED') {
+                            updates[`users/${uid}/history/${betId}`] = null;
+                        }
+                    });
+                });
+                db.ref().update(updates).then(() => Notifier.toast("Historial resuelto global limpiado.", "success"));
             },
 
             loadFeedback() {
