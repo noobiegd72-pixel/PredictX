@@ -2168,7 +2168,7 @@
                             const oddsText = opt.odds ? parseFloat(opt.odds).toFixed(2) : '1.10';
 
                             html += `
-                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', '${currentSectionKey}', ${idx}, ${currentSectionIsSingle})">
+                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', '${currentSectionKey}', ${idx}, ${!currentSectionIsSingle})">
                                     <span>${opt.name || opt.text}</span>
                                     <span class="opt-odds">x${oddsText}</span>
                                 </button>
