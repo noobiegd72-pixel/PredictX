@@ -2168,7 +2168,7 @@
                             const oddsText = opt.odds ? parseFloat(opt.odds).toFixed(2) : '1.10';
 
                             html += `
-                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', '${currentSectionKey}', ${idx}, ${!currentSectionIsSingle})">
+                                <button class="opt-btn ${activeClass}" id="btn-${mId}-${idx}" onclick="MarketEngine.handleOptionClick('${mId}', '${currentSectionKey}', ${idx}, ${currentSectionIsSingle})">
                                     <span>${opt.name || opt.text}</span>
                                     <span class="opt-odds">x${oddsText}</span>
                                 </button>
@@ -2263,7 +2263,7 @@
                 }
             },
 
-            handleOptionClick: function(marketId, sectionIdx, optionIdx, isMultiple) {
+            handleOptionClick: function(marketId, sectionIdx, optionIdx, isSingleSelection) {
                 if (!AppState.currentSelection) AppState.currentSelection = {};
                 if (!AppState.currentSelection[marketId]) AppState.currentSelection[marketId] = {};
 
@@ -2282,10 +2282,10 @@
                         delete AppState.currentSelection[marketId][sKey];
                     }
                 } else {
-                    if (isMultiple) {
-                        currentSection.push(optionIdx);
-                    } else {
+                    if (isSingleSelection) {
                         AppState.currentSelection[marketId][sKey] = [optionIdx];
+                    } else {
+                        currentSection.push(optionIdx);
                     }
                 }
 
