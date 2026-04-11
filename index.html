@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PredictX v1.7 | Las apuestas de la clase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PredictX v1.7.1 | Las apuestas de la clase</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
@@ -911,6 +911,448 @@
         }
 
         /* --------------------------------------------------------------------------
+           MEJORAS RESPONSIVE ADICIONALES PARA ESCALADO UNIVERSAL
+           -------------------------------------------------------------------------- */
+        html {
+            font-size: clamp(14px, 1.2vw, 16px);
+        }
+
+        body {
+            width: 100%;
+            min-width: 320px;
+        }
+
+        img, video, iframe, canvas, svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        .app-container {
+            width: min(100%, 1400px);
+            padding: clamp(12px, 2vw, 20px);
+            gap: clamp(16px, 2.5vw, 30px);
+        }
+
+        .glass-panel {
+            border-radius: clamp(14px, 2vw, 20px);
+        }
+
+        header {
+            padding: clamp(12px, 2vw, 15px) clamp(14px, 2.4vw, 25px);
+            gap: clamp(10px, 2vw, 15px);
+        }
+
+        .brand-logo {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            word-break: break-word;
+        }
+
+        .brand-version {
+            letter-spacing: clamp(1px, 0.35vw, 2px);
+        }
+
+        .user-widget {
+            width: 100%;
+            max-width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: clamp(10px, 1.8vw, 16px) clamp(12px, 2vw, 20px);
+        }
+
+        .user-info {
+            min-width: 0;
+        }
+
+        .user-name,
+        .user-id {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        .balance-display {
+            font-size: clamp(1.15rem, 2.8vw, 1.6rem);
+            padding-left: clamp(0px, 1vw, 20px);
+        }
+
+        nav.main-tabs {
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .tab-btn {
+            font-size: clamp(0.82rem, 1.6vw, 0.95rem);
+            padding: clamp(10px, 1.8vw, 12px) clamp(14px, 2.4vw, 24px);
+            min-height: 44px;
+        }
+
+        main.tab-content {
+            padding: clamp(16px, 3vw, 30px) !important;
+        }
+
+        .market-card {
+            padding: clamp(16px, 2.5vw, 25px);
+            margin-bottom: clamp(14px, 2vw, 20px);
+        }
+
+        .market-header {
+            gap: 12px;
+        }
+
+        .market-title {
+            font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+            overflow-wrap: anywhere;
+        }
+
+        .market-meta {
+            flex-wrap: wrap;
+            gap: 8px 12px;
+        }
+
+        .options-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+        }
+
+        .opt-btn {
+            min-height: 72px;
+        }
+
+        .complex-opt-row {
+            padding: clamp(12px, 2vw, 15px);
+        }
+
+        .numeric-row-grid > div {
+            min-width: min(180px, 100%);
+        }
+
+        .bet-actions-row {
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .amount-wrapper {
+            min-width: 0;
+        }
+
+        .input-control {
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            min-height: 44px;
+        }
+
+        .btn-submit {
+            min-height: 48px;
+            width: auto;
+            max-width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+        }
+
+        .stat-card {
+            padding: clamp(18px, 2.5vw, 25px);
+        }
+
+        .stat-value {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+        }
+
+        .history-item {
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .history-item-left,
+        .history-item-right {
+            min-width: 0;
+            flex: 1 1 260px;
+        }
+
+        .history-item-picks {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        .admin-layout {
+            grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+            align-items: start;
+        }
+
+        .admin-sidebar {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .admin-panel-content {
+            min-width: 0;
+        }
+
+        .dynamic-row {
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .dynamic-row > * {
+            min-width: 0;
+        }
+
+        .modal-container {
+            width: min(100%, 800px);
+            max-height: 92vh;
+            margin: 0 auto;
+        }
+
+        .modal-body {
+            padding: clamp(16px, 2.5vw, 25px);
+        }
+
+        .toast {
+            min-width: min(320px, calc(100vw - 24px));
+            max-width: calc(100vw - 24px);
+        }
+
+        #toast-container {
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        #toast-container .toast {
+            pointer-events: auto;
+        }
+
+        .data-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .data-table thead,
+        .data-table tbody,
+        .data-table tr {
+            min-width: 100%;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+        }
+
+        #ban-screen .ban-content {
+            width: min(100%, 500px);
+        }
+
+        @media (max-width: 1200px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            .admin-nav-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .brand-container {
+                align-items: flex-start;
+            }
+
+            .user-widget {
+                width: 100%;
+            }
+
+            nav.main-tabs {
+                padding: 8px;
+            }
+
+            .main-tabs .tab-btn {
+                flex: 0 0 auto;
+            }
+
+            .bet-actions-row {
+                flex-direction: column;
+            }
+
+            .btn-submit {
+                width: 100%;
+                max-width: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .market-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 12px;
+            }
+
+            .user-widget {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .balance-display {
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .market-card {
+                padding: 14px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-item-right {
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .dynamic-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .dynamic-row-type {
+                width: 100%;
+            }
+
+            .creator-toolbar {
+                gap: 8px;
+            }
+
+            .creator-toolbar .btn-tool {
+                width: 100%;
+            }
+
+            .btn-tool {
+                width: 100%;
+            }
+
+            .modal-container {
+                max-height: 96vh;
+                border-radius: 16px;
+            }
+
+            .modal-header {
+                padding: 16px 18px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            #toast-container {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                align-items: stretch;
+            }
+
+            .toast {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .tab-btn {
+                width: auto;
+            }
+
+            .admin-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-nav-btn {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .brand-logo {
+                font-size: 1.7rem;
+            }
+
+            .brand-version {
+                font-size: 0.7rem;
+            }
+
+            .market-title {
+                font-size: 1.05rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .tab-btn {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+            }
+
+            .input-control {
+                padding: 11px 12px;
+            }
+
+            .btn-submit {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .app-container {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .glass-panel {
+                border-radius: 22px;
+            }
+
+            main.tab-content {
+                padding: 32px !important;
+            }
+        }
+
+/* --------------------------------------------------------------------------
            MEDIA QUERIES (RESPONSIVIDAD)
            -------------------------------------------------------------------------- */
         @media (max-width: 900px) {
@@ -1009,7 +1451,7 @@
         <header class="glass-panel">
             <div class="brand-container">
                 <span class="brand-logo">PredictX</span>
-                <span class="brand-version">v1.7</span>
+                <span class="brand-version">v1.7.1</span>
             </div>
             
             <div class="user-widget">
@@ -1197,7 +1639,7 @@
     
     <section class="patch-version" style="margin-bottom: 30px; border-left: 4px solid var(--accent-primary); padding-left: 15px;">
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
-                <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7</div>
+                <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7.1</div>
                 <div>
                     <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
                     <p style="color: var(--text-secondary); font-size: 0.9rem;">Nuevas pestañas, login UID y limpieza de historial</p>
@@ -2263,7 +2705,7 @@
                 }
             },
 
-            handleOptionClick: function(marketId, sectionIdx, optionIdx, isSingleSelection) {
+            handleOptionClick: function(marketId, sectionIdx, optionIdx, isMultiple) {
                 if (!AppState.currentSelection) AppState.currentSelection = {};
                 if (!AppState.currentSelection[marketId]) AppState.currentSelection[marketId] = {};
 
@@ -2282,10 +2724,10 @@
                         delete AppState.currentSelection[marketId][sKey];
                     }
                 } else {
-                    if (isSingleSelection) {
-                        AppState.currentSelection[marketId][sKey] = [optionIdx];
-                    } else {
+                    if (isMultiple) {
                         currentSection.push(optionIdx);
+                    } else {
+                        AppState.currentSelection[marketId][sKey] = [optionIdx];
                     }
                 }
 
