@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PredictX v1.7.1 | Las apuestas de la clase</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -120,9 +120,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
+            padding: 12px 18px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             position: relative;
             z-index: 50;
         }
@@ -152,30 +152,34 @@
         .user-widget {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             background: var(--bg-input);
-            padding: 10px 20px;
-            border-radius: var(--radius-md);
+            padding: 8px 14px;
+            border-radius: 12px;
             border: 1px solid var(--border-subtle);
+            max-width: 100%;
         }
 
         .user-info {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            gap: 2px;
         }
 
         .user-name {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.98rem;
             color: var(--text-primary);
+            line-height: 1.1;
         }
 
         .user-id {
             font-family: var(--font-mono);
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-secondary);
             cursor: pointer;
+            line-height: 1.1;
         }
 
         .user-id:hover {
@@ -184,12 +188,177 @@
 
         .balance-display {
             font-family: var(--font-mono);
-            font-size: 1.6rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--semantic-success);
-            padding-left: 20px;
+            padding-left: 12px;
             border-left: 1px solid var(--border-subtle);
             letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+
+
+        .preview-odds-row {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preview-odds-value {
+            color: var(--accent-hover);
+            font-family: var(--font-mono);
+            font-weight: 800;
+        }
+
+        .ou-option-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            align-items: flex-start;
+            text-align: left;
+            padding: 15px 15px 15px 54px;
+            min-height: 102px;
+            justify-content: center;
+            isolation: isolate;
+        }
+
+        .ou-side-strip {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ou-side-strip::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.98;
+        }
+
+        .ou-side-text {
+            position: relative;
+            z-index: 1;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        .ou-over .ou-side-strip::before {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 1), rgba(5, 150, 105, 0.9));
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.08);
+        }
+
+        .ou-under .ou-side-strip::before {
+            background: linear-gradient(180deg, rgba(244, 63, 94, 1), rgba(225, 29, 72, 0.9));
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.08);
+        }
+
+        .ou-over .ou-side-text {
+            color: #ecfdf5;
+        }
+
+        .ou-under .ou-side-text {
+            color: #fff1f2;
+        }
+
+        .ou-marker {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: fit-content;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ou-over .ou-marker {
+            color: #86efac;
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .ou-under .ou-marker {
+            color: #fda4af;
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.35);
+        }
+
+        .ou-over.opt-btn {
+            border-left: none;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(255, 255, 255, 0.05));
+            box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.18);
+        }
+
+        .ou-under.opt-btn {
+            border-left: none;
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(255, 255, 255, 0.05));
+            box-shadow: inset 0 0 0 1px rgba(244, 63, 94, 0.18);
+        }
+
+        .ou-over.opt-btn .opt-odds {
+            color: #34d399;
+        }
+
+        .ou-under.opt-btn .opt-odds {
+            color: #fb7185;
+        }
+
+        .ou-over.opt-btn.selected {
+            box-shadow: inset 0 0 0 1px var(--semantic-success), 0 0 0 1px rgba(16, 185, 129, 0.18);
+        }
+
+        .ou-under.opt-btn.selected {
+            box-shadow: inset 0 0 0 1px var(--semantic-error), 0 0 0 1px rgba(244, 63, 94, 0.18);
+        }
+
+        .prob-calc-box {
+            margin-top: 20px;
+            padding: 18px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prob-calc-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prob-calc-result {
+            font-family: var(--font-mono);
+            color: var(--semantic-info);
+            font-weight: 800;
         }
 
         /* --------------------------------------------------------------------------
@@ -751,7 +920,9 @@
         .type-normal { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .type-number { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
         .type-range { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .type-ou { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+        .type-ou { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
+        .type-over { background: rgba(16, 185, 129, 0.2); color: #86efac; }
+        .type-under { background: rgba(244, 63, 94, 0.2); color: #fda4af; }
 
         .btn-danger-icon {
             background: rgba(244, 63, 94, 0.2);
@@ -911,448 +1082,6 @@
         }
 
         /* --------------------------------------------------------------------------
-           MEJORAS RESPONSIVE ADICIONALES PARA ESCALADO UNIVERSAL
-           -------------------------------------------------------------------------- */
-        html {
-            font-size: clamp(14px, 1.2vw, 16px);
-        }
-
-        body {
-            width: 100%;
-            min-width: 320px;
-        }
-
-        img, video, iframe, canvas, svg {
-            max-width: 100%;
-            height: auto;
-        }
-
-        table {
-            width: 100%;
-        }
-
-        .app-container {
-            width: min(100%, 1400px);
-            padding: clamp(12px, 2vw, 20px);
-            gap: clamp(16px, 2.5vw, 30px);
-        }
-
-        .glass-panel {
-            border-radius: clamp(14px, 2vw, 20px);
-        }
-
-        header {
-            padding: clamp(12px, 2vw, 15px) clamp(14px, 2.4vw, 25px);
-            gap: clamp(10px, 2vw, 15px);
-        }
-
-        .brand-logo {
-            font-size: clamp(1.8rem, 4vw, 2.2rem);
-            word-break: break-word;
-        }
-
-        .brand-version {
-            letter-spacing: clamp(1px, 0.35vw, 2px);
-        }
-
-        .user-widget {
-            width: 100%;
-            max-width: 100%;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: clamp(10px, 1.8vw, 16px) clamp(12px, 2vw, 20px);
-        }
-
-        .user-info {
-            min-width: 0;
-        }
-
-        .user-name,
-        .user-id {
-            max-width: 100%;
-            overflow-wrap: anywhere;
-        }
-
-        .balance-display {
-            font-size: clamp(1.15rem, 2.8vw, 1.6rem);
-            padding-left: clamp(0px, 1vw, 20px);
-        }
-
-        nav.main-tabs {
-            align-items: center;
-            gap: 8px;
-            padding: 10px;
-        }
-
-        .tab-btn {
-            font-size: clamp(0.82rem, 1.6vw, 0.95rem);
-            padding: clamp(10px, 1.8vw, 12px) clamp(14px, 2.4vw, 24px);
-            min-height: 44px;
-        }
-
-        main.tab-content {
-            padding: clamp(16px, 3vw, 30px) !important;
-        }
-
-        .market-card {
-            padding: clamp(16px, 2.5vw, 25px);
-            margin-bottom: clamp(14px, 2vw, 20px);
-        }
-
-        .market-header {
-            gap: 12px;
-        }
-
-        .market-title {
-            font-size: clamp(1.15rem, 2.2vw, 1.4rem);
-            overflow-wrap: anywhere;
-        }
-
-        .market-meta {
-            flex-wrap: wrap;
-            gap: 8px 12px;
-        }
-
-        .options-grid {
-            grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
-        }
-
-        .opt-btn {
-            min-height: 72px;
-        }
-
-        .complex-opt-row {
-            padding: clamp(12px, 2vw, 15px);
-        }
-
-        .numeric-row-grid > div {
-            min-width: min(180px, 100%);
-        }
-
-        .bet-actions-row {
-            align-items: stretch;
-            flex-wrap: wrap;
-        }
-
-        .amount-wrapper {
-            min-width: 0;
-        }
-
-        .input-control {
-            font-size: clamp(0.95rem, 2vw, 1.1rem);
-            min-height: 44px;
-        }
-
-        .btn-submit {
-            min-height: 48px;
-            width: auto;
-            max-width: 100%;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-        }
-
-        .stat-card {
-            padding: clamp(18px, 2.5vw, 25px);
-        }
-
-        .stat-value {
-            font-size: clamp(2rem, 4vw, 2.5rem);
-        }
-
-        .history-item {
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .history-item-left,
-        .history-item-right {
-            min-width: 0;
-            flex: 1 1 260px;
-        }
-
-        .history-item-picks {
-            max-width: 100%;
-            overflow-wrap: anywhere;
-        }
-
-        .admin-layout {
-            grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
-            align-items: start;
-        }
-
-        .admin-sidebar {
-            width: 100%;
-            min-width: 0;
-        }
-
-        .admin-panel-content {
-            min-width: 0;
-        }
-
-        .dynamic-row {
-            flex-wrap: wrap;
-            align-items: flex-start;
-        }
-
-        .dynamic-row > * {
-            min-width: 0;
-        }
-
-        .modal-container {
-            width: min(100%, 800px);
-            max-height: 92vh;
-            margin: 0 auto;
-        }
-
-        .modal-body {
-            padding: clamp(16px, 2.5vw, 25px);
-        }
-
-        .toast {
-            min-width: min(320px, calc(100vw - 24px));
-            max-width: calc(100vw - 24px);
-        }
-
-        #toast-container {
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
-            align-items: flex-end;
-            pointer-events: none;
-        }
-
-        #toast-container .toast {
-            pointer-events: auto;
-        }
-
-        .data-table {
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .data-table thead,
-        .data-table tbody,
-        .data-table tr {
-            min-width: 100%;
-        }
-
-        .data-table th,
-        .data-table td {
-            white-space: nowrap;
-        }
-
-        #ban-screen .ban-content {
-            width: min(100%, 500px);
-        }
-
-        @media (max-width: 1200px) {
-            .admin-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .admin-sidebar {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            }
-
-            .admin-nav-btn {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 900px) {
-            header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .brand-container {
-                align-items: flex-start;
-            }
-
-            .user-widget {
-                width: 100%;
-            }
-
-            nav.main-tabs {
-                padding: 8px;
-            }
-
-            .main-tabs .tab-btn {
-                flex: 0 0 auto;
-            }
-
-            .bet-actions-row {
-                flex-direction: column;
-            }
-
-            .btn-submit {
-                width: 100%;
-                max-width: none;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .market-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .app-container {
-                padding: 10px;
-            }
-
-            header {
-                padding: 12px;
-            }
-
-            .user-widget {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .user-info {
-                align-items: flex-start;
-                width: 100%;
-            }
-
-            .balance-display {
-                border-left: none;
-                padding-left: 0;
-            }
-
-            .market-card {
-                padding: 14px;
-            }
-
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .history-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .history-item-right {
-                align-items: flex-start;
-                text-align: left;
-            }
-
-            .dynamic-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .dynamic-row-type {
-                width: 100%;
-            }
-
-            .creator-toolbar {
-                gap: 8px;
-            }
-
-            .creator-toolbar .btn-tool {
-                width: 100%;
-            }
-
-            .btn-tool {
-                width: 100%;
-            }
-
-            .modal-container {
-                max-height: 96vh;
-                border-radius: 16px;
-            }
-
-            .modal-header {
-                padding: 16px 18px;
-            }
-
-            .modal-body {
-                padding: 16px;
-            }
-
-            #toast-container {
-                left: 10px;
-                right: 10px;
-                bottom: 10px;
-                align-items: stretch;
-            }
-
-            .toast {
-                width: 100%;
-                min-width: 0;
-            }
-
-            .tab-btn {
-                width: auto;
-            }
-
-            .admin-sidebar {
-                grid-template-columns: 1fr;
-            }
-
-            .admin-nav-btn {
-                padding: 12px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .brand-logo {
-                font-size: 1.7rem;
-            }
-
-            .brand-version {
-                font-size: 0.7rem;
-            }
-
-            .market-title {
-                font-size: 1.05rem;
-            }
-
-            .stat-value {
-                font-size: 1.8rem;
-            }
-
-            .tab-btn {
-                padding: 10px 14px;
-                font-size: 0.8rem;
-            }
-
-            .input-control {
-                padding: 11px 12px;
-            }
-
-            .btn-submit {
-                font-size: 1rem;
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .app-container {
-                padding-left: 24px;
-                padding-right: 24px;
-            }
-
-            .glass-panel {
-                border-radius: 22px;
-            }
-
-            main.tab-content {
-                padding: 32px !important;
-            }
-        }
-
-/* --------------------------------------------------------------------------
            MEDIA QUERIES (RESPONSIVIDAD)
            -------------------------------------------------------------------------- */
         @media (max-width: 900px) {
@@ -1634,91 +1363,122 @@
             </div>
         </main>
 
-        <main id="tab-changelog" class="tab-content glass-panel" style="padding: 30px;">
+                <main id="tab-changelog" class="tab-content glass-panel" style="padding: 30px;">
             <div class="patch-notes-container" style="max-height: 450px; overflow-y: auto; padding-right: 10px;">
-    
-    <section class="patch-version" style="margin-bottom: 30px; border-left: 4px solid var(--accent-primary); padding-left: 15px;">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
-                <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7.1</div>
-                <div>
-                    <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Nuevas pestañas, login UID y limpieza de historial</p>
-                </div>
-            </div>
-        
-        <ul style="list-style: none; padding: 0; font-size: 0.9rem; line-height: 1.6;">
-            <li style="margin-bottom: 10px;">
-                <b style="color: var(--semantic-info);">🔐 Vinculación rápida por UID:</b> 
-                Ya puedes abrir una cuenta guardada desde otro dispositivo y conservar una sesión anterior como respaldo para volver atrás.
-            </li>
-            <li style="margin-bottom: 10px;">
-                <b style="color: var(--semantic-success);">📈 Cuotas exponenciales por fuerza:</b> 
-                El admin puede definir una cuota base y un exponente para que las opciones numéricas, más que y menos que escalen de forma exponencial según la distancia al valor base.
-            </li>
-            <li style="margin-bottom: 10px;">
-                <b style="color: var(--accent-hover);">🎯 Selección por sección:</b> 
-                Cada sección independiente admite su propia selección única o múltiple sin bloquear las demás.
-            </li>
-            <li style="margin-bottom: 10px;">
-                <b style="color: var(--semantic-warning);">🔄 Deselección y limpieza:</b> 
-                Al volver a pulsar una opción ya marcada se desactiva, y los campos vacíos de número, rango, más que y menos que no cuentan para la cuota.
-            </li>
-            <li style="margin-bottom: 10px;">
-                <b style="color: #a855f7;">⚡ Panel admin mejorado:</b> 
-                Los créditos son editables al pulsar sobre ellos, la vista de apuestas del mercado funciona de nuevo, y las validadas pueden borrarse del historial.
-            </li>
-            <li style="margin-bottom: 10px;">
-                <b style="color: var(--semantic-info);">➕ Más que / Menos que separados:</b> 
-                Ahora se crean como opciones independientes, con cuota creciente o decreciente según el lado correcto de la línea marcada por el admin.
-            </li>
-        </ul>
-    </section>
 
-    <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
-    
-</div>
+                <section class="patch-version" style="margin-bottom: 30px; border-left: 4px solid var(--accent-primary); padding-left: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
+                        <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7.1</div>
+                        <div>
+                            <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Escalado responsive, cabecera compacta y mejoras visuales</p>
+                        </div>
+                    </div>
 
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
-                <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7-beta</div>
-                <div>
-                    <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Revamp de interfaz, motor avanzado de apuestas, etc.</p>
-                </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 20px; max-width: 800px;">
-                <div style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--accent-primary); padding: 20px; border-radius: 0 12px 12px 0;">
-                    <h3 style="color: var(--accent-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>⚙️</span> Motor de Apuestas Avanzado</h3>
-                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
-                        <li><strong>Opciones Dinámicas:</strong> Los administradores ahora pueden crear apuestas con opciones mezcladas (Normal, Rango, Número Exacto, Más Que y Menos Que) en un mismo mercado.</li>
-                        <li><strong>Selección Única Forzada:</strong> Capacidad de forzar que toda una apuesta, o una sección específica dentro de ella, solo permita elegir una opción por bloque.</li>
-                        <li><strong>Horarios de Cierre:</strong> Las apuestas ahora respetan un temporizador estricto. Una vez superada la "Hora de Cierre", el mercado se bloquea automáticamente.</li>
-                        <li><strong>Más Que / Menos Que Separados:</strong> La creación y evaluación de cuotas ya distingue cada lado como opción independiente, con la fuerza del exponente aplicada desde la cuota base del admin.</li>
+                    <ul style="list-style: none; padding: 0; font-size: 0.9rem; line-height: 1.6;">
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-info);">📱 Interfaz escalada para todos los dispositivos:</b>
+                            La UI, la UX y los bloques principales se han ajustado para responder mejor en móviles, tablets y pantallas grandes.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--accent-hover);">🧾 Cabecera compacta:</b>
+                            La barra superior del usuario y los créditos vuelve a un formato más pequeño y limpio, manteniendo la lectura rápida.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-success);">💰 Cuota visible en el ticket:</b>
+                            Ahora se muestra la cuota de la apuesta debajo de los créditos estimados para consultar el rendimiento antes de confirmar.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-warning);">🔀 Más que / Menos que con marcador:</b>
+                            Las opciones de más y menos quedan visualmente diferenciadas con marcadores claros y una separación estética mayor.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: #a855f7;">🧮 Calculadora de cuota por probabilidad:</b>
+                            Se añadió una calculadora auxiliar dentro del creador de apuestas para obtener una cuota teórica sin guardarla en el mercado.
+                        </li>
                     </ul>
+                </section>
+
+                <section class="patch-version" style="margin-bottom: 30px; border-left: 4px solid var(--accent-primary); padding-left: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
+                        <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7</div>
+                        <div>
+                            <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Nuevas pestañas, login UID y limpieza de historial</p>
+                        </div>
+                    </div>
+
+                    <ul style="list-style: none; padding: 0; font-size: 0.9rem; line-height: 1.6;">
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-info);">🔐 Vinculación rápida por UID:</b>
+                            Ya puedes abrir una cuenta guardada desde otro dispositivo y conservar una sesión anterior como respaldo para volver atrás.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-success);">📈 Cuotas exponenciales por fuerza:</b>
+                            El admin puede definir una cuota base y un exponente para que las opciones numéricas, más que y menos que escalen de forma exponencial según la distancia al valor base.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--accent-hover);">🎯 Selección por sección:</b>
+                            Cada sección independiente admite su propia selección única o múltiple sin bloquear las demás.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-warning);">🔄 Deselección y limpieza:</b>
+                            Al volver a pulsar una opción ya marcada se desactiva, y los campos vacíos de número, rango, más que y menos que no cuentan para la cuota.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: #a855f7;">⚡ Panel admin mejorado:</b>
+                            Los créditos son editables al pulsar sobre ellos, la vista de apuestas del mercado funciona de nuevo, y las validadas pueden borrarse del historial.
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <b style="color: var(--semantic-info);">➕ Más que / Menos que separados:</b>
+                            Ahora se crean como opciones independientes, con cuota creciente o decreciente según el lado correcto de la línea marcada por el admin.
+                        </li>
+                    </ul>
+                </section>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0;">
+
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
+                    <div style="background: var(--accent-primary); color: white; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 1.5rem;">v1.7-beta</div>
+                    <div>
+                        <h2 style="font-size: 1.8rem; font-weight: 800;">Notas del Parche</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Revamp de interfaz, motor avanzado de apuestas, etc.</p>
+                    </div>
                 </div>
 
-                <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--semantic-warning); padding: 20px; border-radius: 0 12px 12px 0;">
-                    <h3 style="color: var(--semantic-warning); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>🛡️</span> Funciones Administrativas</h3>
-                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
-                        <li><strong>Acceso Encriptado:</strong> El panel de control se ha ocultado de la vista pública y asegurado mediante una terminal.</li>
-                        <li><strong>Editor en Vivo:</strong> Capacidad de editar mercados después de publicarlos o mientras están en la Cola.</li>
-                        <li><strong>Gestión de Cola:</strong> Crea mercados y guárdalos en "Cola" para activarlos manualmente en el momento perfecto.</li>
-                        <li><strong>Control Extremo:</strong> El administrador puede ver y editar los tickets individuales de cada usuario, e incluso eliminar permanentemente usuarios de la base de datos.</li>
-                    </ul>
-                </div>
+                <div style="display: flex; flex-direction: column; gap: 20px; max-width: 800px;">
+                    <div style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--accent-primary); padding: 20px; border-radius: 0 12px 12px 0;">
+                        <h3 style="color: var(--accent-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>⚙️</span> Motor de Apuestas Avanzado</h3>
+                        <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
+                            <li><strong>Opciones Dinámicas:</strong> Los administradores ahora pueden crear apuestas con opciones mezcladas (Normal, Rango, Número Exacto, Más Que y Menos Que) en un mismo mercado.</li>
+                            <li><strong>Selección Única Forzada:</strong> Capacidad de forzar que toda una apuesta, o una sección específica dentro de ella, solo permita elegir una opción por bloque.</li>
+                            <li><strong>Horarios de Cierre:</strong> Las apuestas ahora respetan un temporizador estricto. Una vez superada la "Hora de Cierre", el mercado se bloquea automáticamente.</li>
+                            <li><strong>Más Que / Menos Que Separados:</strong> La creación y evaluación de cuotas ya distingue cada lado como opción independiente, con la fuerza del exponente aplicada desde la cuota base del admin.</li>
+                        </ul>
+                    </div>
 
-                <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--semantic-error); padding: 20px; border-radius: 0 12px 12px 0;">
-                    <h3 style="color: var(--semantic-error); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>✨</span> Quality of Life (Mejoras de Usuario)</h3>
-                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
-                        <li><strong>Cancelación de Apuestas:</strong> Los usuarios pueden borrar sus apuestas "PENDIENTES" desde su historial y recuperar sus CR, siempre y cuando el mercado no haya cerrado.</li>
-                        <li>Estadísticas globales añadidas al panel del administrador (Total de apuestas, volumen, etc.).</li>
-                        <li>Nueva Interfaz de Usuario y transiciones suaves para una experiencia premium.</li>
-                    </ul>
+                    <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--semantic-warning); padding: 20px; border-radius: 0 12px 12px 0;">
+                        <h3 style="color: var(--semantic-warning); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>🛡️</span> Funciones Administrativas</h3>
+                        <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
+                            <li><strong>Acceso Encriptado:</strong> El panel de control se ha ocultado de la vista pública y asegurado mediante una terminal.</li>
+                            <li><strong>Editor en Vivo:</strong> Capacidad de editar mercados después de publicarlos o mientras están en la Cola.</li>
+                            <li><strong>Gestión de Cola:</strong> Crea mercados y guárdalos en "Cola" para activarlos manualmente en el momento perfecto.</li>
+                            <li><strong>Control Extremo:</strong> El administrador puede ver y editar los tickets individuales de cada usuario, e incluso eliminar permanentemente usuarios de la base de datos.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--semantic-error); padding: 20px; border-radius: 0 12px 12px 0;">
+                        <h3 style="color: var(--semantic-error); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;"><span>✨</span> Quality of Life (Mejoras de Usuario)</h3>
+                        <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.6; font-size: 0.95rem;">
+                            <li><strong>Cancelación de Apuestas:</strong> Los usuarios pueden borrar sus apuestas "PENDIENTES" desde su historial y recuperar sus CR, siempre y cuando el mercado no haya cerrado.</li>
+                            <li>Estadísticas globales añadidas al panel del administrador (Total de apuestas, volumen, etc.).</li>
+                            <li>Nueva Interfaz de Usuario y transiciones suaves para una experiencia premium.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </main>
-
-        <main id="tab-admin" class="tab-content glass-panel" style="padding: 30px; border: 1px solid var(--semantic-warning);">
+<main id="tab-admin" class="tab-content glass-panel" style="padding: 30px; border: 1px solid var(--semantic-warning);">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-subtle); padding-bottom: 20px; margin-bottom: 20px;">
                 <div>
                     <h2 style="color: var(--semantic-warning); font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px;"><span>⚡</span> Terminal de Administración</h2>
@@ -1804,13 +1564,28 @@
                                 <button onclick="AdminCore.addDynamicRow('normal')" class="btn-tool" style="color: #34d399; border-color: rgba(52, 211, 153, 0.5);">+ Opción Normal</button>
                                 <button onclick="AdminCore.addDynamicRow('number')" class="btn-tool" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.5);">+ Predecir Número</button>
                                 <button onclick="AdminCore.addDynamicRow('range')" class="btn-tool" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.5);">+ Rango (Min-Max)</button>
-                                <button onclick="AdminCore.addDynamicRow('over')" class="btn-tool" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.5);">+ Más Que</button>
-                                <button onclick="AdminCore.addDynamicRow('under')" class="btn-tool" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.5);">+ Menos Que</button>
+                                <button onclick="AdminCore.addDynamicRow('over')" class="btn-tool" style="color: #86efac; border-color: rgba(16, 185, 129, 0.55); background: rgba(16, 185, 129, 0.10);">+ Más Que</button>
+                                <button onclick="AdminCore.addDynamicRow('under')" class="btn-tool" style="color: #fda4af; border-color: rgba(244, 63, 94, 0.55); background: rgba(244, 63, 94, 0.10);">+ Menos Que</button>
                             </div>
 
                             <div id="dynamic-rows-container" style="display: flex; flex-direction: column; gap: 10px; min-height: 100px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
                                 <div style="text-align: center; color: var(--text-tertiary); font-size: 0.85rem; padding: 20px;" id="empty-rows-msg">No hay opciones añadidas. Usa los botones de arriba.</div>
                             </div>
+                        </div>
+
+                        <div class="prob-calc-box">
+                            <div class="prob-calc-title">🧮 Calculadora de cuota por probabilidad</div>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">
+                                Calcula una cuota teórica a partir de una probabilidad. Este valor no se guarda en la apuesta; solo sirve como referencia.
+                            </p>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                                <div class="form-group" style="flex:1; min-width: 200px; margin-bottom: 0;">
+                                    <label>Probabilidad (%)</label>
+                                    <input type="number" id="calc-probability" class="input-control" placeholder="Ej: 62.5" min="0" max="100" step="0.1" oninput="AdminCore.updateProbabilityCalculator()">
+                                </div>
+                                <button class="btn-tool" style="height: 48px;" onclick="AdminCore.updateProbabilityCalculator()">Calcular cuota</button>
+                            </div>
+                            <div id="probability-calc-result" class="prob-calc-result">Cuota estimada: x0.00</div>
                         </div>
 
                         <div style="display: flex; gap: 15px; margin-top: 30px;">
@@ -2663,11 +2438,17 @@
                                         <span>${opt.name || opt.text} (Línea: ${line})</span>
                                     </div>
                                     <div style="display:flex; gap:10px;">
-                                        <button class="opt-btn ${isOver?'selected':''}" style="flex:1; flex-direction:row;" onclick="MarketEngine.handleOUClick('${mId}', ${idx}, 'OVER')">
-                                            <span>MÁS DE ${line}</span> <span class="opt-odds">x${opt.oddsOver || 1.85}</span>
+                                        <button class="opt-btn ou-option-card ou-over ${isOver?'selected':''}" style="flex:1; align-items:flex-start;" onclick="MarketEngine.handleOUClick('${mId}', ${idx}, 'OVER')">
+                                            <span class="ou-side-strip"><span class="ou-side-text">MÁS</span></span>
+                                            <span class="ou-marker">▲ Más que</span>
+                                            <span>MÁS DE ${line}</span>
+                                            <span class="opt-odds">x${opt.oddsOver || 1.85}</span>
                                         </button>
-                                        <button class="opt-btn ${isUnder?'selected':''}" style="flex:1; flex-direction:row;" onclick="MarketEngine.handleOUClick('${mId}', ${idx}, 'UNDER')">
-                                            <span>MENOS DE ${line}</span> <span class="opt-odds">x${opt.oddsUnder || 1.85}</span>
+                                        <button class="opt-btn ou-option-card ou-under ${isUnder?'selected':''}" style="flex:1; align-items:flex-start;" onclick="MarketEngine.handleOUClick('${mId}', ${idx}, 'UNDER')">
+                                            <span class="ou-side-strip"><span class="ou-side-text">MENOS</span></span>
+                                            <span class="ou-marker">▼ Menos que</span>
+                                            <span>MENOS DE ${line}</span>
+                                            <span class="opt-odds">x${opt.oddsUnder || 1.85}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -2682,8 +2463,11 @@
                             <div class="amount-wrapper">
                                 <label>CRÉDITOS A INVERTIR</label>
                                 <input type="number" id="amt-${mId}" class="input-control" placeholder="Ej: 5.00" oninput="MarketEngine.updatePreviewOdds('${mId}')">
-                                <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:5px; font-weight:600;">
+                                <div class="preview-odds-row">
                                     Retorno Est: <span id="preview-win-${mId}" style="color:var(--semantic-success); font-family:var(--font-mono);">0.00 CR</span>
+                                </div>
+                                <div class="preview-odds-row">
+                                    Cuota de la apuesta: <span id="preview-odds-${mId}" class="preview-odds-value">x1.00</span>
                                 </div>
                             </div>
                             <button class="btn-submit" id="btn-submit-${mId}" style="flex:1; max-width:250px;" onclick="BettingEngine.placeBet('${mId}')" ${isClosedTime?'disabled':''}>
@@ -2742,6 +2526,7 @@
                 AppState.localSelections[marketId].optionsIdx = flattened;
 
                 this.renderMarkets();
+                this.updatePreviewOdds(mId);
             },
 
             handleNumInput(mId, idx, val, type, min, max) {
@@ -2778,6 +2563,7 @@
                     AppState.localSelections[mId].ou[idx] = dir;
                 }
                 this.renderMarkets();
+                this.updatePreviewOdds(mId);
             },
 
             toggleNumericSelection(mId, idx, type) {
@@ -2862,11 +2648,13 @@
             updatePreviewOdds(mId) {
                 const amtInput = document.getElementById(`amt-${mId}`);
                 const previewEl = document.getElementById(`preview-win-${mId}`);
+                const oddsEl = document.getElementById(`preview-odds-${mId}`);
                 if (!amtInput || !previewEl) return;
 
                 const amount = parseFloat(amtInput.value) || 0;
                 const odds = this.calculateTotalOdds(mId);
                 previewEl.innerText = `${(amount * odds).toFixed(2)} CR`;
+                if (oddsEl) oddsEl.innerText = `x${odds.toFixed(2)}`;
             }
         };
 
@@ -3163,6 +2951,21 @@
                 if(event && event.currentTarget) event.currentTarget.classList.add('active');
             },
 
+            updateProbabilityCalculator() {
+                const input = document.getElementById('calc-probability');
+                const result = document.getElementById('probability-calc-result');
+                if (!input || !result) return;
+
+                const probability = parseFloat(input.value);
+                if (!Number.isFinite(probability) || probability <= 0) {
+                    result.innerText = 'Cuota estimada: x0.00';
+                    return;
+                }
+
+                const odds = 100 / Math.max(0.1, probability);
+                result.innerText = `Cuota estimada: x${odds.toFixed(2)}`;
+            },
+
             // --- CREADOR DE MERCADOS DINÁMICO ---
             addDynamicRow(type, existingData = null) {
                 const container = document.getElementById('dynamic-rows-container');
@@ -3223,7 +3026,7 @@
                     const oddsBase = existingData ? safeNumber(existingData.oddsBase ?? existingData.odds, 1.85) : 1.85;
                     const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
                     html = `
-                        <div class="dynamic-row-type type-ou">${type === 'over' ? 'MÁS' : 'MENOS'}</div>
+                        <div class="dynamic-row-type type-ou ${type === 'over' ? 'type-over' : 'type-under'}">${type === 'over' ? 'MÁS' : 'MENOS'}</div>
                         <input type="text" class="input-control d-name" placeholder="${type === 'over' ? 'Más que' : 'Menos que'}" value="${escapeHTML(name)}" style="flex:1;">
                         <input type="number" class="input-control d-line" placeholder="Línea" value="${line}" step="0.01" style="width:90px;">
                         <input type="number" class="input-control d-odds" placeholder="Cuota base" value="${oddsBase}" step="0.01" style="width:100px;">
@@ -3235,7 +3038,7 @@
                     const oddsBaseUnder = existingData ? safeNumber(existingData.oddsUnder ?? existingData.odds, 1.85) : 1.85;
                     const force = existingData ? safeNumber(existingData.force, 1.25) : 1.25;
                     html = `
-                        <div class="dynamic-row-type type-ou">MÁS/MENOS</div>
+                        <div class="dynamic-row-type type-ou type-over">MÁS/MENOS</div>
                         <input type="text" class="input-control d-name" placeholder="Texto (Ej: Tarjetas)" value="${escapeHTML(name)}" style="flex:1;">
                         <input type="number" class="input-control d-line" placeholder="Línea" value="${line}" step="0.01" style="width:90px;">
                         <input type="number" class="input-control d-oOver" placeholder="Ct Más" value="${oddsBaseOver}" step="0.01" style="width:80px;">
